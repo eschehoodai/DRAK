@@ -10,13 +10,21 @@ export enum Screen {
   RESERVE = 'RESERVE',
 }
 
+export interface MenuVariant {
+  label: string;
+  price: string;
+}
+
 export interface MenuItem {
   id: string;
   name: string;
-  price: string;
-  currency: 'KUPFER' | 'SILBER' | 'GOLD';
+  /** Single price. Omit when the dish has multiple `variants` instead. */
+  price?: string;
+  currency?: 'KUPFER' | 'SILBER' | 'GOLD';
   description: string;
-  type: 'vorspeise' | 'hauptgang' | 'special';
+  type: 'vorspeise' | 'hauptgang' | 'nachspeise' | 'special';
+  /** Optional price variants (e.g. burger with different meats). */
+  variants?: MenuVariant[];
   isSpecial?: boolean;
 }
 

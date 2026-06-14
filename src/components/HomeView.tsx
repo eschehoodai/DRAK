@@ -7,6 +7,7 @@ import React from 'react';
 import { Screen } from '../types';
 import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin } from 'lucide-react';
 import candlelitGobletImage from '../assets/images/Speise2.webp';
+import logoDrak from '../assets/images/logo-drak.png';
 import headerVideo from '../assets/images/headervideo.webm';
 
 interface HomeViewProps {
@@ -118,12 +119,10 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
 
             <div className="border-t border-gold-secondary/25 pt-6 flex space-x-6">
               <div>
-                <span className="font-cinzel text-3xl font-black text-gold-primary tracking-widest">XII</span>
-                <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Stunden geschmort</p>
+                <p className="font-cinzel text-sm font-black text-gold-primary tracking-widest uppercase">Regionale Spezialitäten</p>
               </div>
               <div className="border-l border-gold-secondary/25 pl-6">
-                <span className="font-cinzel text-3xl font-black text-gold-primary tracking-widest">100%</span>
-                <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Holzkohlegrill</p>
+                <p className="font-cinzel text-sm font-black text-gold-primary tracking-widest uppercase">Historische Gemäuer & Biergarten</p>
               </div>
               <div className="border-l border-gold-secondary/25 pl-6">
                 <span className="font-cinzel text-3xl font-black text-gold-primary tracking-widest">II</span>
@@ -132,14 +131,23 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
             </div>
           </div>
 
-          {/* Cozy candlelit image side */}
-          <div className="relative border border-gold-secondary/30 p-2 bg-void-black/40">
-            <div className="gilded-corner gilded-corner-tl" />
-            <div className="gilded-corner gilded-corner-tr" />
-            <div className="gilded-corner gilded-corner-bl" />
-            <div className="gilded-corner gilded-corner-br" />
+          {/* Logo + Cozy candlelit image side */}
+          <div className="flex flex-col gap-4 h-full">
+            <div className="flex-1 flex items-center justify-center p-6">
+              <img
+                src={logoDrak}
+                alt="Drachentaverne Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
 
-            <div className="relative h-[380px] w-full overflow-hidden border border-gold-secondary/15">
+            <div className="relative flex-1 border border-gold-secondary/30 p-2 bg-void-black/40">
+              <div className="gilded-corner gilded-corner-tl" />
+              <div className="gilded-corner gilded-corner-tr" />
+              <div className="gilded-corner gilded-corner-bl" />
+              <div className="gilded-corner gilded-corner-br" />
+
+              <div className="relative h-full w-full overflow-hidden border border-gold-secondary/15">
               <img
                 src={candlelitGobletImage}
                 alt="DRAK Cozy Candlelit Setting"
@@ -156,6 +164,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
                 </p>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </section>
@@ -238,36 +247,39 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
           <Quote className="h-8 w-8 opacity-40" />
         </div>
 
-        <h2 className="font-cinzel text-3xl font-bold tracking-widest text-gold-bright uppercase mb-16">
-          Zunftstimmen aus den Königreichen
+        <h2 className="font-cinzel text-3xl font-bold tracking-widest text-gold-bright uppercase mb-4">
+          Ein Wort von unseren Gästen
         </h2>
+        <p className="font-serif text-base text-cream-parchment/60 leading-relaxed mb-16">
+          So kürzlich verlautet aus dem Munde zufriedener Besucher:
+        </p>
 
         {/* Testimonials Carousel or Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
           {/* Review 1 */}
-          <div className="relative border border-gold-secondary/20 p-6 bg-tavern-dark/10">
-            <p className="font-serif text-sm italic text-cream-parchment/80 leading-relaxed">
-              "Beim Lichte meiner Rüstung, so zart war kein Drache zuvor! Das Drachensteak zerging auf meiner Zunge, als wäre es von reinstem Engelsodem liebkost worden. Die Kräuter-Jus ist ein Gottesgeschenk."
+          <div className="relative border border-gold-primary/40 p-8 md:p-10 bg-tavern-dark/10 shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)] hover:border-gold-primary/70 transition-all duration-300">
+            <p className="font-serif text-base italic text-cream-parchment/85 leading-relaxed">
+              "Wir waren am Samstag im Drak mit guten Freunden. Wir wurden sehr freundlich empfangen und das Ambiente ist richtig gut. Das Essen und die Getränke kamen sehr schnell. Die Portionen sind reichlich und es hat uns sehr gut geschmeckt. Wir kommen auf alle Fälle wieder."
             </p>
-            <div className="mt-4 flex items-center space-x-3">
+            <div className="mt-6 flex items-center space-x-3">
               <div className="h-0.5 w-6 bg-gold-secondary" />
               <div>
-                <p className="font-cinzel text-xs font-bold text-gold-primary tracking-widest uppercase">Ritter Galahad</p>
-                <p className="font-serif text-[10px] text-cream-parchment/40">Drachenjäger aus dem Reich</p>
+                <p className="font-cinzel text-sm font-bold text-gold-primary tracking-widest uppercase">Peggy Simon</p>
+                <p className="font-serif text-xs text-cream-parchment/50">Bewertung on Google</p>
               </div>
             </div>
           </div>
 
           {/* Review 2 */}
-          <div className="relative border border-gold-secondary/20 p-6 bg-tavern-dark/10">
-            <p className="font-serif text-sm italic text-cream-parchment/80 leading-relaxed">
-              "Ein Elixir für Geist und Glieder! Die Suppe der Kleriker hat meine uralten Knochen nach einer viertägigen Wanderung durch die Elfenwälder im Nu belebt. Die Ambiance such ihresgleichen."
+          <div className="relative border border-gold-primary/40 p-8 md:p-10 bg-tavern-dark/10 shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_25px_rgba(212,175,55,0.25)] hover:border-gold-primary/70 transition-all duration-300">
+            <p className="font-serif text-base italic text-cream-parchment/85 leading-relaxed">
+              "Geiles Feeling, nettes Personal. TOP Preis-Leistungs-Verhältnis. Waren zu 3., jeder hatte eine Vorsuppe, ein reichliches Hauptgericht und 4 Getränke für knapp 93,00€. Ich wünsche der Taverne ein langes Bestehen und immer nette Gäste! Wir kommen wieder!"
             </p>
-            <div className="mt-4 flex items-center space-x-3">
+            <div className="mt-6 flex items-center space-x-3">
               <div className="h-0.5 w-6 bg-gold-secondary" />
               <div>
-                <p className="font-cinzel text-xs font-bold text-gold-primary tracking-widest uppercase">Erzmagier Balthasar</p>
-                <p className="font-serif text-[10px] text-cream-parchment/40">Meister des Hohen Rats</p>
+                <p className="font-cinzel text-sm font-bold text-gold-primary tracking-widest uppercase">Mellanie Neumann</p>
+                <p className="font-serif text-xs text-cream-parchment/50">Local Guide bei Google</p>
               </div>
             </div>
           </div>

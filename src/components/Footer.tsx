@@ -62,9 +62,13 @@ export default function Footer({ onNavigate }: FooterProps) {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start space-x-3">
                 <Clock className="mt-0.5 h-4 w-4 text-gold-secondary shrink-0" />
-                <div className="font-serif">
-                  <p className="font-bold">Montag - Sonntag</p>
-                  <p className="text-cream-parchment/60">17:00 - 23:00 Uhr</p>
+                <div className="font-serif space-y-1">
+                  <p><span className="font-bold">So:</span> <span className="text-cream-parchment/60">11:00–21:00</span></p>
+                  <p><span className="font-bold">Mo:</span> <span className="text-cream-parchment/60">17:00–21:00</span></p>
+                  <p><span className="font-bold">Di:</span> <span className="text-cream-parchment/60 italic">Geschlossen</span></p>
+                  <p><span className="font-bold">Mi–Do:</span> <span className="text-cream-parchment/60">17:00–21:00</span></p>
+                  <p><span className="font-bold">Fr:</span> <span className="text-cream-parchment/60">17:00–22:00</span></p>
+                  <p><span className="font-bold">Sa:</span> <span className="text-cream-parchment/60">11:00–22:00</span></p>
                 </div>
               </li>
             </ul>

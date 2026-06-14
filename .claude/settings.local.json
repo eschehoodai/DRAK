@@ -4,7 +4,10 @@
       "Bash(npm run *)",
       "Bash(gh auth *)",
       "PowerShell(Get-Command gh -ErrorAction SilentlyContinue)",
-      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); gh auth login -p https -w)"
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); gh auth login -p https -w)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\X\\\\Desktop\\\\Drachentaerne\" -Filter \"*.png\" -Recurse -Depth 1)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "PowerShell(npm run lint)"
     ]
   }
 }
