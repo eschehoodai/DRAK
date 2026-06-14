@@ -9,6 +9,7 @@ import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin } from 'lucide-react';
 import candlelitGobletImage from '../assets/images/Speise2.webp';
 import logoDrak from '../assets/images/logo-drak.png';
 import headerVideo from '../assets/images/headervideo.webm';
+import gewoelbeVideo from '../assets/images/gewölbe.mp4';
 
 interface HomeViewProps {
   onNavigate: (screen: Screen) => void;
@@ -43,18 +44,18 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
         </div>
 
         {/* Hero Content */}
-        <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-20 md:px-8">
-          <div className="max-w-2xl space-y-6">
+        <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-14 sm:pb-20 md:px-8">
+          <div className="max-w-2xl space-y-5 sm:space-y-6">
             <div className="inline-flex items-center space-x-2 border border-gold-primary/40 bg-void-black/80 px-4 py-1 font-cinzel text-[10px] tracking-widest text-gold-primary uppercase font-bold">
               <Flame className="h-3 w-3 text-gold-primary candle-glow" />
               <span>Gegründet im Jahre des Herrn MMXIV</span>
             </div>
 
-            <h1 className="font-cinzel text-5xl font-black tracking-widest text-gold-bright sm:text-6xl md:text-7xl leading-none">
+            <h1 className="font-cinzel text-[clamp(1.625rem,7.5vw,4.5rem)] font-black tracking-normal text-gold-bright sm:tracking-widest leading-tight sm:leading-none">
               DRACHENTAVERNE ZITTAU
             </h1>
 
-            <p className="font-cinzel text-xs tracking-widest text-gold-primary/80 -mt-4">
+            <p className="font-cinzel text-xs tracking-widest text-gold-primary/80 -mt-2 sm:-mt-4">
               Regionale Küche · Biergarten · Tischreservierung
             </p>
 
@@ -170,8 +171,18 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
       </section>
 
       {/* ================= VAULTS & CHAMBERS SECTION ================= */}
-      <section className="bg-tavern-dark/20 border-y border-gold-secondary/20 py-24">
-        <div className="mx-auto max-w-6xl px-4 md:px-8">
+      <section className="relative border-y border-gold-secondary/20 py-24 overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src={gewoelbeVideo} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-void-black/75" />
+        <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="font-cinzel text-3xl font-bold tracking-widest text-gold-bright uppercase">
               Unsere Zwei Gewölbe

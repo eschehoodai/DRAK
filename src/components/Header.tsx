@@ -104,32 +104,32 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
       </div>
 
       {/* Mobile nav indicator bar */}
-      <div className="flex md:hidden justify-around border-t border-gold-secondary/10 bg-void-black px-2 py-2 text-xs font-semibold">
-        <button 
+      <div className="flex md:hidden justify-between border-t border-gold-secondary/10 bg-void-black px-1 py-2 text-xs font-semibold">
+        <button
           id="mob-nav-home"
-          onClick={() => onNavigate(Screen.HOME)} 
-          className={`font-cinzel tracking-wider px-3 py-1 ${currentScreen === Screen.HOME ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
+          onClick={() => onNavigate(Screen.HOME)}
+          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${currentScreen === Screen.HOME ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
         >
           Startseite
         </button>
-        <button 
+        <button
           id="mob-nav-menu"
-          onClick={() => onNavigate(Screen.MENU)} 
-          className={`font-cinzel tracking-wider px-3 py-1 ${currentScreen === Screen.MENU ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
+          onClick={() => onNavigate(Screen.MENU)}
+          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${currentScreen === Screen.MENU ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
         >
           Speisekarte
         </button>
         <button
           id="mob-nav-gallery"
           onClick={() => onNavigate(Screen.GALLERY)}
-          className={`font-cinzel tracking-wider px-3 py-1 ${currentScreen === Screen.GALLERY ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
+          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${currentScreen === Screen.GALLERY ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
         >
           Galerie
         </button>
         <button
           id="mob-nav-impressum"
           onClick={() => onNavigate(Screen.IMPRESSUM)}
-          className={`font-cinzel tracking-wider px-3 py-1 ${currentScreen === Screen.IMPRESSUM ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
+          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${currentScreen === Screen.IMPRESSUM ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
         >
           Impressum
         </button>

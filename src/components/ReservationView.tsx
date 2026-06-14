@@ -18,7 +18,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   const [guests, setGuests] = useState(2);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('18:00');
-  const [vault, setVault] = useState('Die Große Kathedrale');
+  const [vault, setVault] = useState('Die Grosse Kathedrale');
   const [notes, setNotes] = useState(initialNotes || '');
   
   // App states
@@ -380,35 +380,31 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase mb-2">
                     Wählt Euer Gewölbe
                   </label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[
                       {
-                        name: 'Die Große Kathedrale',
-                        desc: 'Erleuchtet von Kerzen-Lüstern, herrschaftliche lange Tafeln, nah am Kamin.',
+                        name: 'Die Grosse Kathedrale',
+                        desc: 'Massive, kreuzförmige Deckenbögen, schwere Eichentische für große Bünde, beleuchtet von gewaltigen, flackernden Eisenkronleuchtern über dem Kamin. Ideal für königliche Gelage.',
                       },
                       {
-                        name: 'Die Ahnengruft',
-                        desc: 'Geheimnisvolle Nische, leises Gemurmel, dicke Sandsteinbögen für Privatsphäre.',
-                      },
-                      {
-                        name: 'Das Drachennest',
-                        desc: 'Aussichtsloge mit Blick auf das Rheintal. Romantisch erwärmt von Glut.',
+                        name: 'Unter den alten Linden',
+                        desc: 'Ein lauschiger Biergarten im Schatten uralter Linden, mit rustikalen Holzbänken und dem sanften Plätschern des Brunnens. Kühles Bier und deftige Brotzeiten unter freiem Himmel.',
                       },
                     ].map((v) => (
                       <div
                         key={v.name}
                         id={`vault-option-${v.name.replace(/\s+/g, '-').toLowerCase()}`}
                         onClick={() => setVault(v.name)}
-                        className={`border-2 p-4 transition-all duration-300 cursor-pointer text-left flex flex-col justify-between h-32 ${
+                        className={`border-2 p-4 transition-all duration-300 cursor-pointer text-left flex flex-col ${
                           vault === v.name
                             ? 'border-gold-primary bg-gold-primary/10'
                             : 'border-gold-secondary/20 bg-void-black/20 hover:border-gold-secondary/50'
                         }`}
                       >
-                        <span className="font-cinzel text-xs font-black tracking-wider text-gold-bright">
+                        <span className="font-cinzel text-xs font-black tracking-wider text-gold-bright block mb-2">
                           {v.name}
                         </span>
-                        <p className="font-serif text-[11px] leading-relaxed text-cream-parchment/60 mt-2">
+                        <p className="font-serif text-[11px] leading-relaxed text-cream-parchment/60">
                           {v.desc}
                         </p>
                       </div>

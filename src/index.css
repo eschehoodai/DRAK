@@ -32,11 +32,16 @@
 }
 
 /* Base body adjustments */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   background-color: #0a0a0a;
   color: #f5f5dc;
   font-family: var(--font-serif);
-  overflow-x: hidden;
 }
 
 /* Pulse glow for candlelight elements */
