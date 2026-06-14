@@ -60,6 +60,21 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
           </button>
           
           <button
+            id="nav-link-gallery"
+            onClick={() => onNavigate(Screen.GALLERY)}
+            className={`font-cinzel text-sm font-bold tracking-wider uppercase transition-all duration-300 relative py-2 ${
+              currentScreen === Screen.GALLERY
+                ? 'text-gold-bright'
+                : 'text-cream-parchment/70 hover:text-gold-bright'
+            }`}
+          >
+            Galerie
+            {currentScreen === Screen.GALLERY && (
+              <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
+            )}
+          </button>
+
+          <button
             id="nav-link-impressum"
             onClick={() => onNavigate(Screen.IMPRESSUM)}
             className={`font-cinzel text-sm font-bold tracking-wider uppercase transition-all duration-300 relative py-2 ${
@@ -104,9 +119,16 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
         >
           Speisekarte
         </button>
-        <button 
+        <button
+          id="mob-nav-gallery"
+          onClick={() => onNavigate(Screen.GALLERY)}
+          className={`font-cinzel tracking-wider px-3 py-1 ${currentScreen === Screen.GALLERY ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
+        >
+          Galerie
+        </button>
+        <button
           id="mob-nav-impressum"
-          onClick={() => onNavigate(Screen.IMPRESSUM)} 
+          onClick={() => onNavigate(Screen.IMPRESSUM)}
           className={`font-cinzel tracking-wider px-3 py-1 ${currentScreen === Screen.IMPRESSUM ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
         >
           Impressum

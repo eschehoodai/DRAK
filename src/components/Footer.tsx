@@ -106,6 +106,7 @@ export default function Footer({ onNavigate }: FooterProps) {
           <div className="flex space-x-6">
             <button id="ftr-lnk-home" onClick={() => onNavigate(Screen.HOME)} className="hover:text-gold-primary transition-colors">Startseite</button>
             <button id="ftr-lnk-menu" onClick={() => onNavigate(Screen.MENU)} className="hover:text-gold-primary transition-colors">Speisekarte</button>
+            <button id="ftr-lnk-gallery" onClick={() => onNavigate(Screen.GALLERY)} className="hover:text-gold-primary transition-colors">Galerie</button>
             <button id="ftr-lnk-impressum" onClick={() => onNavigate(Screen.IMPRESSUM)} className="hover:text-gold-primary transition-colors">Impressum</button>
             <button id="ftr-lnk-reserve" onClick={() => onNavigate(Screen.RESERVE)} className="hover:text-gold-primary transition-colors">Reservierung</button>
           </div>

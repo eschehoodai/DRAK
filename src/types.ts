@@ -6,6 +6,7 @@
 export enum Screen {
   HOME = 'HOME',
   MENU = 'MENU',
+  GALLERY = 'GALLERY',
   IMPRESSUM = 'IMPRESSUM',
   RESERVE = 'RESERVE',
 }

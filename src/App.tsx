@@ -8,6 +8,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import HomeView from './components/HomeView';
 import MenuView from './components/MenuView';
+import GalleryView from './components/GalleryView';
 import ImpressumView from './components/ImpressumView';
 import ReservationView from './components/ReservationView';
 import { Screen } from './types';
@@ -46,7 +47,11 @@ export default function App() {
         {currentScreen === Screen.MENU && (
           <MenuView onNavigate={handleNavigate} />
         )}
-        
+
+        {currentScreen === Screen.GALLERY && (
+          <GalleryView onNavigate={handleNavigate} />
+        )}
+
         {currentScreen === Screen.IMPRESSUM && (
           <ImpressumView />
         )}
