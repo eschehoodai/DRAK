@@ -10,6 +10,7 @@ import candlelitGobletImage from '../assets/images/Speise2.webp';
 import logoDrak from '../assets/images/logo-drak.png';
 import headerVideo from '../assets/images/headervideo.webm';
 import gewoelbeVideo from '../assets/images/gewölbe.mp4';
+import tafelVideo from '../assets/images/tafel.webm';
 
 interface HomeViewProps {
   onNavigate: (screen: Screen) => void;
@@ -297,26 +298,38 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
         </div>
 
         {/* Main CTA */}
-        <div className="mt-20 border border-gold-primary/30 p-12 bg-tavern-dark/45 relative overflow-hidden">
-          {/* Decorative Corner Flourishes */}
-          <div className="gilded-corner gilded-corner-tl" />
-          <div className="gilded-corner gilded-corner-tr" />
-          <div className="gilded-corner gilded-corner-bl" />
-          <div className="gilded-corner gilded-corner-br" />
-
-          <h3 className="font-cinzel text-xl md:text-2xl font-black text-gold-bright tracking-widest uppercase mb-4">
-            Bereit für das herrschaftliche Mahl?
-          </h3>
-          <p className="font-serif text-sm text-cream-parchment/70 max-w-xl mx-auto leading-relaxed mb-8">
-            Die Kessel brutzeln und die Krüge stehen bereit. Eilt Euch, edler Gefährte – unsere Gewölbe sind begehrt im gesamten Drachenfelsland!
-          </p>
-          <button
-            id="bottom-cta-reserve"
-            onClick={() => onNavigate(Screen.RESERVE)}
-            className="bg-gold-primary border border-gold-primary px-8 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer"
+        <div className="mt-20 border border-gold-primary/30 p-12 relative overflow-hidden">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
           >
-            Tafel für heute buchen
-          </button>
+            <source src={tafelVideo} type="video/webm" />
+          </video>
+          <div className="absolute inset-0 bg-void-black/60" />
+
+          <div className="relative z-10">
+            <div className="gilded-corner gilded-corner-tl" />
+            <div className="gilded-corner gilded-corner-tr" />
+            <div className="gilded-corner gilded-corner-bl" />
+            <div className="gilded-corner gilded-corner-br" />
+
+            <h3 className="font-cinzel text-xl md:text-2xl font-black text-gold-bright tracking-widest uppercase mb-4">
+              Bereit für das herrschaftliche Mahl?
+            </h3>
+            <p className="font-serif text-sm text-cream-parchment/70 max-w-xl mx-auto leading-relaxed mb-8">
+              Die Kessel brutzeln und die Krüge stehen bereit. Eilt Euch, edler Gefährte – unsere Gewölbe sind begehrt im gesamten Drachenfelsland!
+            </p>
+            <button
+              id="bottom-cta-reserve"
+              onClick={() => onNavigate(Screen.RESERVE)}
+              className="bg-gold-primary border border-gold-primary px-8 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer"
+            >
+              Tafel für heute buchen
+            </button>
+          </div>
         </div>
       </section>
     </div>
