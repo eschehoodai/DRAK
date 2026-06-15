@@ -11,6 +11,7 @@ import MenuView from './components/MenuView';
 import GalleryView from './components/GalleryView';
 import ImpressumView from './components/ImpressumView';
 import ReservationView from './components/ReservationView';
+import JobsView from './components/JobsView';
 import { Screen } from './types';
 
 export default function App() {
@@ -57,10 +58,14 @@ export default function App() {
         )}
         
         {currentScreen === Screen.RESERVE && (
-          <ReservationView 
-            initialNotes={initialReserveNotes} 
-            onClearNotes={handleClearNotes} 
+          <ReservationView
+            initialNotes={initialReserveNotes}
+            onClearNotes={handleClearNotes}
           />
+        )}
+
+        {currentScreen === Screen.JOBS && (
+          <JobsView />
         )}
       </main>
 

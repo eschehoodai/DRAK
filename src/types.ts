@@ -9,6 +9,7 @@ export enum Screen {
   GALLERY = 'GALLERY',
   IMPRESSUM = 'IMPRESSUM',
   RESERVE = 'RESERVE',
+  JOBS = 'JOBS',
 }
 
 export interface MenuVariant {
@@ -38,4 +39,17 @@ export interface Reservation {
   vault: string;
   notes?: string;
   id: string;
+}
+
+export type JobPosition = 'Servicekraft' | 'Koch/Köchin';
+
+export interface JobApplication {
+  id: string;
+  position: JobPosition;
+  name: string;
+  email: string;
+  phone?: string;
+  whatsapp: string;
+  about?: string;
+  fileName?: string;
 }
