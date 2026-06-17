@@ -13,7 +13,12 @@
       "Bash(npx tsc *)",
       "Bash(echo \"exit: $?\")",
       "Bash(Select-Object -Last 15)",
-      "PowerShell(npm run build 2>&1)"
+      "PowerShell(npm run build 2>&1)",
+      "PowerShell(npx tsc --noEmit -p tsconfig.json)",
+      "Bash(npx vite *)",
+      "mcp__Claude_in_Chrome__navigate",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "mcp__visualize__read_me"
     ]
   }
 }

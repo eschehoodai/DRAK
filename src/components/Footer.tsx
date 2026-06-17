@@ -5,13 +5,16 @@
 
 import React from 'react';
 import { Screen } from '../types';
-import { Phone, Mail, Clock, MapPin, Compass } from 'lucide-react';
+import { Phone, Mail, Clock, MapPin } from 'lucide-react';
+import { useCookieConsent } from '../context/CookieContext';
 
 interface FooterProps {
   onNavigate: (screen: Screen) => void;
 }
 
 export default function Footer({ onNavigate }: FooterProps) {
+  const { openSettings } = useCookieConsent();
+
   return (
     <footer className="relative mt-auto border-t-2 border-gold-primary/30 bg-void-black text-cream-parchment/80 pt-16 pb-12">
       {/* Visual top highlight line */}
@@ -110,6 +113,8 @@ export default function Footer({ onNavigate }: FooterProps) {
             <button id="ftr-lnk-jobs" onClick={() => onNavigate(Screen.JOBS)} className="hover:text-gold-primary transition-colors">Jobs</button>
             <button id="ftr-lnk-impressum" onClick={() => onNavigate(Screen.IMPRESSUM)} className="hover:text-gold-primary transition-colors">Impressum</button>
             <button id="ftr-lnk-reserve" onClick={() => onNavigate(Screen.RESERVE)} className="hover:text-gold-primary transition-colors">Reservierung</button>
+            <button id="ftr-lnk-datenschutz" onClick={() => onNavigate(Screen.DATENSCHUTZ)} className="hover:text-gold-primary transition-colors">Datenschutz</button>
+            <button id="ftr-lnk-cookies" onClick={openSettings} className="hover:text-gold-primary transition-colors">Cookie-Einstellungen</button>
           </div>
           <div>
             Entworfen in herrschaftlicher Pracht nach altgothischen Vorgaben.

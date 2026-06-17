@@ -88,9 +88,16 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
       <section className="mx-auto max-w-6xl px-4 py-24 md:px-8 relative">
         <div id="home-glow-1" className="absolute top-[40%] right-0 h-80 w-80 rounded-full bg-gold-primary/5 blur-3xl pointer-events-none" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Legend Text */}
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
+          {/* Tier 1–3: the legend, with logo watermark behind */}
+          <div className="relative">
+            <img
+              src={logoDrak}
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none select-none absolute inset-0 h-full w-full opacity-30 object-contain"
+            />
+            <div className="relative z-10 space-y-6">
             <div className="flex items-center space-x-2 text-gold-primary font-cinzel text-xs font-extrabold tracking-widest uppercase">
               <BookOpen className="h-4 w-4" />
               <span>Unsere Sage</span>
@@ -104,52 +111,39 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
               m Herzen von Zittau, am Fuße des Zittauer Gebirges und unweit der berühmten Zittauer Fastentücher, lädt die Drachentaverne zu regionalen Genüssen aus der Oberlausitz ein. Was vor Jahrhunderten als Herberge für Reisende, Handwerker und Händler begann, ist heute ein Gasthaus mit Charakter: deftige Hausmannskost, Fleischgerichte vom heimischen Metzger, täglich frisches Brot aus der Region und ein kühles Bier aus sächsischer Brautradition.
             </p>
 
-            <p className="font-cinzel text-sm font-bold tracking-widest text-gold-primary uppercase pt-4">Was Euch erwartet:</p>
-            <ul className="font-serif text-cream-parchment/80 leading-relaxed text-base space-y-2 pt-2">
-              <li><strong className="text-gold-primary">Regionale Küche</strong> — ehrlich, deftig, mit Zutaten aus der Oberlausitz</li>
-              <li><strong className="text-gold-primary">Biergarten</strong> — unter freiem Himmel, mit Blick auf die historische Altstadt Zittaus</li>
-              <li><strong className="text-gold-primary">Tischreservierung</strong> — einfach online oder telefonisch einen Platz sichern</li>
-            </ul>
-
-            <p className="font-serif text-cream-parchment/80 leading-relaxed text-base pt-4">
-              Ob nach einem Bummel durch Zittaus Altstadt, einem Besuch der Frauenkirche oder einer Wanderung durch das Zittauer Gebirge — in der Drachentaverne kehrt ihr ein, wo seit jeher Gäste willkommen sind.
+            <p className="font-serif text-cream-parchment/80 leading-relaxed text-base">
+              Ob nach einem Bummel durch Zittaus Altstadt, einem Besuch der Frauenkirche oder einer Wanderung durch das Zittauer Gebirge — in der Drachentaverne kehrt Ihr ein, wo seit jeher Gäste willkommen sind.
             </p>
 
-            <p className="font-cinzel text-sm font-bold tracking-widest text-gold-primary pt-4">
-              Jetzt Tisch reservieren und Platz im Biergarten sichern!
-            </p>
-
-            <div className="border-t border-gold-secondary/25 pt-6 flex space-x-6">
+            {/* Facts + reserve CTA */}
+            <div className="border-t border-gold-secondary/25 pt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
               <div>
-                <p className="font-cinzel text-sm font-black text-gold-primary tracking-widest uppercase">Regionale Spezialitäten</p>
+                <p className="font-cinzel text-2xl font-black text-gold-primary tracking-wide">II</p>
+                <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Gewölbe</p>
               </div>
               <div className="border-l border-gold-secondary/25 pl-6">
-                <p className="font-cinzel text-sm font-black text-gold-primary tracking-widest uppercase">Historische Gemäuer & Biergarten</p>
+                <p className="font-cinzel text-2xl font-black text-gold-primary tracking-wide">Regional</p>
+                <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Oberlausitz</p>
               </div>
-              <div className="border-l border-gold-secondary/25 pl-6">
-                <span className="font-cinzel text-3xl font-black text-gold-primary tracking-widest">II</span>
-                <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Gewölbekammern</p>
-              </div>
+              <button
+                id="sage-btn-reserve"
+                onClick={() => onNavigate(Screen.RESERVE)}
+                className="ml-auto bg-gold-primary border border-gold-primary px-6 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer text-center whitespace-nowrap"
+              >
+                Jetzt Reservieren
+              </button>
+            </div>
             </div>
           </div>
 
-          {/* Logo + Cozy candlelit image side */}
-          <div className="flex flex-col gap-4 h-full">
-            <div className="flex-1 flex items-center justify-center p-6">
-              <img
-                src={logoDrak}
-                alt="Drachentaverne Logo"
-                className="w-full h-full object-contain"
-              />
-            </div>
+          {/* Cozy candlelit image */}
+          <div className="relative border border-gold-secondary/30 p-2 bg-void-black/40 min-h-[24rem]">
+            <div className="gilded-corner gilded-corner-tl" />
+            <div className="gilded-corner gilded-corner-tr" />
+            <div className="gilded-corner gilded-corner-bl" />
+            <div className="gilded-corner gilded-corner-br" />
 
-            <div className="relative flex-1 border border-gold-secondary/30 p-2 bg-void-black/40">
-              <div className="gilded-corner gilded-corner-tl" />
-              <div className="gilded-corner gilded-corner-tr" />
-              <div className="gilded-corner gilded-corner-bl" />
-              <div className="gilded-corner gilded-corner-br" />
-
-              <div className="relative h-full w-full overflow-hidden border border-gold-secondary/15">
+            <div className="relative h-full w-full overflow-hidden border border-gold-secondary/15">
               <img
                 src={candlelitGobletImage}
                 alt="DRAK Cozy Candlelit Setting"
@@ -166,7 +160,6 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
                 </p>
               </div>
             </div>
-          </div>
           </div>
         </div>
       </section>

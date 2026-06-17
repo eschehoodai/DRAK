@@ -10,6 +10,7 @@ export enum Screen {
   IMPRESSUM = 'IMPRESSUM',
   RESERVE = 'RESERVE',
   JOBS = 'JOBS',
+  DATENSCHUTZ = 'DATENSCHUTZ',
 }
 
 export interface MenuVariant {

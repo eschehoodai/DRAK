@@ -3,11 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Screen, MenuItem } from '../types';
-import { X, FileText, Download } from 'lucide-react';
-import roastedPigImage from '../assets/images/roasted_pig_1781370924159.jpg';
-import candlelitGobletImage from '../assets/images/Speise2.webp';
+import { FileText, Download } from 'lucide-react';
 import speisekartePdf from '../assets/images/Speisekarte1.pdf';
 
 interface MenuViewProps {
@@ -182,31 +180,6 @@ const nachspeisen: MenuItem[] = [
  *  HELPERS
  * ============================================================ */
 
-const priceLabel = (item: MenuItem): string =>
-  item.price ?? (item.variants?.length ? `ab ${item.variants[0].price}` : '');
-
-const typeBadge = (item: MenuItem): string => {
-  switch (item.type) {
-    case 'vorspeise':
-      return 'Edle Vorspeise';
-    case 'nachspeise':
-      return 'Süße Nachspeise';
-    default:
-      return 'Deftiger Hauptgang';
-  }
-};
-
-const recommendation = (item: MenuItem): string => {
-  switch (item.type) {
-    case 'vorspeise':
-      return 'Wir empfehlen dazu einen Becher frischen Met aus der Region, um Euren Gaumen auf das kommende Festmahl einzustimmen.';
-    case 'nachspeise':
-      return 'Zum süßen Ausklang reichen wir Euch gern einen Schluck warmen Gewürzwein oder einen Becher Honiglikör nach alter Klostertradition.';
-    default:
-      return 'Zu unseren deftigen Hauptspeisen empfehlen wir einen kräftigen dunklen Doppelbock oder einen Krug Tavernen-Dunkelbier, der jeden Recken stärkt.';
-  }
-};
-
 /* ============================================================
  *  PRESENTATIONAL COMPONENTS
  * ============================================================ */
@@ -278,16 +251,12 @@ function SubHeader({ label, note }: { label: string; note?: string }) {
   );
 }
 
-function DishCard({ item, onSelect }: { item: MenuItem; onSelect: (item: MenuItem) => void }) {
+function DishCard({ item }: { item: MenuItem }) {
   return (
-    <div
-      id={`menu-item-${item.id}`}
-      onClick={() => onSelect(item)}
-      className="group cursor-pointer p-2 transition-all hover:bg-gold-secondary/5 border border-transparent hover:border-gold-secondary/15"
-    >
+    <div id={`menu-item-${item.id}`} className="p-2 border border-transparent">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-          <h3 className="font-cinzel text-[15px] font-bold tracking-wider uppercase text-gold-bright group-hover:text-gold-primary transition-colors inline-block">
+          <h3 className="font-cinzel text-[15px] font-bold tracking-wider uppercase text-gold-bright inline-block">
             {item.name}
           </h3>
           {item.isSpecial && (
@@ -329,11 +298,11 @@ function DishCard({ item, onSelect }: { item: MenuItem; onSelect: (item: MenuIte
   );
 }
 
-function DishGrid({ items, onSelect }: { items: MenuItem[]; onSelect: (item: MenuItem) => void }) {
+function DishGrid({ items }: { items: MenuItem[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
       {items.map((item) => (
-        <DishCard key={item.id} item={item} onSelect={onSelect} />
+        <DishCard key={item.id} item={item} />
       ))}
     </div>
   );
@@ -355,19 +324,7 @@ function SectionDivider() {
  *  MAIN VIEW
  * ============================================================ */
 
-export default function MenuView({ onNavigate }: MenuViewProps) {
-  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
-
-  const handleItemClick = (item: MenuItem) => {
-    setSelectedItem(item);
-  };
-
-  const handleReserveDish = (item: MenuItem) => {
-    const textMsg = `Ich möchte einen Tisch reservieren und freue mich besonders auf das Gericht: ${item.name} (${priceLabel(item)})`;
-    onNavigate(Screen.RESERVE, textMsg);
-    setSelectedItem(null);
-  };
-
+export default function MenuView(_props: MenuViewProps) {
   return (
     <section className="relative mx-auto max-w-5xl px-4 py-16 md:px-8">
       {/* Background radial highlight */}
@@ -397,11 +354,11 @@ export default function MenuView({ onNavigate }: MenuViewProps) {
       {/* ================= VORSPEISEN ================= */}
       <MenuPanel id="section-vorspeisen" title="Vorspeisen" subtitle="Gustatio" className="mt-16">
         <SubHeader label="Warm" />
-        <DishGrid items={vorspeisenWarm} onSelect={handleItemClick} />
+        <DishGrid items={vorspeisenWarm} />
 
         <div className="mt-14">
           <SubHeader label="Kalt" />
-          <DishGrid items={vorspeisenKalt} onSelect={handleItemClick} />
+          <DishGrid items={vorspeisenKalt} />
         </div>
       </MenuPanel>
 
@@ -410,11 +367,11 @@ export default function MenuView({ onNavigate }: MenuViewProps) {
       {/* ================= HAUPTSPEISEN ================= */}
       <MenuPanel id="section-hauptspeisen" title="Hauptspeisen">
         <SubHeader label="Für Erwachsene" />
-        <DishGrid items={hauptErwachsene} onSelect={handleItemClick} />
+        <DishGrid items={hauptErwachsene} />
 
         <div className="mt-14">
           <SubHeader label="Für Kinder" note="Prinzessinnen & Knaben" />
-          <DishGrid items={hauptKinder} onSelect={handleItemClick} />
+          <DishGrid items={hauptKinder} />
         </div>
       </MenuPanel>
 
@@ -422,16 +379,8 @@ export default function MenuView({ onNavigate }: MenuViewProps) {
 
       {/* ================= NACHSPEISEN ================= */}
       <MenuPanel id="section-nachspeisen" title="Nachspeisen">
-        <SubHeader label="Für Kinder" />
-        <DishGrid items={nachspeisen} onSelect={handleItemClick} />
+        <DishGrid items={nachspeisen} />
       </MenuPanel>
-
-      {/* Decorative interactive tip */}
-      <div className="mt-12 text-center">
-        <p className="font-serif text-xs italic text-gold-secondary/60">
-          * Klickt auf ein Gericht, um mehr über dessen mittelalterliche Zubereitung und Empfehlungen zu erfahren.
-        </p>
-      </div>
 
       {/* ================= PDF SPEISEKARTE SECTION ================= */}
       <MenuPanel
@@ -479,106 +428,6 @@ export default function MenuView({ onNavigate }: MenuViewProps) {
           </a>
         </div>
       </MenuPanel>
-
-      {/* ================= DETAIL POPUP WINDOW (Interactive Modality) ================= */}
-      {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void-black/85 backdrop-blur-sm transition-all duration-300">
-          <div
-            id="dish-detail-modal"
-            className="relative w-full max-w-xl border-2 border-gold-primary bg-tavern-dark p-6 md:p-8 text-cream-parchment animate-in fade-in zoom-in-95 duration-200"
-          >
-            <GildedCorners />
-
-            {/* Close Button */}
-            <button
-              id="close-dish-modal"
-              onClick={() => setSelectedItem(null)}
-              className="absolute top-4 right-4 text-gold-secondary hover:text-gold-bright p-1 cursor-pointer transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
-
-            {/* Dish Image Context */}
-            <div className="mb-6 relative h-48 w-full border border-gold-secondary/30 bg-void-black overflow-hidden">
-              <img
-                src={selectedItem.type === 'hauptgang' || selectedItem.isSpecial ? roastedPigImage : candlelitGobletImage}
-                alt={selectedItem.name}
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover opacity-75 filter contrast-125"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-tavern-dark to-transparent" />
-              <div className="absolute bottom-4 left-4 border border-gold-primary bg-void-black/80 px-3 py-1 font-mono text-[10px] tracking-widest text-gold-primary font-bold uppercase">
-                {typeBadge(selectedItem)}
-              </div>
-            </div>
-
-            {/* Details */}
-            <div className="flex items-baseline justify-between gap-3 border-b border-gold-secondary/20 pb-2 mb-4">
-              <h3 className="font-cinzel text-xl font-bold tracking-widest text-gold-primary uppercase">
-                {selectedItem.name}
-              </h3>
-              {priceLabel(selectedItem) && (
-                <span className="shrink-0 font-cinzel text-sm font-semibold uppercase text-gold-bright">
-                  {priceLabel(selectedItem)}
-                </span>
-              )}
-            </div>
-
-            <p className="font-serif text-base text-cream-parchment/90 leading-relaxed mb-6 italic">
-              "{selectedItem.description}"
-            </p>
-
-            {/* Price variants in detail view */}
-            {selectedItem.variants && (
-              <div className="mb-6 border border-gold-secondary/20 bg-void-black/40 p-4">
-                <p className="font-cinzel text-xs font-bold text-gold-secondary tracking-widest uppercase mb-3">
-                  ZUR WAHL:
-                </p>
-                <div className="space-y-2">
-                  {selectedItem.variants.map((variant) => (
-                    <div key={variant.label} className="flex items-baseline justify-between gap-2">
-                      <span className="font-cinzel text-sm tracking-wider text-cream-parchment/90">
-                        {variant.label}
-                      </span>
-                      <span className="shrink-0 font-cinzel text-xs font-semibold uppercase text-gold-secondary">
-                        {variant.price}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Tavern Lore Description */}
-            <div className="bg-void-black/55 border-l-2 border-gold-primary p-4 mb-6 text-sm">
-              <p className="font-cinzel text-xs font-bold text-gold-secondary tracking-widest uppercase mb-1">
-                KULINARISCHE EMPFEHLUNG:
-              </p>
-              <p className="font-serif text-cream-parchment/70 leading-relaxed">
-                {recommendation(selectedItem)}
-              </p>
-            </div>
-
-            {/* Action CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-end">
-              <button
-                id="modal-cancel"
-                onClick={() => setSelectedItem(null)}
-                className="border border-gold-secondary/40 px-5 py-2 font-cinzel text-xs uppercase tracking-wider text-cream-parchment hover:bg-gold-secondary/10 transition-colors cursor-pointer"
-              >
-                Zurück zur Karte
-              </button>
-              <button
-                id="modal-reserve-dish"
-                onClick={() => handleReserveDish(selectedItem)}
-                className="flex items-center justify-center space-x-2 bg-gold-primary text-void-black border border-gold-primary px-5 py-2 font-cinzel text-xs font-bold uppercase tracking-wider hover:bg-gold-bright transition-colors cursor-pointer"
-              >
-                <span>Dieses Gericht Reservieren</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }
