@@ -6,9 +6,11 @@
 import React, { useState } from 'react';
 import { Screen } from '../types';
 import { Camera, ZoomIn, X, Calendar } from 'lucide-react';
-import feastHallImage from '../assets/images/feast_hall_1781370910972.jpg';
-import roastedPigImage from '../assets/images/roasted_pig_1781370924159.jpg';
-import candlelitGobletImage from '../assets/images/candlelit_goblet_1781370897386.jpg';
+import eingangsbereichImage from '../assets/images/drak-restaurant-zittau-eingangsbereich-mittelalter.jpg';
+import taverneSchild from '../assets/images/drak-restaurant-zittau-taverne-schild.webp';
+import historicaDeko from '../assets/images/drak-restaurant-zittau-historica-dekoration.webp';
+import gastraumImage from '../assets/images/drak-restaurant-zittau-gastraum-historica.jpg';
+import eroeffnungImage from '../assets/images/drak-restaurant-zittau-eroeffnung.webp';
 import speiseImage from '../assets/images/Speise2.webp';
 
 interface GalleryViewProps {
@@ -31,30 +33,44 @@ interface GalleryImage {
 const galleryImages: GalleryImage[] = [
   {
     id: 'g1',
-    src: feastHallImage,
-    title: 'Der große Festsaal',
-    caption: 'Schwere Eichentische unter kreuzförmigen Deckenbögen — bereit für königliche Gelage.',
+    src: eingangsbereichImage,
+    title: 'Der Eingangsbereich',
+    caption: 'Mittelalterliches Flair empfängt Euch schon beim ersten Schritt durch unsere Tore.',
     span: 'sm:col-span-2 lg:col-span-2 lg:row-span-2',
   },
   {
     id: 'g2',
-    src: roastedPigImage,
-    title: 'Vom offenen Feuer',
-    caption: 'Knuspriger Braten, langsam über glühenden Kohlen gegart.',
-    span: 'sm:col-span-2 lg:col-span-2',
+    src: taverneSchild,
+    title: 'Die Taverne',
+    caption: 'Ein handgeschnitztes Holzschild markiert den Einlass in unsere mittelalterliche Welt.',
+    span: '',
   },
   {
     id: 'g3',
-    src: candlelitGobletImage,
-    title: 'Beim Kerzenschein',
-    caption: 'Ein voller Becher und gedämpftes Licht in behaglicher Atmosphäre.',
+    src: historicaDeko,
+    title: 'Historische Dekoration',
+    caption: 'Stierschädel, Schwert und Wagenrad — historische Relikte schmücken unsere Gewölbe.',
     span: '',
   },
   {
     id: 'g4',
+    src: gastraumImage,
+    title: 'Im Gastraum',
+    caption: 'Herzliche Gastfreundschaft und ein kühler Krug Met — so macht Einkehren Freude.',
+    span: 'sm:col-span-2 lg:col-span-2',
+  },
+  {
+    id: 'g5',
     src: speiseImage,
     title: 'Edle Tafelfreuden',
     caption: 'Deftige Speisen, angerichtet nach uralten Rezepten.',
+    span: '',
+  },
+  {
+    id: 'g6',
+    src: eroeffnungImage,
+    title: 'Die Eröffnung',
+    caption: 'Drak Restaurant Zittau — Genuss wie im Mittelalter, seit dem 02. Mai.',
     span: '',
   },
 ];

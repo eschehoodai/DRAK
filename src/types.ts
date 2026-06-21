@@ -24,8 +24,8 @@ export interface MenuItem {
   /** Single price. Omit when the dish has multiple `variants` instead. */
   price?: string;
   currency?: 'KUPFER' | 'SILBER' | 'GOLD';
-  description: string;
-  type: 'vorspeise' | 'hauptgang' | 'nachspeise' | 'special';
+  description?: string;
+  type: 'vorspeise' | 'hauptgang' | 'nachspeise' | 'special' | 'getraenk';
   /** Optional price variants (e.g. burger with different meats). */
   variants?: MenuVariant[];
   isSpecial?: boolean;

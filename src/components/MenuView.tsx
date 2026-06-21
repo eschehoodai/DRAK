@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Screen, MenuItem } from '../types';
+import { Screen, MenuItem, MenuVariant } from '../types';
 import { FileText, Download } from 'lucide-react';
 import speisekartePdf from '../assets/images/Speisekarte1.pdf';
 
@@ -180,6 +180,122 @@ const nachspeisen: MenuItem[] = [
  *  HELPERS
  * ============================================================ */
 
+/**
+ * Convert a price in Talern (Euro-Gegenwert) into the tavern's coinage.
+ * 1 Silber = 100 Kupfer.  coin(5.9) → "5 Silber & 90 Kupfer", coin(7) → "7 Silber".
+ */
+function coin(taler: number): string {
+  const total = Math.round(taler * 100);
+  const silber = Math.floor(total / 100);
+  const kupfer = total % 100;
+  return kupfer === 0 ? `${silber} Silber` : `${silber} Silber & ${kupfer} Kupfer`;
+}
+
+/** Build size/price variants, e.g. variants(['0,2L', 3.2], ['0,4L', 4.1]). */
+function variants(...pairs: [string, number][]): MenuVariant[] {
+  return pairs.map(([label, taler]) => ({ label, price: coin(taler) }));
+}
+
+/* ============================================================
+ *  DRINKS DATA — grouped by section & sub-category
+ * ============================================================ */
+
+/* ---- Geistiges aus der Alchemistenküche (Liköre, 2cl / 4cl) ---- */
+const likoere: MenuItem[] = [
+  { id: 'lik1', name: 'Maraska Kršikovac', description: 'Fruchtiger Birnenlikör', variants: variants(['2cl', 2.9], ['4cl', 5.1]), type: 'getraenk' },
+  { id: 'lik2', name: 'Maraska Orahovec', description: 'Kräuterlikör', variants: variants(['2cl', 2.9], ['4cl', 5.1]), type: 'getraenk' },
+  { id: 'lik3', name: 'Maraska Pelinkovac', description: 'Bitterlikör mit Wermut', variants: variants(['2cl', 2.9], ['4cl', 5.1]), type: 'getraenk' },
+  { id: 'lik4', name: 'Bärenjäger', description: 'Honiglikör', variants: variants(['2cl', 3.7], ['4cl', 7.0]), type: 'getraenk' },
+  { id: 'lik5', name: 'Marie Brizard Menthe Verte', description: 'Minzlikör', variants: variants(['2cl', 3.7], ['4cl', 7.0]), type: 'getraenk' },
+  { id: 'lik6', name: 'Waldgeist', description: 'Waldmeisterlikör', variants: variants(['2cl', 2.0], ['4cl', 4.0]), type: 'getraenk' },
+  { id: 'lik7', name: 'Bols', description: 'Holunderblütenlikör', variants: variants(['2cl', 3.0], ['4cl', 5.1]), type: 'getraenk' },
+];
+
+/* ---- Agrest & Verjus (Fruchtsäfte, 0,2L / 0,4L) ---- */
+const saefte: MenuItem[] = [
+  { id: 'saf1', name: 'Orange', variants: variants(['0,2L', 3.2], ['0,4L', 4.1]), type: 'getraenk' },
+  { id: 'saf2', name: 'Multivitamin', variants: variants(['0,2L', 3.2], ['0,4L', 4.1]), type: 'getraenk' },
+  { id: 'saf3', name: 'Banane', variants: variants(['0,2L', 3.2], ['0,4L', 4.1]), type: 'getraenk' },
+  { id: 'saf4', name: 'Sauerkirsche', variants: variants(['0,2L', 3.2], ['0,4L', 4.1]), type: 'getraenk' },
+  { id: 'saf5', name: 'Apfel', variants: variants(['0,2L', 3.2], ['0,4L', 4.1]), type: 'getraenk' },
+  { id: 'saf6', name: 'Apfelschorle', variants: variants(['0,2L', 3.1], ['0,4L', 4.2]), type: 'getraenk' },
+];
+
+/* ---- Wasser (0,2L / 0,4L / 0,75L) ---- */
+const wasser: MenuItem[] = [
+  { id: 'was1', name: 'Still', variants: variants(['0,2L', 2.5], ['0,4L', 3.8], ['0,75L', 6.5]), type: 'getraenk' },
+  { id: 'was2', name: 'Medium', variants: variants(['0,2L', 2.5], ['0,4L', 3.8], ['0,75L', 6.5]), type: 'getraenk' },
+  { id: 'was3', name: 'Spritzig', variants: variants(['0,2L', 2.5], ['0,4L', 3.8], ['0,75L', 6.5]), type: 'getraenk' },
+];
+
+/* ---- Absud & Kraut (Heißgetränke) ---- */
+const heissGetraenke: MenuItem[] = [
+  { id: 'heg1', name: 'Tee nach Wahl', price: coin(3.8), type: 'getraenk' },
+  { id: 'heg2', name: 'Tschechischer Tee', description: 'Becherovka, Orangen- & Zitronensaft, Orange', price: coin(4.8), type: 'getraenk' },
+  { id: 'heg3', name: 'Tschechischer Türkischer Kaffee', price: coin(2.8), type: 'getraenk' },
+];
+
+/* ---- Vinum (Weine, 0,2L / 0,75L) ---- */
+const weine: MenuItem[] = [
+  { id: 'win1', name: 'Dornfelder Rot', description: 'Trocken', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
+  { id: 'win2', name: 'Dornfelder Rot', description: 'Halbtrocken', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
+  { id: 'win3', name: 'Dornfelder Rosé', description: 'Halbtrocken', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
+  { id: 'win4', name: 'Grauburgunder Weiß', description: 'Trocken', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
+  { id: 'win5', name: 'Vinumschorle', description: 'Weinschorle · 0,2 L', price: coin(5.1), type: 'getraenk' },
+  { id: 'win6', name: 'Rotkäppchen Piccolo', description: 'Piccolo 0,2 L · trocken, rosé oder alkoholfrei', price: coin(4.5), type: 'getraenk' },
+];
+
+/* ---- Trunk der Asen (Met, je 0,25 L) ---- */
+const met: MenuItem[] = [
+  { id: 'met1', name: 'Thors Trunk', description: 'Weißer Met', price: coin(5.5), type: 'getraenk' },
+  { id: 'met2', name: 'Drachenblut', description: 'Roter Met', price: coin(5.5), type: 'getraenk' },
+  { id: 'met3', name: 'Hanf-Met', price: coin(5.5), type: 'getraenk' },
+];
+
+/* ---- Ungebrautes (alkoholfrei) ---- */
+const zuckerwasserFass: MenuItem[] = [
+  { id: 'zwf1', name: 'Himbeere', variants: variants(['0,2L', 3.1], ['0,4L', 4.2]), type: 'getraenk' },
+  { id: 'zwf2', name: 'Cola', variants: variants(['0,2L', 3.1], ['0,4L', 4.2]), type: 'getraenk' },
+  { id: 'zwf3', name: 'Traube', variants: variants(['0,2L', 3.1], ['0,4L', 4.2]), type: 'getraenk' },
+];
+
+const zuckerwasserFlasche: MenuItem[] = [
+  { id: 'zwv1', name: 'Fanta', variants: variants(['0,2L', 3.1], ['0,4L', 4.2]), type: 'getraenk' },
+  { id: 'zwv2', name: 'Sprite', variants: variants(['0,2L', 3.1], ['0,4L', 4.2]), type: 'getraenk' },
+  { id: 'zwv3', name: 'Mezzo Mix', variants: variants(['0,2L', 3.1], ['0,4L', 4.2]), type: 'getraenk' },
+  { id: 'zwv4', name: 'Kofola', variants: variants(['0,2L', 3.1], ['0,4L', 4.2]), type: 'getraenk' },
+];
+
+const bitterzuckerwasser: MenuItem[] = [
+  { id: 'biz1', name: 'Ginger Ale', price: coin(3.2), type: 'getraenk' },
+  { id: 'biz2', name: 'Tonic Water', price: coin(3.2), type: 'getraenk' },
+];
+
+/* ---- Gebräu (Biere, 0,3L / 0,5L) ---- */
+const biere: MenuItem[] = [
+  { id: 'bie1', name: 'Cervisia – Der Mönche Gebräu', description: 'Wechselnde Sorten: Svijany 450, Geschnittenes Bier, Baronin Dunkles u. a.', variants: variants(['0,3L', 3.1], ['0,5L', 4.9]), type: 'getraenk' },
+  { id: 'bie2', name: 'Radler', variants: variants(['0,3L', 3.1], ['0,5L', 4.9]), type: 'getraenk' },
+  { id: 'bie3', name: 'Lübzer', description: 'Alkoholfrei', variants: variants(['0,3L', 3.8], ['0,5L', 4.9]), type: 'getraenk' },
+  { id: 'bie4', name: 'Erdinger Weizen', description: 'Alkoholfrei', variants: variants(['0,3L', 3.8], ['0,5L', 4.9]), type: 'getraenk' },
+];
+
+/* ---- Spezialitäten (2cl / 4cl) ---- */
+const spezialitaeten: MenuItem[] = [
+  { id: 'spz1', name: 'Madame Geneva Gin', description: '44 %', variants: variants(['2cl', 5.1], ['4cl', 9.0]), type: 'getraenk' },
+  { id: 'spz2', name: 'Madame Geneva Gin', description: '41,9 %', variants: variants(['2cl', 4.7], ['4cl', 8.5]), type: 'getraenk' },
+  { id: 'spz3', name: 'Herzdame', description: '21 %', variants: variants(['2cl', 4.0], ['4cl', 7.1]), type: 'getraenk' },
+  { id: 'spz4', name: 'Kreuzritter', description: 'Kräuterschnaps · 30 %', variants: variants(['2cl', 4.1], ['4cl', 9.0]), type: 'getraenk' },
+  { id: 'spz5', name: 'Zingiba Aperitivum', description: '20 %', variants: variants(['2cl', 3.0], ['4cl', 5.1]), type: 'getraenk' },
+  { id: 'spz6', name: 'Williams Birne', description: 'Birnenlikör', variants: variants(['2cl', 4.4], ['4cl', 7.9]), type: 'getraenk' },
+];
+
+/* ---- Hexens Gebräu (Cocktails, je 0,4 L) ---- */
+const cocktails: MenuItem[] = [
+  { id: 'cok1', name: 'Aperol Spritz', price: coin(7.9), type: 'getraenk' },
+  { id: 'cok2', name: 'Gin Tonic', price: coin(7.9), type: 'getraenk' },
+  { id: 'cok3', name: '43er Kirsch', price: coin(7.9), type: 'getraenk' },
+];
+
 /* ============================================================
  *  PRESENTATIONAL COMPONENTS
  * ============================================================ */
@@ -272,9 +388,11 @@ function DishCard({ item }: { item: MenuItem }) {
         )}
       </div>
 
-      <p className="mt-2 font-serif text-sm text-cream-parchment/60 leading-relaxed">
-        {item.description}
-      </p>
+      {item.description && (
+        <p className="mt-2 font-serif text-sm text-cream-parchment/60 leading-relaxed">
+          {item.description}
+        </p>
+      )}
 
       {/* Price variants (e.g. burger meats) */}
       {item.variants && (
@@ -316,6 +434,33 @@ function SectionDivider() {
         <path d="M12 2L2 12l10 10 10-10L12 2z" fill="currentColor" />
       </svg>
       <div className="h-[1px] w-32 bg-gradient-to-l from-transparent to-gold-secondary/60" />
+    </div>
+  );
+}
+
+function GroupHeading({
+  label,
+  note,
+  className = '',
+}: {
+  label: string;
+  note?: string;
+  className?: string;
+}) {
+  return (
+    <div className={`text-center ${className}`}>
+      <div className="flex items-center justify-center space-x-4">
+        <div className="h-[1px] w-16 bg-gradient-to-r from-transparent to-gold-secondary/70" />
+        <h3 className="font-cinzel text-xl font-bold tracking-[0.2em] text-gold-primary uppercase sm:text-2xl">
+          {label}
+        </h3>
+        <div className="h-[1px] w-16 bg-gradient-to-l from-transparent to-gold-secondary/70" />
+      </div>
+      {note && (
+        <p className="mt-2 font-serif text-sm italic text-cream-parchment/50 tracking-wide">
+          {note}
+        </p>
+      )}
     </div>
   );
 }
@@ -380,6 +525,113 @@ export default function MenuView(_props: MenuViewProps) {
       {/* ================= NACHSPEISEN ================= */}
       <MenuPanel id="section-nachspeisen" title="Nachspeisen">
         <DishGrid items={nachspeisen} />
+      </MenuPanel>
+
+      <SectionDivider />
+
+      {/* ================= DIE TRÄNKE (sub-hero) ================= */}
+      <div id="section-traenke" className="text-center">
+        <h2 className="font-cinzel text-3xl font-extrabold tracking-widest text-gold-bright sm:text-4xl">
+          DIE TRÄNKE
+        </h2>
+
+        <div className="my-6 flex items-center justify-center space-x-4">
+          <div className="h-[1px] w-24 bg-gradient-to-r from-transparent to-gold-secondary" />
+          <svg className="h-4 w-4 text-gold-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 2L2 12l10 10 10-10L12 2z" fill="currentColor" />
+          </svg>
+          <div className="h-[1px] w-24 bg-gradient-to-l from-transparent to-gold-secondary" />
+        </div>
+
+        <p className="mx-auto max-w-2xl font-serif text-lg italic text-cream-parchment/80 leading-relaxed">
+          Edle Weine, kräftiger Met und allerlei Gebräu – gereicht in Silber und Kupfer.
+        </p>
+      </div>
+
+      {/* ----- Gruppe: Alkoholfrei ----- */}
+      <GroupHeading label="Ohne Gehalt" note="Alkoholfreie Tränke – kalt & warm" className="mt-12" />
+
+      {/* ================= AGREST & VERJUS ================= */}
+      <MenuPanel id="section-saefte" title="Agrest & Verjus" className="mt-16">
+        <SubHeader label="Fruchtsäfte" note="0,2L / 0,4L" />
+        <DishGrid items={saefte} />
+      </MenuPanel>
+
+      <SectionDivider />
+
+      {/* ================= WASSER ================= */}
+      <MenuPanel id="section-wasser" title="Wasser" subtitle="Aqua">
+        <SubHeader label="Quellwasser" note="Still · Medium · Spritzig" />
+        <DishGrid items={wasser} />
+      </MenuPanel>
+
+      <SectionDivider />
+
+      {/* ================= UNGEBRAUTES ================= */}
+      <MenuPanel id="section-ungebrautes" title="Ungebrautes">
+        <SubHeader label="Zuckerwasser vom Fass" note="0,2L / 0,4L" />
+        <DishGrid items={zuckerwasserFass} />
+
+        <div className="mt-14">
+          <SubHeader label="Zuckerwasser aus der Vlesche" note="0,2L / 0,4L" />
+          <DishGrid items={zuckerwasserFlasche} />
+        </div>
+
+        <div className="mt-14">
+          <SubHeader label="Bitterzuckerwasser" note="Je 0,2 Liter" />
+          <DishGrid items={bitterzuckerwasser} />
+        </div>
+      </MenuPanel>
+
+      <SectionDivider />
+
+      {/* ================= ABSUD & KRAUT ================= */}
+      <MenuPanel id="section-absud" title="Absud & Kraut">
+        <SubHeader label="Heiße Tränke" />
+        <DishGrid items={heissGetraenke} />
+      </MenuPanel>
+
+      {/* ----- Gruppe: Alkoholisch ----- */}
+      <GroupHeading label="Mit Gehalt" note="Geistreiche & gegorene Tränke" className="mt-20" />
+
+      {/* ================= GEISTIGES ================= */}
+      <MenuPanel id="section-geistiges" title="Geistiges" subtitle="Aqua vitae" className="mt-16">
+        <SubHeader label="Aus der Alchemistenküche" note="Liköre & Geistiges · Preise je 2cl / 4cl" />
+        <DishGrid items={likoere} />
+      </MenuPanel>
+
+      <SectionDivider />
+
+      {/* ================= AEGIS TRUNK ================= */}
+      <MenuPanel id="section-aegis" title="Aegis Trunk" subtitle="Aus den deutschen Grafschaften & Fürstentümern">
+        <SubHeader label="Vinum" note="Weine · 0,2L / 0,75L" />
+        <DishGrid items={weine} />
+
+        <div className="mt-14">
+          <SubHeader label="Trunk der Asen" note="Met · je 0,25 Liter" />
+          <DishGrid items={met} />
+        </div>
+      </MenuPanel>
+
+      <SectionDivider />
+
+      {/* ================= GEBRÄU ================= */}
+      <MenuPanel id="section-gebraeu" title="Gebräu" subtitle="Cervisia">
+        <SubHeader label="Biere" note="0,3L / 0,5L" />
+        <DishGrid items={biere} />
+      </MenuPanel>
+
+      <SectionDivider />
+
+      {/* ================= SPEZIALITÄTEN ================= */}
+      <MenuPanel id="section-spezialitaeten" title="Spezialitäten">
+        <SubHeader label="Hochprozentiges" note="Preise je 2cl / 4cl" />
+        <DishGrid items={spezialitaeten} />
+
+        <div className="mt-14">
+          <SubHeader label="Hexens Gebräu" note="Cocktails · je 0,4 Liter" />
+          <DishGrid items={cocktails} />
+        </div>
       </MenuPanel>
 
       {/* ================= PDF SPEISEKARTE SECTION ================= */}
