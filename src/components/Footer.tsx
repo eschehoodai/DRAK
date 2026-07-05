@@ -36,7 +36,7 @@ export default function Footer({ onNavigate }: FooterProps) {
               Edle Speisen und kräftige Tränke, zubereitet nach uralten Rezepten aus den tiefsten Gewölben unserer Taverne.
             </p>
             <div className="pt-4 text-xs font-mono text-gold-secondary/80">
-              © MMXIV Drachen Taverne. Alle Rechte vorbehalten.
+              © MMXXVI Drachen Taverne. Alle Rechte vorbehalten.
             </div>
           </div>
 

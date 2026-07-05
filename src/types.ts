@@ -11,6 +11,7 @@ export enum Screen {
   RESERVE = 'RESERVE',
   JOBS = 'JOBS',
   DATENSCHUTZ = 'DATENSCHUTZ',
+  NOT_FOUND = 'NOT_FOUND',
 }
 
 export interface MenuVariant {

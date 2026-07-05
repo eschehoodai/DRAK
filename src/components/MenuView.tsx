@@ -5,8 +5,6 @@
 
 import React from 'react';
 import { Screen, MenuItem, MenuVariant } from '../types';
-import { FileText, Download } from 'lucide-react';
-import speisekartePdf from '../assets/images/Speisekarte1.pdf';
 
 interface MenuViewProps {
   onNavigate: (screen: Screen, initialNotes?: string) => void;
@@ -634,52 +632,6 @@ export default function MenuView(_props: MenuViewProps) {
         </div>
       </MenuPanel>
 
-      {/* ================= PDF SPEISEKARTE SECTION ================= */}
-      <MenuPanel
-        id="section-pdf-speisekarte"
-        title="Gesamt-Speisekarte (PDF)"
-        icon={<FileText className="h-4 w-4 text-gold-primary" />}
-        className="mt-20"
-      >
-        {/* Description */}
-        <p className="text-center font-serif text-sm italic text-cream-parchment/70 leading-relaxed mb-6 max-w-2xl mx-auto">
-          Hier findet Ihr die vollständige Gesamt-Speisekarte unserer Taverne als Pergament-Dokument zum Betrachten und Herunterladen.
-        </p>
-
-        {/* PDF Viewer Container */}
-        <div className="relative w-full h-[600px] md:h-[750px] border border-gold-secondary/30 bg-void-black overflow-hidden">
-          <iframe
-            id="pdf-speisekarte-viewer"
-            src={speisekartePdf}
-            title="DRAK Gesamt-Speisekarte (PDF)"
-            className="w-full h-full"
-            style={{ backgroundColor: '#1a120b' }}
-          />
-        </div>
-
-        {/* Download Button */}
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            id="pdf-download-link"
-            href={speisekartePdf}
-            download="DRAK_Speisekarte.pdf"
-            className="inline-flex items-center space-x-2 bg-gold-primary border border-gold-primary px-6 py-3 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer"
-          >
-            <Download className="h-4 w-4" />
-            <span>Speisekarte herunterladen</span>
-          </a>
-          <a
-            id="pdf-open-newtab"
-            href={speisekartePdf}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-2 border border-gold-secondary bg-void-black/60 backdrop-blur-sm px-6 py-3 font-cinzel text-xs font-bold uppercase tracking-widest text-gold-secondary hover:text-gold-bright hover:bg-gold-secondary/15 transition-all cursor-pointer"
-          >
-            <FileText className="h-4 w-4" />
-            <span>In neuem Fenster öffnen</span>
-          </a>
-        </div>
-      </MenuPanel>
     </section>
   );
 }

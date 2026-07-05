@@ -1,5 +1,5 @@
-<!doctype html>
-<html lang="en">
+﻿<!doctype html>
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,11 +9,88 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#0a0a0a" />
-    <title>Drachentaverne Zittau</title>
+
+    <title>Drachen Taverne – Mittelalter-Restaurant in Zittau | Speisen &amp; Tafeln wie anno dazumal</title>
+    <meta
+      name="description"
+      content="Die Drachen Taverne in Zittau: Mittelalterliches Restaurant mit deftigen Speisen, Met und Tavernenatmosphäre im historischen Gewölbe. Jetzt Tisch reservieren – Innere Weberstraße 11, 02763 Zittau."
+    />
+    <link rel="canonical" href="https://drakzittau.de/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="restaurant" />
+    <meta property="og:site_name" content="Drachen Taverne Zittau" />
+    <meta property="og:title" content="Drachen Taverne – Mittelalter-Restaurant in Zittau" />
+    <meta
+      property="og:description"
+      content="Deftige Speisen, Met und Tavernenatmosphäre im historischen Gewölbe von Zittau. Jetzt Tisch reservieren."
+    />
+    <meta property="og:url" content="https://drakzittau.de/" />
+    <meta property="og:image" content="https://drakzittau.de/android-chrome-512x512.png" />
+    <meta property="og:locale" content="de_DE" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Drachen Taverne – Mittelalter-Restaurant in Zittau" />
+    <meta
+      name="twitter:description"
+      content="Deftige Speisen, Met und Tavernenatmosphäre im historischen Gewölbe von Zittau. Jetzt Tisch reservieren."
+    />
+    <meta name="twitter:image" content="https://drakzittau.de/android-chrome-512x512.png" />
+
+    <!-- Schema.org: Lokales Restaurant -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Restaurant",
+        "name": "Drachen Taverne",
+        "description": "Mittelalterliches Restaurant mit deftigen Speisen, Met und Tavernenatmosphäre im historischen Gewölbe von Zittau.",
+        "url": "https://drakzittau.de/",
+        "image": "https://drakzittau.de/android-chrome-512x512.png",
+        "logo": "https://drakzittau.de/android-chrome-512x512.png",
+        "telephone": "+49 3583 5495389",
+        "email": "post@drachen-taverne.de",
+        "servesCuisine": ["Deutsch", "Mittelalterlich", "Rustikal"],
+        "priceRange": "€€",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Innere Weberstraße 11",
+          "postalCode": "02763",
+          "addressLocality": "Zittau",
+          "addressCountry": "DE"
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": "Sunday",
+            "opens": "11:00",
+            "closes": "21:00"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Wednesday", "Thursday"],
+            "opens": "17:00",
+            "closes": "21:00"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": "Friday",
+            "opens": "17:00",
+            "closes": "22:00"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": "Saturday",
+            "opens": "11:00",
+            "closes": "22:00"
+          }
+        ],
+        "acceptsReservations": "True"
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

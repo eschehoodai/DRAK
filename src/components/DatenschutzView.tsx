@@ -74,7 +74,7 @@ export default function DatenschutzView() {
             <p className="font-bold text-cream-parchment">DRAK GmbH</p>
             <p>Innere Weberstraße 11</p>
             <p>02763 Zittau</p>
-            <p className="pt-1">Vertreten durch: Burgherr Alric von Drachenfels</p>
+            <p className="pt-1">Vertreten durch: Robert Koch</p>
             <p className="pt-1">Telefon: 03583 5495389</p>
             <p>
               E-Mail:{' '}

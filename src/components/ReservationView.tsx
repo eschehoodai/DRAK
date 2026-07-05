@@ -384,11 +384,11 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     {[
                       {
                         name: 'Die Grosse Kathedrale',
-                        desc: 'Massive, kreuzförmige Deckenbögen, schwere Eichentische für große Bünde, beleuchtet von gewaltigen, flackernden Eisenkronleuchtern über dem Kamin. Ideal für königliche Gelage.',
+                        desc: 'Massive, kreuzförmige Deckenbögen und schwere Eichentische für große Bünde, getaucht in warmes, flackerndes Kerzenlicht. Ideal für königliche Gelage.',
                       },
                       {
                         name: 'Unter den alten Linden',
-                        desc: 'Ein lauschiger Biergarten im Schatten uralter Linden, mit rustikalen Holzbänken und dem sanften Plätschern des Brunnens. Kühles Bier und deftige Brotzeiten unter freiem Himmel.',
+                        desc: 'Ein lauschiger Biergarten im Schatten uralter Linden, mit rustikalen Holzbänken. Kühles Bier und deftige Brotzeiten unter freiem Himmel.',
                       },
                     ].map((v) => (
                       <div

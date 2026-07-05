@@ -1,20 +1,45 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Drachen Taverne Zittau – Website
 
-# Run and deploy your AI Studio app
+Website des mittelalterlichen Restaurants **Drachen Taverne** in Zittau
+(Innere Weberstraße 11, 02763 Zittau) — https://drakzittau.de/
 
-This contains everything you need to run your app locally.
+Single-Page-Anwendung mit React 19, Vite 6, Tailwind CSS 4 und TypeScript.
 
-View your app in AI Studio: https://ai.studio/apps/40666581-9339-4189-92eb-5990d8d3505c
+## Voraussetzungen
 
-## Run Locally
+- Node.js 20 oder neuer
 
-**Prerequisites:**  Node.js
+## Entwicklung
 
+```bash
+npm install     # Abhängigkeiten installieren
+npm run dev     # Entwicklungsserver auf http://localhost:3000
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Veröffentlichung
+
+```bash
+npm run build   # erzeugt den Ordner dist/
+```
+
+Den kompletten Inhalt von `dist/` in das Web-Verzeichnis des Hosters hochladen
+(statisches Hosting mit HTTPS genügt).
+
+## Projektstruktur
+
+| Pfad | Inhalt |
+|---|---|
+| `index.html` | HTML-Grundgerüst, SEO-Metadaten, Schema.org-Markup |
+| `src/App.tsx` | Zentrale Navigation zwischen den Ansichten |
+| `src/components/` | Alle Seiten und Bausteine (Home, Speisekarte, Galerie, Reservierung, Jobs, Impressum, Datenschutz, Cookie-Banner) |
+| `src/assets/images/` | Bilder, Videos, Musik, Speisekarten-PDF |
+| `public/` | Favicons, robots.txt, sitemap.xml |
+
+Ausführliche Informationen: siehe `Dokumentation-Drachen-Taverne-Website.docx`.
+
+## Hinweis Reservierung
+
+Das Reservierungsformular speichert Buchungen derzeit nur im Browser des
+Gastes (localStorage) — es wird **keine Benachrichtigung an das Restaurant**
+versendet. Für den Produktivbetrieb muss ein E-Mail-Versand oder ein
+Reservierungssystem angebunden werden.

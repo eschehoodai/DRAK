@@ -6,10 +6,10 @@
 import React, { useState } from 'react';
 import { Screen } from '../types';
 import { Camera, ZoomIn, X, Calendar } from 'lucide-react';
-import eingangsbereichImage from '../assets/images/drak-restaurant-zittau-eingangsbereich-mittelalter.jpg';
+import eingangsbereichImage from '../assets/images/drak-restaurant-zittau-eingangsbereich-mittelalter.webp';
 import taverneSchild from '../assets/images/drak-restaurant-zittau-taverne-schild.webp';
 import historicaDeko from '../assets/images/drak-restaurant-zittau-historica-dekoration.webp';
-import gastraumImage from '../assets/images/drak-restaurant-zittau-gastraum-historica.jpg';
+import gastraumImage from '../assets/images/drak-restaurant-zittau-gastraum-historica.webp';
 import eroeffnungImage from '../assets/images/drak-restaurant-zittau-eroeffnung.webp';
 import speiseImage from '../assets/images/Speise2.webp';
 

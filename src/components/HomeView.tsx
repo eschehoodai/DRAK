@@ -7,7 +7,7 @@ import React from 'react';
 import { Screen } from '../types';
 import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin } from 'lucide-react';
 import candlelitGobletImage from '../assets/images/Speise2.webp';
-import logoDrak from '../assets/images/logo-drak.png';
+import logoDrak from '../assets/images/logo-drak.webp';
 import headerVideo from '../assets/images/headervideo.webm';
 import gewoelbeVideo from '../assets/images/gewölbe.mp4';
 import tafelVideo from '../assets/images/tafel.webm';
@@ -202,7 +202,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
                   Die Große Kathedrale
                 </h3>
                 <p className="font-serif text-base leading-relaxed text-cream-parchment/70">
-                  Massive, kreuzförmige Deckenbögen, schwere Eichentische für große Bünde, beleuchtet von gewaltigen, flackernden Eisenkronleuchtern über dem Kamin. Ideal für königliche Gelage.
+                  Massive, kreuzförmige Deckenbögen und schwere Eichentische für große Bünde, getaucht in warmes, flackerndes Kerzenlicht. Ideal für königliche Gelage.
                 </p>
               </div>
               <button
@@ -229,7 +229,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
                   Unter den alten Linden
                 </h3>
                 <p className="font-serif text-base leading-relaxed text-cream-parchment/70">
-                  Ein lauschiger Biergarten im Schatten uralter Linden, mit rustikalen Holzbänken und dem sanften Plätschern des Brunnens. Hier genießt Ihr kühles Bier, deftige Brotzeiten und schwäbische Spezialitäten unter freiem Himmel.
+                  Ein lauschiger Biergarten im Schatten uralter Linden, mit rustikalen Holzbänken. Hier genießt Ihr kühles Bier, deftige Brotzeiten und Oberlausitzer Spezialitäten unter freiem Himmel.
                 </p>
               </div>
               <button

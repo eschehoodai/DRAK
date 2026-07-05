@@ -37,7 +37,7 @@ export default function ImpressumView() {
           </div>
           <div className="font-serif text-sm text-cream-parchment/80 leading-relaxed max-w-md pt-2">
             <p className="italic text-cream-parchment/60">Vertreten durch:</p>
-            <p className="font-bold">Burgherr Alric von Drachenfels</p>
+            <p className="font-bold">Robert Koch</p>
           </div>
         </div>
 
@@ -77,7 +77,7 @@ export default function ImpressumView() {
           </h2>
           <div className="font-serif text-sm text-cream-parchment/80 leading-relaxed max-w-lg">
             <p className="text-cream-parchment/60 pb-1">Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:</p>
-            <p className="font-mono text-gold-bright tracking-wider font-bold">DE999999999</p>
+            <p className="font-mono text-gold-bright tracking-wider font-bold">DE450878816</p>
           </div>
         </div>
 
