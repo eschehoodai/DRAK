@@ -25,14 +25,22 @@ jobs:
       - name: Produktions-Build erzeugen
         run: npm run build
 
+      # lftp statt FTP-Deploy-Action: der netcup/Plesk-FTP-Server verlangt
+      # TLS Session Reuse auf der Datenverbindung, was nur lftp sauber beherrscht.
       - name: Per FTPS zu netcup hochladen
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          local-dir: dist/
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
           # Zielordner im Webspace: Domain-Ordner + httpdocs
           # (Struktur laut Plesk File Manager: Basisverzeichnis > drakzittau.de > httpdocs)
-          server-dir: drakzittau.de/httpdocs/
+          lftp -c "
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate true;
+            open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" \"$FTP_SERVER\";
+            mirror -R --delete --parallel=4 --verbose dist/ drakzittau.de/httpdocs/;
+          "
