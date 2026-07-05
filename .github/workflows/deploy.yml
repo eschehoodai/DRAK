@@ -33,6 +33,6 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           local-dir: dist/
-          # Zielordner im Webspace (netcup/Plesk: meist "httpdocs/").
-          # Bei Bedarf anpassen, z.B. auf einen Unterordner der Domain.
-          server-dir: httpdocs/
+          # Zielordner im Webspace: Domain-Ordner + httpdocs
+          # (Struktur laut Plesk File Manager: Basisverzeichnis > drakzittau.de > httpdocs)
+          server-dir: drakzittau.de/httpdocs/
