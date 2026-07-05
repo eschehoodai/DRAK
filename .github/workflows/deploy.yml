@@ -39,4 +39,11 @@ jobs:
           # (Struktur laut Plesk File Manager: Basisverzeichnis > drakzittau.de > httpdocs)
           # verify-certificate off: das Plesk-FTP-Zertifikat von netcup ist nicht
           # auf den Hosting-Hostnamen ausgestellt; die Verbindung bleibt TLS-verschlüsselt.
-          lftp -c "set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate no; open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" \"$FTP_SERVER\"; mirror -R --delete --parallel=4 --verbose dist/ drakzittau.de/httpdocs/"
+          cat > /tmp/deploy.lftp <<EOF
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate no
+          open -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_SERVER"
+          mirror -R --delete --parallel=4 --verbose dist/ drakzittau.de/httpdocs/
+          EOF
+          lftp -f /tmp/deploy.lftp
