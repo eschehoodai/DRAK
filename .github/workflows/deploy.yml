@@ -1,0 +1,38 @@
+name: Deploy zu netcup
+
+on:
+  push:
+    branches: [main]
+  # Manueller Start über den "Actions"-Tab in GitHub
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Produktions-Build erzeugen
+        run: npm run build
+
+      - name: Per FTPS zu netcup hochladen
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: dist/
+          # Zielordner im Webspace (netcup/Plesk: meist "httpdocs/").
+          # Bei Bedarf anpassen, z.B. auf einen Unterordner der Domain.
+          server-dir: httpdocs/
