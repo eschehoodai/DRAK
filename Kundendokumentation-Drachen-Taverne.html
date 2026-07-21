@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Übergabe- & Produktdokumentation – Drachen Taverne Zittau</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm 18mm 20mm 18mm;
+    }
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1a1a1a;
+      line-height: 1.55;
+      font-size: 11pt;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+    .header-banner {
+      border-bottom: 3px solid #b8860b;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .header-banner h1 {
+      font-size: 22pt;
+      margin: 0 0 4px 0;
+      color: #1a1a1a;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .header-banner h2 {
+      font-size: 13pt;
+      margin: 0;
+      color: #b8860b;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .welcome-box {
+      background: #f8f6f0;
+      border-left: 4px solid #b8860b;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      border-radius: 0 6px 6px 0;
+    }
+    h2.section-title {
+      font-size: 14pt;
+      color: #1a1a1a;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 28px;
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+    h3.sub-title {
+      font-size: 12pt;
+      color: #2d3748;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    p {
+      margin: 0 0 10px 0;
+    }
+    ul, ol {
+      margin: 0 0 14px 0;
+      padding-left: 22px;
+    }
+    li {
+      margin-bottom: 6px;
+    }
+    .credentials-card {
+      background: #fdfbf7;
+      border: 1px solid #e8e1d5;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 14px 0;
+    }
+    .credentials-card h4 {
+      margin: 0 0 10px 0;
+      font-size: 11.5pt;
+      color: #8c6505;
+    }
+    .credentials-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      row-gap: 6px;
+      font-size: 10.5pt;
+    }
+    .credentials-grid strong {
+      color: #4a5568;
+    }
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: #edf2f7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10pt;
+      color: #2d3748;
+    }
+    .alert-important {
+      background: #fffaf0;
+      border-left: 4px solid #dd6b20;
+      padding: 12px 16px;
+      margin: 14px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 10pt;
+      color: #7b341e;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px 0;
+      font-size: 10.2pt;
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    th {
+      background: #f7fafc;
+      color: #2d3748;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background: #fafbfc;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+    }
+    .footer-note {
+      margin-top: 36px;
+      padding-top: 14px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 9pt;
+      color: #718096;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-banner">
+    <h2>Übergabe- &amp; Produktdokumentation</h2>
+    <h1>Drachen Taverne Zittau</h1>
+    <p style="color: #4a5568; font-size: 10.5pt; margin-top: 4px;">
+      Innere Weberstraße 11, 02763 Zittau &bull; <strong>https://drakzittau.de</strong>
+    </p>
+  </div>
+
+  <div class="welcome-box">
+    <strong>Herzlich willkommen!</strong><br>
+    Diese Dokumentation bietet Ihnen als Eigentümer und Betreiber der Drachen Taverne Zittau einen vollständigen, transparenten Überblick über Ihre neue Website. Sie erfahren hier genau, welche technischen Standards eingesetzt wurden, welche Funktionen Ihre Website bietet und wie der Betrieb optimal gestaltet ist.
+  </div>
+
+  <h2 class="section-title">1. Übersicht &amp; Qualitätsversprechen</h2>
+  <p>
+    Ihre neue Website wurde als hochmoderne <strong>Single-Page-Application (SPA)</strong> konzipiert. Im Gegensatz zu traditionellen, oft langsamen Baukasten-Systemen (wie WordPress ohne Optimierung) bietet diese Lösung entscheidende Vorteile:
+  </p>
+  <ul>
+    <li><strong>Blitzschnelle Ladezeiten:</strong> Beim Aufruf der Seite wird die Anwendung einmal geladen – der Wechsel zwischen Unterseiten (Speisekarte, Galerie, Reservierung) geschieht sofort und ohne störendes Seitenneuladen.</li>
+    <li><strong>Maximale Sicherheit &amp; Stabilität:</strong> Da die Website im Betrieb keine anfällige Datenbank benötigt, ist sie extrem unempfindlich gegenüber Hackerangriffen, Ausfällen oder Serverüberlastungen.</li>
+    <li><strong>Perfekte Darstellung auf allen Geräten (Responsive Design):</strong> Ob Smartphone, Tablet oder Desktop-PC – das Layout passt sich automatisch und harmonisch an jede Bildschirmgröße an.</li>
+    <li><strong>Authentisches Tavernen-Erlebnis:</strong> Edle Farbpaletten (Warmes Gold, tiefes Schiefergrau), mittelalterliche Typografie und eine optional zuschaltbare Hintergrundmusik sorgen für ein einzigartiges Gästeerlebnis.</li>
+  </ul>
+
+  <h2 class="section-title">2. Der Funktionsumfang im Detail</h2>
+  
+  <h3 class="sub-title">🏰 Startseite (<code>/</code>)</h3>
+  <ul>
+    <li><strong>Hero-Bereich:</strong> Stimmungsvoller erster Eindruck mit direktem Call-to-Action zur Tischreservierung und Speisekarte.</li>
+    <li><strong>Atmosphärische Einführung:</strong> Vorstellung des historischen Gewölbes ("Die Grosse Kathedrale", "Biergarten").</li>
+    <li><strong>Schnellübersicht:</strong> Öffnungszeiten, Standort und Highlights der Küche direkt auf einen Blick.</li>
+  </ul>
+
+  <h3 class="sub-title">📜 Interaktive Speisekarte (<code>/speisekarte</code>)</h3>
+  <ul>
+    <li><strong>Übersichtliche Kategorien:</strong> Deftige Hauptgänge, Vorspeisen, Nachspeisen sowie eine umfangreiche Getränkekarte (Met, Biere, Weine &amp; Tavernen-Cocktails).</li>
+    <li><strong>Besonderes Highlight (Pre-Fill):</strong> Gäste können Lieblingsgerichte direkt anklicken und mit einer Notiz nahtlos in die Tischreservierung übernehmen.</li>
+  </ul>
+
+  <h3 class="sub-title">🖼️ Galerie (<code>/galerie</code>)</h3>
+  <ul>
+    <li><strong>Visuelle Impressionen:</strong> Hochwertige Bilder und Videos präsentieren den Gastraum, die Dekoration und historische Veranstaltungen.</li>
+    <li><strong>Optimierte Medienübertragung:</strong> Komprimierte Formate garantieren schnelle Ladezeiten auch im mobilen Netz.</li>
+  </ul>
+
+  <h3 class="sub-title">📅 Interaktive Tischreservierung (<code>/reservierung</code>)</h3>
+  <ul>
+    <li><strong>Gäste-Formular:</strong> Erfassung von Datum, Uhrzeit, Personenanzahl, Wunschbereich im Gewölbe und Sonderwünschen.</li>
+    <li><strong>Buchungscode-System:</strong> Nach Absenden der Reservierung erhält der Gast einen eindeutigen Buchungscode zur Bestätigung und Abfrage.</li>
+    <li><strong>Technischer Hinweis zur Flexibilität:</strong> Aktuell speichert das System Reservierungen als interaktiven Prototyp im Browser. Bei Bedarf kann dieses Modul problemlos an ein E-Mail-System (PHP/SMTP) oder an Ihr bestehendes Reservierungssystem (z. B. OpenTable, Resmio, Gastronovi) angebunden werden.</li>
+  </ul>
+
+  <h3 class="sub-title">⚔️ Jobs &amp; Karriere (<code>/jobs</code>)</h3>
+  <ul>
+    <li><strong>Mittelalterliche Stellenausschreibungen:</strong> Einladende Präsentation offener Positionen in Service und Küche zur Personalgewinnung.</li>
+  </ul>
+
+  <h3 class="sub-title">⚖️ Rechtssicherheit &amp; DSGVO (<code>/impressum</code>, <code>/datenschutz</code>)</h3>
+  <ul>
+    <li><strong>Impressum:</strong> Rechtskonforme Anbieterkennzeichnung (Innere Weberstraße 11, 02763 Zittau).</li>
+    <li><strong>Datenschutzerklärung:</strong> Ausführliche, DSGVO-konforme Information über Datenverarbeitung und Cookies.</li>
+    <li><strong>Cookie-Consent-Banner:</strong> Integriertes Banner zur rechtskonformen Einwilligung der Besucher.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <h2 class="section-title">3. Suchmaschinenoptimierung (SEO) &amp; Google-Integration</h2>
+  <p>Damit die Drachen Taverne von Gästen aus Zittau und Touristen optimal gefunden wird, sind führende SEO-Standards fest integriert:</p>
+  <ol>
+    <li><strong>Schema.org Structured Data (<code>Restaurant</code>):</strong> Google erkennt die Website automatisch als lokales Restaurant mit Adresse (Innere Weberstraße 11, 02763 Zittau), Telefonnummer, Öffnungszeiten und Preisklasse (<code>€€</code>).</li>
+    <li><strong>Dynamische Metadaten je Unterseite:</strong> Jede Unterseite (Home, Speisekarte, Reservierung etc.) besitzt eigene Titel und Beschreibungen für perfekte Suchergebnisse.</li>
+    <li><strong>Social-Media-Vorschau (Open Graph &amp; Twitter Cards):</strong> Wird der Link <code>https://drakzittau.de</code> per WhatsApp, Facebook oder Instagram geteilt, erscheint automatisch ein Vorschaubild und eine ansprechende Beschreibung.</li>
+    <li><strong>Sitemap (<code>sitemap.xml</code>) &amp; Robots (<code>robots.txt</code>):</strong> Sorgen für ein schnelles und vollständiges Indexieren durch Suchmaschinen-Crawler.</li>
+    <li><strong>Registrierung in der Google Search Console:</strong> Die Website wurde bereits offiziell in der <strong>Google Search Console</strong> registriert und eingereicht. Damit wird die Indexierung der Domain (<code>https://drakzittau.de</code>) bei Google aktiv überwacht und für beste Suchergebnisse optimiert.</li>
+  </ol>
+
+  <h2 class="section-title">4. Technologie-Stack &amp; Zukunftssicherheit</h2>
+  <p>Die Website wurde mit modernen, branchenführenden Technologien der professionellen Softwareentwicklung realisiert:</p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Technologie</th>
+        <th>Einsatzzweck &amp; Vorteil</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>React 19</strong></td>
+        <td>Modernste Benutzeroberfläche für flüssige Interaktionen ohne Wartezeiten</td>
+      </tr>
+      <tr>
+        <td><strong>TypeScript 5</strong></td>
+        <td>Maximale Code-Qualität, Fehlerfreiheit und Wartbarkeit</td>
+      </tr>
+      <tr>
+        <td><strong>Vite 6</strong></td>
+        <td>Hochleistung-Build-System mit automatischem Cache-Busting (Besucher sehen immer sofort die neueste Version)</td>
+      </tr>
+      <tr>
+        <td><strong>Tailwind CSS 4</strong></td>
+        <td>Flexibles, modernes Design-System mit exzellenter Performance</td>
+      </tr>
+      <tr>
+        <td><strong>Apache <code>.htaccess</code></strong></td>
+        <td>Perfektes Single-Page-App-Routing auf Webservern wie Netcup</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title">5. Betrieb, Hosting &amp; Pflege</h2>
+
+  <div class="credentials-card avoid-break">
+    <h4>🔐 Ihre Zugangsdaten zum Netcup Kundenportal (CCP)</h4>
+    <p style="margin-bottom: 12px; color: #4a5568;">
+      Wir freuen uns, Sie als Kunden bei netcup begrüßen zu dürfen! Anbei erhalten Sie Ihre Zugangsdaten zum netcup CCP (Customer Control Panel). Sie haben dort die Möglichkeit, Ihre Daten und Produkte zu pflegen sowie vergangene Rechnungen einzusehen.
+    </p>
+    <div class="credentials-grid">
+      <div><strong>Login-URL:</strong></div>
+      <div><a href="https://www.customercontrolpanel.de" target="_blank">https://www.customercontrolpanel.de</a></div>
+      <div><strong>Kundennummer:</strong></div>
+      <div><code>384871</code></div>
+      <div><strong>Passwort:</strong></div>
+      <div><code>Ds3FU,fZ/amDw93Yz</code></div>
+    </div>
+  </div>
+
+  <div class="alert-important avoid-break">
+    <strong>Wichtiger Sicherheitshinweis:</strong> Bitte bewahren Sie diese Zugangsdaten sicher auf, damit Sie jederzeit vollen Zugriff auf Ihre Vertrags- und Domainverwaltung haben.
+  </div>
+
+  <h3 class="sub-title">Reibungsloser Betrieb bei Netcup</h3>
+  <ul>
+    <li>Die Website erfordert <strong>keine teuren Server oder Datenbank-Wartungen</strong>.</li>
+    <li>Der fertig komprimierte Website-Ordner (<code>dist/</code>) läuft auf Ihrem Webhosting (Netcup) extrem ressourcenschonend und stabil.</li>
+    <li>Vollständige SSL/TLS-Unterstützung (<code>https://drakzittau.de</code>) sorgt für Vertrauen und Datensicherheit.</li>
+  </ul>
+
+  <h2 class="section-title">6. Zusammenfassung für Ihre Sicherheit</h2>
+  <p>Mit dieser Website erhalten Sie ein <strong>technisch exzellentes, maßgeschneidertes digitales Aushängeschild</strong> für die Drachen Taverne Zittau:</p>
+  <ul>
+    <li>✅ <strong>Optisch beeindruckend:</strong> Ein einzigartiges Mittelalter-Flair, das Gäste begeistert.</li>
+    <li>✅ <strong>Technisch robust:</strong> Höchste Ladegeschwindigkeit, mobiloptimiert und ausfallsicher.</li>
+    <li>✅ <strong>Rechtlich abgesichert:</strong> DSGVO-konforme Struktur inklusive Cookie-Banner und Impressum.</li>
+    <li>✅ <strong>Bereit für die Zukunft:</strong> Einfach erweiterbar und bestens aufgestellt für Google &amp; Gäste.</li>
+  </ul>
+
+  <div class="footer-note">
+    Drachen Taverne Zittau &bull; Innere Weberstraße 11, 02763 Zittau &bull; https://drakzittau.de
+  </div>
+
+</body>
+</html>

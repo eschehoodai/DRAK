@@ -105,8 +105,8 @@ export default function Footer({ onNavigate }: FooterProps) {
         </div>
 
         {/* Bottom fine line & small maps grounding info */}
-        <div className="mt-12 pt-8 border-t border-gold-secondary/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-serif text-cream-parchment/40">
-          <div className="flex space-x-6">
+        <div className="mt-12 pt-8 border-t border-gold-secondary/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-serif text-cream-parchment/40 text-center sm:text-left">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-x-6 gap-y-2">
             <button id="ftr-lnk-home" onClick={() => onNavigate(Screen.HOME)} className="hover:text-gold-primary transition-colors">Startseite</button>
             <button id="ftr-lnk-menu" onClick={() => onNavigate(Screen.MENU)} className="hover:text-gold-primary transition-colors">Speisekarte</button>
             <button id="ftr-lnk-gallery" onClick={() => onNavigate(Screen.GALLERY)} className="hover:text-gold-primary transition-colors">Galerie</button>
@@ -116,7 +116,7 @@ export default function Footer({ onNavigate }: FooterProps) {
             <button id="ftr-lnk-datenschutz" onClick={() => onNavigate(Screen.DATENSCHUTZ)} className="hover:text-gold-primary transition-colors">Datenschutz</button>
             <button id="ftr-lnk-cookies" onClick={openSettings} className="hover:text-gold-primary transition-colors">Cookie-Einstellungen</button>
           </div>
-          <div>
+          <div className="text-center sm:text-right">
             Entworfen in herrschaftlicher Pracht nach altgothischen Vorgaben.
           </div>
         </div>

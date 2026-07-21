@@ -27,6 +27,7 @@ export default function JobsView() {
   const [fileError, setFileError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [submitted, setSubmitted] = useState<JobApplication | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -65,12 +66,14 @@ export default function JobsView() {
     if (dropped) validateAndSetFile(dropped);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email) {
       alert('Seid gegrüßt! Bitte hinterlasst zumindest Euren Namen und Eure Inschrift (E-Mail).');
       return;
     }
+
+    setIsSubmitting(true);
 
     const randomSuffix = Math.floor(Math.random() * 900) + 100;
     const id = `DRAK-ZUNFT-${toRoman(2026)}-${randomSuffix}`;
@@ -85,6 +88,21 @@ export default function JobsView() {
       about: about || undefined,
       fileName: file?.name,
     };
+
+    // Send email notification to server via PHP mail()
+    try {
+      await fetch('/send-job-application.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(application),
+      });
+    } catch (err) {
+      console.warn('E-Mail-Versand fehlgeschlagen (evtl. lokale Entwicklungsumgebung):', err);
+    } finally {
+      setIsSubmitting(false);
+    }
 
     setSubmitted(application);
   };
@@ -380,9 +398,10 @@ export default function JobsView() {
               <button
                 id="btn-submit-application"
                 type="submit"
-                className="w-full sm:w-auto bg-gold-primary border border-gold-primary px-10 py-4 font-cinzel text-sm font-black tracking-widest uppercase text-void-black hover:bg-gold-bright transition-all cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto bg-gold-primary border border-gold-primary px-10 py-4 font-cinzel text-sm font-black tracking-widest uppercase text-void-black hover:bg-gold-bright transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Kurzbewerbung jetzt absenden
+                {isSubmitting ? 'Brieftaube fliegt...' : 'Kurzbewerbung jetzt absenden'}
               </button>
             </div>
           </form>

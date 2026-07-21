@@ -33,9 +33,9 @@ Den kompletten Inhalt von `dist/` in das Web-Verzeichnis des Hosters hochladen
 | `src/App.tsx` | Zentrale Navigation zwischen den Ansichten |
 | `src/components/` | Alle Seiten und Bausteine (Home, Speisekarte, Galerie, Reservierung, Jobs, Impressum, Datenschutz, Cookie-Banner) |
 | `src/assets/images/` | Bilder, Videos, Musik, Speisekarten-PDF |
-| `public/` | Favicons, robots.txt, sitemap.xml |
+| `public/` | Favicons, robots.txt, sitemap.xml, .htaccess |
 
-Ausführliche Informationen: siehe `Dokumentation-Drachen-Taverne-Website.docx`.
+Ausführliche Kunden- und Projektdokumentation: siehe [`KUNDENDOKUMENTATION.md`](file:///c:/Users/X/Desktop/Drachentaerne/KUNDENDOKUMENTATION.md).
 
 ## Hinweis Reservierung
 

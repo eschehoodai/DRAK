@@ -116,19 +116,21 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
             </p>
 
             {/* Facts + reserve CTA */}
-            <div className="border-t border-gold-secondary/25 pt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
-              <div>
-                <p className="font-cinzel text-2xl font-black text-gold-primary tracking-wide">II</p>
-                <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Gewölbe</p>
-              </div>
-              <div className="border-l border-gold-secondary/25 pl-6">
-                <p className="font-cinzel text-2xl font-black text-gold-primary tracking-wide">Regional</p>
-                <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Oberlausitz</p>
+            <div className="border-t border-gold-secondary/25 pt-6 flex flex-col gap-4">
+              <div className="flex items-center gap-x-6">
+                <div>
+                  <p className="font-cinzel text-2xl font-black text-gold-primary tracking-wide">II</p>
+                  <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Gewölbe</p>
+                </div>
+                <div className="border-l border-gold-secondary/25 pl-6">
+                  <p className="font-cinzel text-2xl font-black text-gold-primary tracking-wide">Regional</p>
+                  <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Oberlausitz</p>
+                </div>
               </div>
               <button
                 id="sage-btn-reserve"
                 onClick={() => onNavigate(Screen.RESERVE)}
-                className="ml-auto bg-gold-primary border border-gold-primary px-6 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer text-center whitespace-nowrap"
+                className="w-full bg-gold-primary border border-gold-primary px-6 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer text-center whitespace-nowrap"
               >
                 Jetzt Reservieren
               </button>

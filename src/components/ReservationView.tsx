@@ -28,6 +28,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   const [lastCreated, setLastCreated] = useState<Reservation | null>(null);
   const [searchedReservation, setSearchedReservation] = useState<Reservation | null>(null);
   const [searchError, setSearchError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle incoming pre-filled notes (e.g. clicked dish from menu)
   useEffect(() => {
@@ -76,12 +77,14 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     return roman;
   };
 
-  const handleCreateReservation = (e: React.FormEvent) => {
+  const handleCreateReservation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !date) {
       alert('Seid gegrüßt! Bitte füllt alle Pflichtfelder aus, um Eure Zunft anzumelden.');
       return;
     }
+
+    setIsSubmitting(true);
 
     const randomSuffix = Math.floor(Math.random() * 900) + 100;
     const currentYearRoman = toRoman(2026);
@@ -97,6 +100,21 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
       vault,
       notes,
     };
+
+    // Send email notification to server via PHP mail()
+    try {
+      await fetch('/send-booking.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newRes),
+      });
+    } catch (err) {
+      console.warn('E-Mail-Versand fehlgeschlagen (evtl. lokale Entwicklungsumgebung):', err);
+    } finally {
+      setIsSubmitting(false);
+    }
 
     const updated = [newRes, ...reservations];
     saveBookings(updated);
@@ -129,8 +147,25 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Seid Ihr sicher, dass Ihr Euer Mahl stornieren wollt?')) {
+      const targetRes = reservations.find((r) => r.id === id);
+
+      // Send cancellation email notification via PHP mail()
+      if (targetRes) {
+        try {
+          await fetch('/send-cancellation.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(targetRes),
+          });
+        } catch (err) {
+          console.warn('Stornierungs-E-Mail fehlgeschlagen (evtl. lokale Entwicklungsumgebung):', err);
+        }
+      }
+
       const updated = reservations.filter((r) => r.id !== id);
       saveBookings(updated);
       if (searchedReservation?.id === id) {
@@ -432,9 +467,10 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 <button
                   id="btn-submit-booking"
                   type="submit"
-                  className="w-full sm:w-auto bg-gold-primary border border-gold-primary px-10 py-4 font-cinzel text-sm font-black tracking-widest uppercase text-void-black hover:bg-gold-bright transition-all cursor-pointer"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto bg-gold-primary border border-gold-primary px-10 py-4 font-cinzel text-sm font-black tracking-widest uppercase text-void-black hover:bg-gold-bright transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Tischvertragsbrief absenden
+                  {isSubmitting ? 'Brieftaube fliegt...' : 'Tischvertragsbrief absenden'}
                 </button>
               </div>
             </form>
