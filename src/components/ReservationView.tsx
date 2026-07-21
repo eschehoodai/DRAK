@@ -5,22 +5,307 @@
 
 import React, { useState, useEffect } from 'react';
 import { Screen, Reservation } from '../types';
-import { Calendar, User, Mail, Hourglass, Shield, Search, Sparkles, Trash2 } from 'lucide-react';
+import { 
+  Calendar, User, Mail, Hourglass, Shield, Search, Sparkles, Trash2,
+  ChevronLeft, ChevronRight, Clock, AlertTriangle, Check, X
+} from 'lucide-react';
 
 interface ReservationViewProps {
   initialNotes?: string;
   onClearNotes?: () => void;
 }
 
+// Öffnungszeiten-Konfiguration
+interface DayHours {
+  isOpen: boolean;
+  open: string;
+  close: string;
+  lastSlot: string;
+  label: string;
+}
+
+const OPENING_HOURS: Record<number, DayHours> = {
+  0: { isOpen: true, open: '11:00', close: '21:00', lastSlot: '20:30', label: 'So: 11:00–21:00' },
+  1: { isOpen: true, open: '17:00', close: '21:00', lastSlot: '20:30', label: 'Mo: 17:00–21:00' },
+  2: { isOpen: false, open: '', close: '', lastSlot: '', label: 'Di: Geschlossen' },
+  3: { isOpen: true, open: '17:00', close: '21:00', lastSlot: '20:30', label: 'Mi: 17:00–21:00' },
+  4: { isOpen: true, open: '17:00', close: '21:00', lastSlot: '20:30', label: 'Do: 17:00–21:00' },
+  5: { isOpen: true, open: '17:00', close: '22:00', lastSlot: '21:30', label: 'Fr: 17:00–22:00' },
+  6: { isOpen: true, open: '11:00', close: '22:00', lastSlot: '21:30', label: 'Sa: 11:00–22:00' },
+};
+
+/**
+ * Format a Date object to YYYY-MM-DD using local time
+ */
+const formatYYYYMMDD = (d: Date): string => {
+  const year = d.getFullYear();
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+/**
+ * Get weekday index (0 = Sun, 1 = Mon, ... 6 = Sat) from YYYY-MM-DD string
+ */
+const getDayOfWeek = (dateStr: string): number => {
+  if (!dateStr) return -1;
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length !== 3) return -1;
+  return new Date(parts[0], parts[1] - 1, parts[2]).getDay();
+};
+
+/**
+ * Generate 30-min time slots for given YYYY-MM-DD string (last slot = 30 min before closing)
+ */
+const getTimeSlotsForDate = (dateStr: string): string[] => {
+  const dayOfWeek = getDayOfWeek(dateStr);
+  const config = OPENING_HOURS[dayOfWeek];
+  if (!config || !config.isOpen) return [];
+
+  const slots: string[] = [];
+  const [openHour, openMin] = config.open.split(':').map(Number);
+  const [lastHour, lastMin] = config.lastSlot.split(':').map(Number);
+
+  let currentMin = openHour * 60 + openMin;
+  const endMin = lastHour * 60 + lastMin;
+
+  while (currentMin <= endMin) {
+    const h = Math.floor(currentMin / 60);
+    const m = currentMin % 60;
+    const formatted = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    slots.push(formatted);
+    currentMin += 30;
+  }
+  return slots;
+};
+
+/**
+ * Get next open day starting from a given date (defaults to today or tomorrow if today closed)
+ */
+const getNextOpenDate = (startDate: Date = new Date()): string => {
+  const d = new Date(startDate);
+  for (let i = 0; i < 7; i++) {
+    const dayIndex = d.getDay();
+    if (OPENING_HOURS[dayIndex].isOpen) {
+      return formatYYYYMMDD(d);
+    }
+    d.setDate(d.getDate() + 1);
+  }
+  return formatYYYYMMDD(new Date());
+};
+
+/**
+ * Formats YYYY-MM-DD into readable German date string: e.g. "Samstag, 25.07.2026"
+ */
+const formatGermanDate = (dateStr: string): string => {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length !== 3) return dateStr;
+  const d = new Date(parts[0], parts[1] - 1, parts[2]);
+  const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+  const dayName = weekdays[d.getDay()];
+  const formattedDay = d.getDate().toString().padStart(2, '0');
+  const formattedMonth = (d.getMonth() + 1).toString().padStart(2, '0');
+  return `${dayName}, ${formattedDay}.${formattedMonth}.${d.getFullYear()}`;
+};
+
+/**
+ * Generates quick selection date options for the user
+ */
+const getQuickChips = () => {
+  const today = new Date();
+  const chips: { label: string; dateStr: string }[] = [];
+
+  // Heute
+  chips.push({ label: 'Heute', dateStr: formatYYYYMMDD(today) });
+
+  // Morgen
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  chips.push({ label: 'Morgen', dateStr: formatYYYYMMDD(tomorrow) });
+
+  // Nächster Freitag
+  const nextFriday = new Date(today);
+  let daysUntilFri = (5 - today.getDay() + 7) % 7;
+  nextFriday.setDate(today.getDate() + daysUntilFri);
+  chips.push({ label: 'Diesen Fr', dateStr: formatYYYYMMDD(nextFriday) });
+
+  // Nächster Samstag
+  const nextSat = new Date(today);
+  let daysUntilSat = (6 - today.getDay() + 7) % 7;
+  nextSat.setDate(today.getDate() + daysUntilSat);
+  chips.push({ label: 'Diesen Sa', dateStr: formatYYYYMMDD(nextSat) });
+
+  // Nächster Sonntag
+  const nextSun = new Date(today);
+  let daysUntilSun = (0 - today.getDay() + 7) % 7;
+  nextSun.setDate(today.getDate() + daysUntilSun);
+  chips.push({ label: 'Diesen So', dateStr: formatYYYYMMDD(nextSun) });
+
+  return chips;
+};
+
+/* ================= CUSTOM CALENDAR MODAL COMPONENT ================= */
+interface CustomCalendarModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedDate: string;
+  onSelectDate: (dateStr: string) => void;
+}
+
+function CustomCalendarModal({ isOpen, onClose, selectedDate, onSelectDate }: CustomCalendarModalProps) {
+  if (!isOpen) return null;
+
+  const initialParts = selectedDate ? selectedDate.split('-').map(Number) : [];
+  const initialMonthDate = initialParts.length === 3 ? new Date(initialParts[0], initialParts[1] - 1, 1) : new Date();
+  const [viewDate, setViewDate] = useState<Date>(initialMonthDate);
+
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+
+  const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
+
+  const monthNames = [
+    'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 
+    'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+  ];
+
+  const firstDayOfMonth = new Date(year, month, 1);
+  const startDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7; // European Monday=0 start
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const calendarDays: (number | null)[] = [];
+  for (let i = 0; i < startDayOfWeek; i++) {
+    calendarDays.push(null);
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    calendarDays.push(day);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md border-2 border-gold-primary bg-void-black p-6 shadow-2xl text-cream-parchment">
+        <div className="gilded-corner gilded-corner-tl" />
+        <div className="gilded-corner gilded-corner-tr" />
+        <div className="gilded-corner gilded-corner-bl" />
+        <div className="gilded-corner gilded-corner-br" />
+
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gold-secondary/30 pb-4 mb-4">
+          <button 
+            type="button" 
+            onClick={prevMonth}
+            className="p-2 text-gold-secondary hover:text-gold-bright hover:bg-gold-primary/10 rounded transition-all cursor-pointer"
+            title="Vorheriger Monat"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <div className="font-cinzel text-base font-bold text-gold-bright tracking-widest uppercase">
+            {monthNames[month]} {year}
+          </div>
+          <button 
+            type="button" 
+            onClick={nextMonth}
+            className="p-2 text-gold-secondary hover:text-gold-bright hover:bg-gold-primary/10 rounded transition-all cursor-pointer"
+            title="Nächster Monat"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Days of week header */}
+        <div className="grid grid-cols-7 gap-1 text-center font-cinzel text-xs font-bold text-gold-secondary uppercase mb-2">
+          <span>Mo</span>
+          <span>Di</span>
+          <span>Mi</span>
+          <span>Do</span>
+          <span>Fr</span>
+          <span>Sa</span>
+          <span>So</span>
+        </div>
+
+        {/* Calendar Grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {calendarDays.map((day, idx) => {
+            if (day === null) {
+              return <div key={`empty-${idx}`} className="h-10" />;
+            }
+
+            const currentDayDate = new Date(year, month, day);
+            currentDayDate.setHours(0, 0, 0, 0);
+
+            const isPast = currentDayDate < today;
+            const isTuesday = currentDayDate.getDay() === 2;
+            const isDisabled = isPast || isTuesday;
+
+            const dayStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            const isSelected = dayStr === selectedDate;
+            const isToday = currentDayDate.getTime() === today.getTime();
+
+            return (
+              <button
+                key={day}
+                type="button"
+                disabled={isDisabled}
+                onClick={() => {
+                  onSelectDate(dayStr);
+                  onClose();
+                }}
+                className={`h-10 flex flex-col items-center justify-center font-serif text-sm transition-all rounded relative cursor-pointer ${
+                  isSelected
+                    ? 'bg-gold-primary text-void-black font-bold shadow-md shadow-gold-primary/20 scale-105 z-10'
+                    : isDisabled
+                    ? 'text-cream-parchment/20 bg-tavern-dark/20 cursor-not-allowed'
+                    : 'text-cream-parchment hover:bg-gold-primary/20 hover:text-gold-bright'
+                } ${isToday && !isSelected ? 'border border-gold-primary/60 text-gold-primary font-bold' : ''}`}
+              >
+                <span>{day}</span>
+                {isTuesday && (
+                  <span className="text-[8px] leading-none text-red-400 font-cinzel tracking-tighter uppercase">Ruhe</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Legend / Info footer */}
+        <div className="mt-6 pt-4 border-t border-gold-secondary/20 flex items-center justify-between text-xs text-cream-parchment/60 font-serif">
+          <div className="flex items-center space-x-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-red-500/80 inline-block" />
+            <span>Dienstag: Ruhetag</span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-1.5 border border-gold-secondary/40 font-cinzel text-xs text-gold-primary hover:bg-gold-primary/10 transition-colors uppercase tracking-wider cursor-pointer"
+          >
+            Schließen
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================= MAIN RESERVATION VIEW COMPONENT ================= */
 export default function ReservationView({ initialNotes, onClearNotes }: ReservationViewProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [guests, setGuests] = useState(2);
-  const [date, setDate] = useState('');
+  
+  // Initialize default date to next open day
+  const [date, setDate] = useState(() => getNextOpenDate(new Date()));
   const [time, setTime] = useState('18:00');
   const [vault, setVault] = useState('Die Grosse Kathedrale');
   const [notes, setNotes] = useState(initialNotes || '');
   
+  // Custom Calendar Modal state
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
   // App states
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [searchCode, setSearchCode] = useState('');
@@ -30,12 +315,24 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   const [searchError, setSearchError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Synchronize available time slots when selected date changes
+  useEffect(() => {
+    if (!date) return;
+    const availableSlots = getTimeSlotsForDate(date);
+    if (availableSlots.length > 0) {
+      if (!availableSlots.includes(time)) {
+        setTime(availableSlots[0]);
+      }
+    } else {
+      setTime('');
+    }
+  }, [date]);
+
   // Handle incoming pre-filled notes (e.g. clicked dish from menu)
   useEffect(() => {
     if (initialNotes) {
       setNotes(initialNotes);
       setActiveTab('create');
-      // Clean up after importing
       if (onClearNotes) onClearNotes();
     }
   }, [initialNotes]);
@@ -81,6 +378,11 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     e.preventDefault();
     if (!name || !email || !date) {
       alert('Seid gegrüßt! Bitte füllt alle Pflichtfelder aus, um Eure Zunft anzumelden.');
+      return;
+    }
+
+    if (getDayOfWeek(date) === 2) {
+      alert('An Dienstagen ruhen Drachen und Wirtsleute. Bitte wählt einen anderen Tag für Euer Festmahl!');
       return;
     }
 
@@ -151,7 +453,6 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     if (confirm('Seid Ihr sicher, dass Ihr Euer Mahl stornieren wollt?')) {
       const targetRes = reservations.find((r) => r.id === id);
 
-      // Send cancellation email notification via PHP mail()
       if (targetRes) {
         try {
           await fetch('/send-cancellation.php', {
@@ -178,11 +479,23 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     }
   };
 
+  const isTuesdaySelected = getDayOfWeek(date) === 2;
+  const availableSlots = getTimeSlotsForDate(date);
+  const quickChips = getQuickChips();
+
   return (
     <section className="relative mx-auto max-w-5xl px-4 py-12 md:px-8">
       {/* Visual background lights */}
       <div className="absolute top-[10%] left-[20%] h-72 w-72 rounded-full bg-gold-primary/5 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[20%] right-[10%] h-72 w-72 rounded-full bg-gold-secondary/5 blur-3xl pointer-events-none" />
+
+      {/* Custom Calendar Modal */}
+      <CustomCalendarModal
+        isOpen={isCalendarOpen}
+        onClose={() => setIsCalendarOpen(false)}
+        selectedDate={date}
+        onSelectDate={(newDate) => setDate(newDate)}
+      />
 
       {/* View Header Tabs */}
       <div className="flex border-b border-gold-secondary/30 mb-8 max-w-lg mx-auto">
@@ -221,7 +534,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
       {activeTab === 'create' && (
         <div className="max-w-3xl mx-auto">
           {lastCreated ? (
-            /* Immersive Success Screen: Scroll */
+            /* Success Certificate */
             <div 
               id="booking-certificate-card"
               className="relative border-4 border-double border-gold-primary bg-void-black p-8 md:p-12 text-center text-cream-parchment animate-in fade-in duration-300"
@@ -248,83 +561,64 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 ~ Gezeichnet im Folianten der Drachen Taverne ~
               </p>
 
-              <div className="my-8 border-y border-gold-secondary/30 py-6 max-w-md mx-auto text-left space-y-4 font-serif">
-                <div className="flex justify-between items-center text-xs md:text-sm">
-                  <span className="text-cream-parchment/50 font-cinzel tracking-wider">ZUNFTBRIEF-NR:</span>
-                  <span className="font-mono text-gold-bright font-black tracking-wider text-base">{lastCreated.id}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs md:text-sm">
-                  <span className="text-cream-parchment/50 font-cinzel tracking-wider">EDLER GAST:</span>
-                  <span className="font-bold text-cream-parchment">{lastCreated.name}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs md:text-sm">
-                  <span className="text-cream-parchment/50 font-cinzel tracking-wider font-semibold">TISCHZUNFT FÜR:</span>
-                  <span className="font-bold text-gold-primary">{lastCreated.guests} Krieger</span>
-                </div>
-                <div className="flex justify-between items-center text-xs md:text-sm">
-                  <span className="text-cream-parchment/50 font-cinzel tracking-wider">DATUM & STUNDE:</span>
-                  <span className="font-bold">{lastCreated.date} um {lastCreated.time} Uhr</span>
-                </div>
-                <div className="flex justify-between items-center text-xs md:text-sm">
-                  <span className="text-cream-parchment/50 font-cinzel tracking-wider">GEWÖLBE:</span>
-                  <span className="font-cinzel text-xs text-gold-bright tracking-widest font-bold uppercase">{lastCreated.vault}</span>
-                </div>
+              <div className="my-8 border-y border-gold-secondary/30 py-6 space-y-3 font-serif text-base">
+                <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Nummer:</span> <strong className="text-gold-bright">{lastCreated.id}</strong></p>
+                <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Truppführer:</span> {lastCreated.name}</p>
+                <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gefährten:</span> {lastCreated.guests} Krieger</p>
+                <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Festmahl-Zeit:</span> {formatGermanDate(lastCreated.date)} um {lastCreated.time} Uhr</p>
+                <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gewölbe:</span> {lastCreated.vault}</p>
                 {lastCreated.notes && (
-                  <div className="border-t border-gold-secondary/15 pt-3 mt-3 text-xs italic text-cream-parchment/70 bg-void-black/40 p-2">
-                    <span className="font-cinzel text-[10px] tracking-wider text-gold-secondary uppercase block mb-1">Botschaft an den Wirt:</span>
-                    "{lastCreated.notes}"
-                  </div>
+                  <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Wünsche:</span> <span className="italic">{lastCreated.notes}</span></p>
                 )}
               </div>
 
-              <div className="pt-2 text-xs text-cream-parchment/60 leading-relaxed mb-8 max-w-md mx-auto">
-                Bringt diesen Brief geschmückt mit dem Reservierungscode auf Eurem Gerät mit. Unser Burgherr Alric hält Euren Met bereits kalt.
-              </div>
+              <p className="font-serif text-xs text-cream-parchment/60 mb-8 max-w-md mx-auto">
+                Notiert Euch Euren Buchungscode <strong>{lastCreated.id}</strong>. Ihr könnt damit jederzeit Euren Zunftbrief einsehen oder stornieren. Eine Brieftaube (E-Mail) wurde versendet.
+              </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   id="btn-new-booking"
                   onClick={() => setLastCreated(null)}
-                  className="border border-gold-secondary px-6 py-3 font-cinzel text-xs tracking-wider uppercase text-gold-secondary hover:text-gold-bright hover:bg-gold-secondary/10 transition-all cursor-pointer"
+                  className="bg-gold-primary px-6 py-3 font-cinzel text-xs font-bold tracking-widest uppercase text-void-black hover:bg-gold-bright transition-colors cursor-pointer"
                 >
-                  Weiteren Tisch buchen
+                  Weiteren Tisch reservieren
                 </button>
-                <button 
-                  id="btn-print"
-                  onClick={() => window.print()}
-                  className="bg-gold-primary border border-gold-primary px-6 py-3 font-cinzel text-xs tracking-wider font-bold uppercase text-void-black hover:bg-gold-bright transition-all cursor-pointer"
+                <button
+                  id="btn-cancel-this-booking"
+                  onClick={() => handleDelete(lastCreated.id)}
+                  className="border border-red-500/50 px-6 py-3 font-cinzel text-xs font-bold tracking-widest uppercase text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
                 >
-                  Brief drucken / sichern
+                  Stornieren
                 </button>
               </div>
             </div>
           ) : (
-            /* Creation Form */
+            /* Booking Form */
             <form 
-              id="booking-form"
               onSubmit={handleCreateReservation} 
-              className="relative border border-gold-secondary/40 bg-tavern-dark/40 p-6 md:p-12"
+              className="relative border border-gold-secondary/30 bg-tavern-dark/30 p-6 md:p-10 shadow-2xl backdrop-blur-sm"
             >
               <div className="gilded-corner gilded-corner-tl" />
               <div className="gilded-corner gilded-corner-tr" />
               <div className="gilded-corner gilded-corner-bl" />
               <div className="gilded-corner gilded-corner-br" />
 
-              <h2 className="text-center font-cinzel text-xl md:text-2xl font-black tracking-widest text-gold-primary uppercase mb-2">
-                Eine Tafel Reservieren
-              </h2>
-              <p className="text-center font-serif text-sm italic text-cream-parchment/50 mb-10">
-                Sichert Euch Euer Festmahl rechtzeitig bei Kerzenschein
-              </p>
+              <div className="text-center mb-8">
+                <h3 className="font-cinzel text-2xl font-bold tracking-widest text-gold-bright uppercase">
+                  EINE TAFEL RESERVIEREN
+                </h3>
+                <p className="font-serif text-xs italic text-cream-parchment/60 mt-1">
+                  Sichert Euch Euer Festmahl rechtzeitig bei Kerzenschein
+                </p>
+              </div>
 
-              <div className="space-y-8">
-                {/* Grid Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Name Input */}
+              <div className="space-y-6">
+                {/* Name & Email inputs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col space-y-2">
-                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span>Name der Truppe *</span>
+                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center gap-1.5">
+                      <User className="h-3.5 w-3.5" /> Name der Truppe *
                     </label>
                     <input
                       id="input-name"
@@ -337,11 +631,9 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     />
                   </div>
 
-                  {/* Email Input */}
                   <div className="flex flex-col space-y-2">
-                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center space-x-2">
-                      <Mail className="h-4 w-4" />
-                      <span>Inschrift (E-Mail) *</span>
+                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center gap-1.5">
+                      <Mail className="h-3.5 w-3.5" /> Inschrift (E-Mail) *
                     </label>
                     <input
                       id="input-email"
@@ -355,7 +647,8 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Guests, Date & Time selectors */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-2">
                   {/* Guests Selector */}
                   <div className="flex flex-col space-y-2">
                     <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase">
@@ -375,44 +668,120 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     </select>
                   </div>
 
-                  {/* Date Input */}
-                  <div className="flex flex-col space-y-2">
-                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase">
-                      Tag des Festmahls *
+                  {/* Date Input with Custom Visual Calendar */}
+                  <div className="flex flex-col space-y-2 col-span-1 md:col-span-1">
+                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center justify-between">
+                      <span>Tag des Festmahls *</span>
                     </label>
-                    <input
-                      id="input-date"
-                      type="date"
-                      required
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      className="border-0 border-b-2 border-gold-secondary/40 bg-transparent py-2 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer"
-                    />
+
+                    {/* Interactive Calendar Button */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        id="btn-open-calendar"
+                        onClick={() => setIsCalendarOpen(true)}
+                        className="w-full border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark/60 py-2 px-1 font-serif text-sm md:text-base text-gold-bright text-left flex items-center justify-between hover:border-gold-primary hover:bg-gold-primary/10 transition-all cursor-pointer group"
+                      >
+                        <span className="truncate">{formatGermanDate(date) || 'Tag wählen...'}</span>
+                        <Calendar className="h-4 w-4 text-gold-secondary group-hover:text-gold-bright shrink-0 ml-2" />
+                      </button>
+
+                      {/* Hidden native input fallback sync */}
+                      <input
+                        id="input-date"
+                        type="date"
+                        required
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        className="sr-only"
+                        tabIndex={-1}
+                      />
+                    </div>
                   </div>
 
-                  {/* Time Select */}
+                  {/* Dynamic Time Select */}
                   <div className="flex flex-col space-y-2">
-                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase">
-                      Stunde des Tages
+                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center justify-between">
+                      <span>Stunde des Tages *</span>
+                      {date && !isTuesdaySelected && (
+                        <span className="text-[10px] text-cream-parchment/50 font-serif lowercase font-normal">
+                          (küchenschluss-regelung)
+                        </span>
+                      )}
                     </label>
+
                     <select
                       id="select-time"
+                      disabled={isTuesdaySelected || availableSlots.length === 0}
                       value={time}
                       onChange={(e) => setTime(e.target.value)}
-                      className="border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer"
+                      className="border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      {['17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00'].map((hr) => (
-                        <option key={hr} value={hr} className="bg-void-black text-cream-parchment">
-                          {hr} Uhr
+                      {isTuesdaySelected ? (
+                        <option value="" className="bg-void-black text-red-400">
+                          Geschlossen (Ruhetag)
                         </option>
-                      ))}
+                      ) : availableSlots.length > 0 ? (
+                        availableSlots.map((hr) => (
+                          <option key={hr} value={hr} className="bg-void-black text-cream-parchment">
+                            {hr} Uhr
+                          </option>
+                        ))
+                      ) : (
+                        <option value="" className="bg-void-black text-cream-parchment">
+                          Keine Zeiten verfügbar
+                        </option>
+                      )}
                     </select>
                   </div>
                 </div>
 
+                {/* Quick Date Select Chips */}
+                <div className="flex items-center flex-wrap gap-2 pt-1 pb-2">
+                  <span className="font-cinzel text-[10px] font-bold uppercase tracking-wider text-gold-secondary/70 mr-1">
+                    Schnellwahl:
+                  </span>
+                  {quickChips.map((chip) => {
+                    const isSelected = date === chip.dateStr;
+                    const isChipTuesday = getDayOfWeek(chip.dateStr) === 2;
+                    return (
+                      <button
+                        key={chip.label}
+                        type="button"
+                        onClick={() => setDate(chip.dateStr)}
+                        className={`px-3 py-1 text-xs font-serif rounded transition-all border cursor-pointer ${
+                          isSelected
+                            ? 'border-gold-primary bg-gold-primary/20 text-gold-bright font-bold'
+                            : isChipTuesday
+                            ? 'border-red-500/30 bg-red-950/20 text-red-300/60 hover:border-red-500/60'
+                            : 'border-gold-secondary/20 bg-void-black/40 text-cream-parchment/70 hover:border-gold-secondary/50 hover:text-cream-parchment'
+                        }`}
+                      >
+                        {chip.label}
+                        {isChipTuesday && <span className="ml-1 text-[9px] text-red-400">(Ruhe)</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Tuesday Ruhetag Warning Banner */}
+                {isTuesdaySelected && (
+                  <div className="p-4 border border-red-500/50 bg-red-950/30 text-red-200 text-xs md:text-sm font-serif flex items-start space-x-3 rounded animate-in fade-in duration-200">
+                    <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold font-cinzel text-red-300 tracking-wide uppercase">
+                        Dienstags ist die Taverne geschlossen
+                      </p>
+                      <p className="mt-1 text-cream-parchment/80 leading-relaxed">
+                        An Dienstagen ruhen Drachen und Wirtsleute. Bitte wählt über die Schnellauswahl oder den Kalender einen anderen Tag für Eure Tischreservierung!
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Vault / Location Selection */}
-                <div className="flex flex-col space-y-3">
-                  <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase mb-2">
+                <div className="flex flex-col space-y-3 pt-2">
+                  <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase mb-1">
                     Wählt Euer Gewölbe
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -463,11 +832,11 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 </div>
               </div>
 
-              <div className="mt-12 text-center">
+              <div className="mt-10 text-center">
                 <button
                   id="btn-submit-booking"
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isTuesdaySelected}
                   className="w-full sm:w-auto bg-gold-primary border border-gold-primary px-10 py-4 font-cinzel text-sm font-black tracking-widest uppercase text-void-black hover:bg-gold-bright transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Brieftaube fliegt...' : 'Tischvertragsbrief absenden'}
@@ -499,125 +868,41 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 className="flex-1 border-0 border-b-2 border-gold-secondary bg-transparent py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary tracking-wider"
               />
               <button
-                id="search-submit"
+                id="btn-search"
                 type="submit"
-                className="bg-gold-primary border border-gold-primary px-8 py-3 text-void-black font-cinzel text-xs font-bold uppercase tracking-widest hover:bg-gold-bright transition-all flex items-center justify-center space-x-2 cursor-pointer shrink-0"
+                className="bg-gold-primary text-void-black px-6 py-2.5 font-cinzel text-xs font-bold uppercase tracking-widest hover:bg-gold-bright transition-colors cursor-pointer"
               >
-                <Search className="h-4 w-4" />
-                <span>Urkunde suchen</span>
+                Im Folianten Suchen
               </button>
             </div>
-            {searchError && (
-              <p id="search-error-msg" className="text-rose-400 font-serif text-xs italic">
-                {searchError}
-              </p>
-            )}
           </form>
 
-          {/* Result Card */}
-          {searchedReservation ? (
-            <div 
-              id="searched-booking-card"
-              className="relative border-2 border-gold-primary bg-void-black/80 p-6 md:p-8 animate-in fade-in duration-200"
-            >
-              <div className="gilded-corner gilded-corner-tl" />
-              <div className="gilded-corner gilded-corner-tr" />
-              <div className="gilded-corner gilded-corner-bl" />
-              <div className="gilded-corner gilded-corner-br" />
-
-              <div className="flex items-center justify-between border-b border-gold-secondary/30 pb-4 mb-4">
-                <div>
-                  <span className="font-mono text-gold-bright font-black tracking-widest text-base">
-                    {searchedReservation.id}
-                  </span>
-                  <div className="font-cinzel text-[10px] tracking-wider text-cream-parchment/50">
-                    STATUS: EINGETRAGEN
-                  </div>
-                </div>
-                <button
-                  id="btn-delete-searched"
-                  onClick={() => handleDelete(searchedReservation.id)}
-                  className="p-2 border border-rose-900/35 hover:bg-rose-950/20 text-rose-400 hover:text-rose-300 transition-all cursor-pointer"
-                  title="Stornieren"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-serif text-sm">
-                <div>
-                  <p className="text-cream-parchment/40 text-xs font-cinzel tracking-wider">GAST NAME</p>
-                  <p className="font-bold text-cream-parchment">{searchedReservation.name}</p>
-                </div>
-                <div>
-                  <p className="text-cream-parchment/40 text-xs font-cinzel tracking-wider">GAST INSCHRIFT</p>
-                  <p className="text-cream-parchment">{searchedReservation.email}</p>
-                </div>
-                <div>
-                  <p className="text-cream-parchment/40 text-xs font-cinzel tracking-wider">KRIEGER TABLE</p>
-                  <p className="font-bold text-gold-primary">{searchedReservation.guests} Gefährten</p>
-                </div>
-                <div>
-                  <p className="text-cream-parchment/40 text-xs font-cinzel tracking-wider">ZEITPUNKT</p>
-                  <p className="font-bold font-serif">{searchedReservation.date} um {searchedReservation.time} Uhr</p>
-                </div>
-                <div className="sm:col-span-2">
-                  <p className="text-cream-parchment/40 text-xs font-cinzel tracking-wider">TAVERNEN GEWÖLBE</p>
-                  <p className="font-cinzel text-xs text-gold-bright uppercase tracking-widest font-black leading-relaxed mt-0.5">
-                    {searchedReservation.vault}
-                  </p>
-                </div>
-                {searchedReservation.notes && (
-                  <div className="sm:col-span-2 border-t border-gold-secondary/10 pt-3 mt-1 italic text-xs text-cream-parchment/60 bg-void-black/30 p-2">
-                    <p className="font-cinzel text-[10px] text-gold-secondary tracking-widest uppercase mb-1">Eure Botschaft:</p>
-                    "{searchedReservation.notes}"
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center font-serif text-xs italic text-cream-parchment/40 py-8">
-              Sucht nach Eurem Zunftbrief, um Details einzusehen oder die Tischanzahl zu stornieren.
+          {searchError && (
+            <div className="p-4 border border-red-500/40 bg-red-950/20 text-red-300 text-sm font-serif mb-6 text-center">
+              {searchError}
             </div>
           )}
 
-          {/* All recorded listings helper (For developer testing and easy retrieval in UI) */}
-          {reservations.length > 0 && (
-            <div className="mt-12 border-t border-gold-secondary/25 pt-6">
-              <h4 className="font-cinzel text-[10px] tracking-widest text-gold-secondary font-black uppercase mb-3">
-                Aktive Zunftregister-Einträge auf diesem Applet ({reservations.length})
-              </h4>
-              <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                {reservations.map((res) => (
-                  <div 
-                    key={res.id} 
-                    className="flex justify-between items-center text-xs border border-gold-secondary/15 p-2 bg-void-black/40"
-                  >
-                    <div>
-                      <span className="font-mono text-gold-bright tracking-wider font-bold mr-3">{res.id}</span>
-                      <span className="font-serif text-cream-parchment/80">{res.name} ({res.guests} Gefährten)</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <button 
-                        id={`use-code-${res.id}`}
-                        onClick={() => {
-                          setSearchCode(res.id);
-                          setSearchedReservation(res);
-                        }}
-                        className="font-cinzel text-[10px] tracking-widest uppercase text-gold-secondary hover:text-gold-bright transition-colors cursor-pointer underline"
-                      >
-                        Wählen
-                      </button>
-                      <button 
-                        id={`cancel-res-${res.id}`}
-                        onClick={() => handleDelete(res.id)}
-                        className="text-rose-400 hover:text-rose-300 p-0.5 cursor-pointer"
-                      >
-                        Storno
-                      </button>
-                    </div>
-                  </div>
-                ))}
+          {searchedReservation && (
+            <div className="border border-gold-primary/50 bg-tavern-dark/40 p-6 space-y-4 font-serif text-sm">
+              <div className="flex justify-between items-center border-b border-gold-secondary/20 pb-3">
+                <span className="font-cinzel text-gold-bright font-bold">{searchedReservation.id}</span>
+                <span className="text-xs text-gold-secondary">{searchedReservation.vault}</span>
+              </div>
+              <div className="space-y-1">
+                <p><strong>Name:</strong> {searchedReservation.name}</p>
+                <p><strong>E-Mail:</strong> {searchedReservation.email}</p>
+                <p><strong>Krieger:</strong> {searchedReservation.guests} Personen</p>
+                <p><strong>Zeitpunkt:</strong> {formatGermanDate(searchedReservation.date)} um {searchedReservation.time} Uhr</p>
+                {searchedReservation.notes && <p><strong>Wünsche:</strong> {searchedReservation.notes}</p>}
+              </div>
+              <div className="pt-2 flex justify-end">
+                <button
+                  onClick={() => handleDelete(searchedReservation.id)}
+                  className="text-xs text-red-400 hover:text-red-300 underline font-cinzel uppercase tracking-wider cursor-pointer"
+                >
+                  Reservierung Stornieren
+                </button>
               </div>
             </div>
           )}
