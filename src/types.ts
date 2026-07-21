@@ -51,7 +51,5 @@ export interface JobApplication {
   name: string;
   email: string;
   phone?: string;
-  whatsapp: string;
   about?: string;
-  fileName?: string;
 }

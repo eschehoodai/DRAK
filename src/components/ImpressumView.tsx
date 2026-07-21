@@ -31,7 +31,7 @@ export default function ImpressumView() {
             Angaben gemäß § 5 TMG
           </h2>
           <div className="font-serif text-sm text-cream-parchment/80 leading-relaxed max-w-md">
-            <p className="font-bold text-base text-cream-parchment">DRAK GmbH</p>
+            <p className="font-bold text-base text-cream-parchment">Drak Zittau DLR Gastro Event UG</p>
             <p>Innere Weberstraße 11</p>
             <p>02763 Zittau</p>
           </div>

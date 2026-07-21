@@ -8,7 +8,7 @@ export default function DatenschutzView() {
     document.title = 'Datenschutzerklärung – Drachen Taverne';
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
-      meta.setAttribute('content', 'Datenschutzerklärung der Drachen Taverne (DRAK GmbH) gemäß DSGVO.');
+      meta.setAttribute('content', 'Datenschutzerklärung der Drachen Taverne (Drak Zittau DLR Gastro Event UG) gemäß DSGVO.');
     }
   }, []);
 
@@ -71,7 +71,7 @@ export default function DatenschutzView() {
             nationaler Datenschutzgesetze sowie sonstiger datenschutzrechtlicher Bestimmungen ist:
           </p>
           <address className="not-italic mt-3 space-y-0.5 pl-4 border-l-2 border-gold-secondary/20">
-            <p className="font-bold text-cream-parchment">DRAK GmbH</p>
+            <p className="font-bold text-cream-parchment">Drak Zittau DLR Gastro Event UG</p>
             <p>Innere Weberstraße 11</p>
             <p>02763 Zittau</p>
             <p className="pt-1">Vertreten durch: Robert Koch</p>

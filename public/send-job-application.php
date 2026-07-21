@@ -37,9 +37,7 @@ $position  = isset($data['position']) ? trim(strip_tags($data['position'])) : 'S
 $name      = isset($data['name']) ? trim(strip_tags($data['name'])) : '';
 $email     = isset($data['email']) ? filter_var(trim($data['email']), FILTER_SANITIZE_EMAIL) : '';
 $phone     = isset($data['phone']) ? trim(strip_tags($data['phone'])) : 'Nicht angegeben';
-$whatsapp  = isset($data['whatsapp']) ? trim(strip_tags($data['whatsapp'])) : 'Nicht angegeben';
 $about     = isset($data['about']) ? trim(strip_tags($data['about'])) : 'Keine zusätzliche Nachricht';
-$fileName  = isset($data['fileName']) ? trim(strip_tags($data['fileName'])) : 'Keine Datei angehängt';
 
 // Validierung
 if (empty($name) || empty($email)) {
@@ -63,8 +61,6 @@ $message .= "Gewünschte Stelle: " . $position . "\n";
 $message .= "Bewerber Name   : " . $name . "\n";
 $message .= "E-Mail-Adresse  : " . $email . "\n";
 $message .= "Telefonnummer   : " . $phone . "\n";
-$message .= "WhatsApp erwünscht: " . $whatsapp . "\n";
-$message .= "Angehängte Datei: " . $fileName . "\n";
 $message .= "--------------------------------------------------------\n";
 $message .= "Über den Bewerber / Motivation:\n";
 $message .= $about . "\n";

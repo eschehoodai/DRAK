@@ -3,33 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { JobApplication, JobPosition } from '../types';
-import { Briefcase, User, Mail, Phone, MessageCircle, UploadCloud, ScrollText, FileText, X } from 'lucide-react';
+import { Briefcase, User, Mail, Phone, ScrollText } from 'lucide-react';
 
 const POSITIONS: JobPosition[] = ['Servicekraft', 'Koch/Köchin'];
-
-const WHATSAPP_OPTIONS = [
-  'Ja gerne, unkompliziert per WhatsApp schreiben',
-  'Nein, lieber per E-Mail oder Telefon',
-];
-
-const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export default function JobsView() {
   const [position, setPosition] = useState<JobPosition>('Servicekraft');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [whatsapp, setWhatsapp] = useState(WHATSAPP_OPTIONS[0]);
   const [about, setAbout] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-  const [fileError, setFileError] = useState('');
-  const [isDragging, setIsDragging] = useState(false);
   const [submitted, setSubmitted] = useState<JobApplication | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Convert number to roman numerals to match the tavern's certificate style
   const toRoman = (num: number): string => {
@@ -44,26 +31,6 @@ export default function JobsView() {
       }
     }
     return roman;
-  };
-
-  const validateAndSetFile = (selected: File | null) => {
-    setFileError('');
-    if (!selected) {
-      setFile(null);
-      return;
-    }
-    if (selected.size > MAX_FILE_BYTES) {
-      setFileError('Euer Schriftstück ist zu schwer (max. 10 MB). Bitte wählt eine kleinere Datei.');
-      return;
-    }
-    setFile(selected);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const dropped = e.dataTransfer.files?.[0];
-    if (dropped) validateAndSetFile(dropped);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,9 +51,7 @@ export default function JobsView() {
       name,
       email,
       phone: phone || undefined,
-      whatsapp,
       about: about || undefined,
-      fileName: file?.name,
     };
 
     // Send email notification to server via PHP mail()
@@ -113,10 +78,7 @@ export default function JobsView() {
     setName('');
     setEmail('');
     setPhone('');
-    setWhatsapp(WHATSAPP_OPTIONS[0]);
     setAbout('');
-    setFile(null);
-    setFileError('');
   };
 
   return (
@@ -165,16 +127,10 @@ export default function JobsView() {
                 <span className="text-cream-parchment/50 font-cinzel tracking-wider">INSCHRIFT:</span>
                 <span className="font-bold">{submitted.email}</span>
               </div>
-              {submitted.fileName && (
-                <div className="flex justify-between items-center gap-3 text-xs md:text-sm">
-                  <span className="text-cream-parchment/50 font-cinzel tracking-wider shrink-0">FOLIANT:</span>
-                  <span className="font-serif text-cream-parchment/90 truncate">{submitted.fileName}</span>
-                </div>
-              )}
             </div>
 
             <div className="pt-2 text-xs text-cream-parchment/60 leading-relaxed mb-8 max-w-md mx-auto">
-              Habt Dank für Euer Interesse! Unser Burgherr meldet sich innerhalb von 3 Werktagen per Telefon oder WhatsApp bei Euch.
+              Habt Dank für Euer Interesse! Unser Burgherr meldet sich innerhalb von 3 Werktagen bei Euch.
             </div>
 
             <button
@@ -205,7 +161,7 @@ export default function JobsView() {
               Direkt-Kurzbewerbung
             </h2>
             <p className="text-center font-serif text-sm italic text-cream-parchment/50 mb-10 max-w-lg mx-auto leading-relaxed">
-              Sendet uns einfach Eure Eckdaten. Kein stundenlanges Schreiben nötig – wir melden uns innerhalb von 3 Werktagen per Telefon oder WhatsApp.
+              Sendet uns einfach Eure Eckdaten. Kein stundenlanges Schreiben nötig – wir melden uns innerhalb von 3 Werktagen bei Euch.
             </p>
 
             <div className="space-y-8">
@@ -264,41 +220,20 @@ export default function JobsView() {
                 </div>
               </div>
 
-              {/* Phone + WhatsApp */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="flex flex-col space-y-2">
-                  <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center space-x-2">
-                    <Phone className="h-4 w-4" />
-                    <span>Telefonnummer für Rückruf (optional)</span>
-                  </label>
-                  <input
-                    id="input-phone"
-                    type="tel"
-                    placeholder="z.B. +49 176 12345678"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="border-0 border-b-2 border-gold-secondary/40 bg-transparent py-2 font-serif text-base text-cream-parchment placeholder:text-cream-parchment/30 outline-none focus:border-gold-primary focus:drop-shadow-[0_4px_6px_rgba(212,175,55,0.15)] transition-all"
-                  />
-                </div>
-
-                <div className="flex flex-col space-y-2">
-                  <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center space-x-2">
-                    <MessageCircle className="h-4 w-4" />
-                    <span>WhatsApp erwünscht?</span>
-                  </label>
-                  <select
-                    id="select-whatsapp"
-                    value={whatsapp}
-                    onChange={(e) => setWhatsapp(e.target.value)}
-                    className="border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer"
-                  >
-                    {WHATSAPP_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt} className="bg-void-black text-cream-parchment">
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* Phone */}
+              <div className="flex flex-col space-y-2">
+                <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center space-x-2">
+                  <Phone className="h-4 w-4" />
+                  <span>Telefonnummer für Rückruf (optional)</span>
+                </label>
+                <input
+                  id="input-phone"
+                  type="tel"
+                  placeholder="z.B. +49 176 12345678"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="border-0 border-b-2 border-gold-secondary/40 bg-transparent py-2 font-serif text-base text-cream-parchment placeholder:text-cream-parchment/30 outline-none focus:border-gold-primary focus:drop-shadow-[0_4px_6px_rgba(212,175,55,0.15)] transition-all"
+                />
               </div>
 
               {/* About */}
@@ -315,82 +250,6 @@ export default function JobsView() {
                   onChange={(e) => setAbout(e.target.value)}
                   className="border-0 border-b-2 border-gold-secondary/40 bg-transparent py-2 font-serif text-sm text-cream-parchment placeholder:text-cream-parchment/30 outline-none focus:border-gold-primary transition-all resize-none"
                 />
-              </div>
-
-              {/* CV / cover letter upload */}
-              <div className="flex flex-col space-y-3">
-                <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase">
-                  Lebenslauf / Bewerbungsschreiben (optional)
-                </label>
-
-                <input
-                  ref={fileInputRef}
-                  id="input-file"
-                  type="file"
-                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*"
-                  className="hidden"
-                  onChange={(e) => validateAndSetFile(e.target.files?.[0] ?? null)}
-                />
-
-                {file ? (
-                  <div
-                    id="file-selected"
-                    className="flex items-center justify-between gap-4 border-2 border-gold-primary/60 bg-gold-primary/5 p-4"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <FileText className="h-6 w-6 text-gold-primary shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-serif text-sm text-cream-parchment truncate">{file.name}</p>
-                        <p className="font-mono text-[10px] text-cream-parchment/50">
-                          {(file.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      id="btn-remove-file"
-                      onClick={() => validateAndSetFile(null)}
-                      className="p-1.5 text-cream-parchment/60 hover:text-rose-400 transition-colors cursor-pointer shrink-0"
-                      title="Datei entfernen"
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
-                  </div>
-                ) : (
-                  <div
-                    id="file-dropzone"
-                    onClick={() => fileInputRef.current?.click()}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsDragging(true);
-                    }}
-                    onDragLeave={() => setIsDragging(false)}
-                    onDrop={handleDrop}
-                    className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed p-8 text-center transition-all cursor-pointer ${
-                      isDragging
-                        ? 'border-gold-primary bg-gold-primary/10'
-                        : 'border-gold-secondary/30 bg-void-black/20 hover:border-gold-secondary/60'
-                    }`}
-                  >
-                    <UploadCloud className="h-9 w-9 text-gold-secondary" />
-                    <p className="font-cinzel text-xs tracking-wider text-cream-parchment/80 uppercase">
-                      Lebenslauf hierher ziehen
-                    </p>
-                    <span className="font-serif text-[11px] italic text-cream-parchment/40">oder</span>
-                    <span className="border border-gold-secondary px-5 py-2 font-cinzel text-[11px] tracking-wider uppercase text-gold-secondary hover:text-gold-bright hover:bg-gold-secondary/10 transition-all">
-                      Datei auswählen
-                    </span>
-                    <p className="mt-2 font-serif text-[11px] text-cream-parchment/40">
-                      PDF, Word oder Bild (max. 10 MB)
-                    </p>
-                  </div>
-                )}
-
-                {fileError && (
-                  <p id="file-error-msg" className="text-rose-400 font-serif text-xs italic">
-                    {fileError}
-                  </p>
-                )}
               </div>
             </div>
 
