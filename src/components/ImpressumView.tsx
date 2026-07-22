@@ -58,7 +58,7 @@ export default function ImpressumView() {
               <span className="text-cream-parchment/50">Telefon:</span> 03583 5495389
             </p>
             <p>
-              <span className="text-cream-parchment/50">E-Mail:</span> post@drak.de
+              <span className="text-cream-parchment/50">E-Mail:</span> drakzittau@dlr-gastro-event.de
             </p>
           </div>
         </div>

@@ -37,9 +37,7 @@ Den kompletten Inhalt von `dist/` in das Web-Verzeichnis des Hosters hochladen
 
 Ausführliche Kunden- und Projektdokumentation: siehe [`KUNDENDOKUMENTATION.md`](file:///c:/Users/X/Desktop/Drachentaerne/KUNDENDOKUMENTATION.md).
 
-## Hinweis Reservierung
+## E-Mail-Versand & Backend
 
-Das Reservierungsformular speichert Buchungen derzeit nur im Browser des
-Gastes (localStorage) — es wird **keine Benachrichtigung an das Restaurant**
-versendet. Für den Produktivbetrieb muss ein E-Mail-Versand oder ein
-Reservierungssystem angebunden werden.
+Das Reservierungs- und Bewerbungssystem ist an PHP-Endpunkte (`public/send-booking.php`, `public/send-cancellation.php`, `public/send-job-application.php`) angebunden. Auf dem Netcup-Webhosting werden Anfragen automatisch per E-Mail an den Tavernen-Betreiber zugestellt.
+

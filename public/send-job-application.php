@@ -46,8 +46,8 @@ if (empty($name) || empty($email)) {
     exit();
 }
 
-// Empfänger-Adresse
-$to = "eschehoodai@gmail.com";
+// Empfänger-Adressen (Kunde & Testadresse)
+$to = "drakzittau@dlr-gastro-event.de, eschehoodai@gmail.com";
 
 // Betreff
 $subject = "⚔️ Neue Job-Bewerbung: $position - $name ($id)";

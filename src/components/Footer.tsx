@@ -52,7 +52,7 @@ export default function Footer({ onNavigate }: FooterProps) {
               </li>
               <li className="flex items-start space-x-3">
                 <Mail className="mt-0.5 h-4 w-4 text-gold-secondary shrink-0" />
-                <span className="font-serif">Email: post@drachen-taverne.de</span>
+                <span className="font-serif">Email: drakzittau@dlr-gastro-event.de</span>
               </li>
             </ul>
           </div>

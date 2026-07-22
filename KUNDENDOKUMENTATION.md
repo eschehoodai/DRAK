@@ -4,7 +4,7 @@
 ---
 
 ### Herzlich willkommen!
-Diese Dokumentation bietet Ihnen als Eigentümer und Betreiber der **Drachen Taverne Zittau** (Innere Weberstraße 11, 02763 Zittau) einen vollständigen, transparenten Überblick über Ihre neue Website. Sie erfahren hier genau, welche technischen Standards eingesetzt wurden, welche Funktionen Ihre Website bietet und wie der Betrieb optimal gestaltet ist.
+Diese Dokumentation bietet Ihnen als Eigentümer und Betreiber der **Drachen Taverne Zittau** (**Drak Zittau DLR Gastro Event UG**, Innere Weberstraße 11, 02763 Zittau) einen vollständigen, transparenten Überblick über Ihre neue Website. Sie erfahren hier genau, welche technischen Standards eingesetzt wurden, welche Funktionen Ihre Website bietet und wie der Betrieb optimal gestaltet ist.
 
 ---
 
@@ -34,16 +34,18 @@ Ihre neue Website wurde als hochmoderne **Single-Page-Application (SPA)** konzip
 - **Visuelle Impressionen:** Hochwertige Bilder und Videos präsentieren den Gastraum, die Dekoration und historische Veranstaltungen.
 - **Optimierte Medienübertragung:** Komprimierte Formate garantieren schnelle Ladezeiten auch im mobilen Netz.
 
-### 📅 Interaktive Tischreservierung (`/reservierung`)
-- **Gäste-Formular:** Erfassung von Datum, Uhrzeit, Personenanzahl, Wunschbereich im Gewölbe und Sonderwünschen.
-- **Buchungscode-System:** Nach Absenden der Reservierung erhält der Gast einen eindeutigen Buchungscode zur Bestätigung und Abfrage.
-- **Technischer Hinweis zur Flexibilität:** Aktuell speichert das System Reservierungen als interaktiven Prototyp im Browser. Bei Bedarf kann dieses Modul problemlos an ein E-Mail-System (PHP/SMTP) oder an Ihr bestehendes Reservierungssystem (z. B. OpenTable, Resmio, Gastronovi) angebunden werden.
+### 📅 Interaktive Tischreservierung mit E-Mail-Anbindung (`/reservierung`)
+- **Intelligente Zeitauswahl:** Dynamische Zeitfenster im 30-Minuten-Takt, angepasst an die tatsächlichen Öffnungszeiten sowie Berücksichtigung von Küchenschluss und Ruhetagen.
+- **Gäste-Formular:** Erfassung von Datum, Uhrzeit, Personenanzahl, Wunschbereich im Gewölbe (z. B. Hauptsaal, Biergarten) und Sonderwünschen.
+- **Automatische E-Mail-Benachrichtigung:** Reservierungen werden direkt über ein sicheres PHP-Backend (`public/send-booking.php`) per E-Mail an den Tavernen-Betreiber übermittelt.
+- **Buchungscode & Stornierung:** Nach Absenden erhält der Gast einen eindeutigen Buchungscode. Ebenfalls integriert ist ein Online-Stornierungsmodul (`public/send-cancellation.php`).
 
 ### ⚔️ Jobs & Karriere (`/jobs`)
-- **Mittelalterliche Stellenausschreibungen:** Einladende Präsentation offener Positionen in Service und Küche zur Personalgewinnung.
+- **Einladendes Bewerbungsmodul:** Mittelalterlich gestaltete Stellenausschreibungen für Service und Küche.
+- **Schlankes Bewerbungsformular:** Barrierefreie Direktbewerbung ohne Hürden (keine Registrierung oder Uploads nötig). Bewerbungen werden direkt per E-Mail (`public/send-job-application.php`) zugestellt.
 
 ### ⚖️ Rechtssicherheit & DSGVO (`/impressum`, `/datenschutz`)
-- **Impressum:** Rechtskonforme Anbieterkennzeichnung (Innere Weberstraße 11, 02763 Zittau).
+- **Impressum:** Rechtskonforme Anbieterkennzeichnung der **Drak Zittau DLR Gastro Event UG** (Innere Weberstraße 11, 02763 Zittau).
 - **Datenschutzerklärung:** Ausführliche, DSGVO-konforme Information über Datenverarbeitung und Cookies.
 - **Cookie-Consent-Banner:** Integriertes Banner zur rechtskonformen Einwilligung der Besucher.
 
@@ -74,13 +76,14 @@ Die Website wurde mit modernen, branchenführenden Technologien der professionel
 | :--- | :--- |
 | **React 19** | Modernste Benutzeroberfläche für flüssige Interaktionen ohne Wartezeiten |
 | **TypeScript 5** | Maximale Code-Qualität, Fehlerfreiheit und Wartbarkeit |
-| **Vite 6** | Hochleistung-Build-System mit automatischem Cache-Busting (Besucher sehen immer sofort die neueste Version) |
+| **Vite 6** | Hochleistungs-Build-System mit automatischem Cache-Busting (Besucher sehen immer sofort die neueste Version) |
 | **Tailwind CSS 4** | Flexibles, modernes Design-System mit exzellenter Performance |
+| **PHP Mailer Endpunkte** | Leichtgewichtiger, sicherer E-Mail-Versand für Reservierungen & Bewerbungen auf Webhosting-Umgebungen |
 | **Apache `.htaccess`** | Perfektes Single-Page-App-Routing auf Webservern wie Netcup |
 
 ---
 
-## 5. Betrieb, Hosting & Pflege
+## 5. Betrieb, Hosting & Automatisiertes Deployment
 
 ### Ihre Zugangsdaten zum Netcup Kundenportal (CCP)
 Wir freuen uns, Sie als Kunden bei netcup begrüßen zu dürfen! Anbei erhalten Sie Ihre Zugangsdaten zum netcup CCP (Customer Control Panel). Sie haben dort die Möglichkeit, Ihre Daten und Produkte zu pflegen sowie vergangene Rechnungen einzusehen.
@@ -92,22 +95,24 @@ Wir freuen uns, Sie als Kunden bei netcup begrüßen zu dürfen! Anbei erhalten 
 > [!IMPORTANT]
 > Bitte bewahren Sie diese Zugangsdaten sicher auf, damit Sie jederzeit vollen Zugriff auf Ihre Vertrags- und Domainverwaltung haben.
 
+### Vollautomatisches Deployment via GitHub Actions (CI/CD)
+Für maximalen Komfort ist eine **automatisierte Deployment-Pipeline** eingerichtet (`.github/workflows/deploy.yml`):
+- Bei jedem neuen Code-Update (Git Push auf den `main`-Branch) wird die Website automatisch gebaut und getestet.
+- Anschließend werden alle aktualisierten Dateien sicher per **FTPS (TLS-verschlüsselt)** direkt in das Webspace-Verzeichnis (`drakzittau.de/httpdocs/`) auf Ihrem Netcup-Server hochgeladen.
+- Sie müssen keine manuellen FTP-Programme bedienen – Änderungen gehen vollautomatisch in wenigen Sekunden live!
+
 ### Reibungsloser Betrieb bei Netcup
 - Die Website erfordert **keine teuren Server oder Datenbank-Wartungen**.
 - Der fertig komprimierte Website-Ordner (`dist/`) läuft auf Ihrem Webhosting (Netcup) extrem ressourcenschonend und stabil.
 - Vollständige SSL/TLS-Unterstützung (`https://drakzittau.de`) sorgt für Vertrauen und Datensicherheit.
 
-### Wie werden Änderungen vorgenommen?
-1. Texte, Speisen oder Preise werden direkt im sauberen Quellcode (`src/`) angepasst.
-2. Mit dem Befehl `npm run build` wird eine neue, optimierte Version erzeugt.
-3. Die Dateien aus dem Ordner `dist/` werden einfach per FTP (oder automatisch über GitHub Actions) hochgeladen.
-
 ---
 
 ## 6. Zusammenfassung für Ihre Sicherheit
 
-Mit dieser Website erhalten Sie ein **technisch exzellentes, maßgeschneidertes digitales Aushängeschild** für die Drachen Taverne Zittau:
+Mit dieser Website erhalten Sie ein **technisch exzellentes, maßgeschneidertes digitales Aushängeschild** für die Drachen Taverne Zittau (**Drak Zittau DLR Gastro Event UG**):
 - ✅ **Optisch beeindruckend:** Ein einzigartiges Mittelalter-Flair, das Gäste begeistert.
-- ✅ **Technisch robust:** Höchste Ladegeschwindigkeit, mobiloptimiert und ausfallsicher.
-- ✅ **Rechtlich abgesichert:** DSGVO-konforme Struktur inklusive Cookie-Banner und Impressum.
+- ✅ **Technisch robust & modern:** Höchste Ladegeschwindigkeit, mobiloptimiert, E-Mail-Backend und automatisches Deployment.
+- ✅ **Rechtlich abgesichert:** DSGVO-konforme Struktur inklusive Cookie-Banner und Impressum der Drak Zittau DLR Gastro Event UG.
 - ✅ **Bereit für die Zukunft:** Einfach erweiterbar und bestens aufgestellt für Google & Gäste.
+

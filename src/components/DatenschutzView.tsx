@@ -78,8 +78,8 @@ export default function DatenschutzView() {
             <p className="pt-1">Telefon: 03583 5495389</p>
             <p>
               E-Mail:{' '}
-              <a href="mailto:post@drak.de" className="text-gold-bright hover:underline">
-                post@drak.de
+              <a href="mailto:drakzittau@dlr-gastro-event.de" className="text-gold-bright hover:underline">
+                drakzittau@dlr-gastro-event.de
               </a>
             </p>
           </address>
@@ -325,8 +325,8 @@ export default function DatenschutzView() {
           </ul>
           <p className="mt-3">
             Zur Ausübung Ihrer Rechte wenden Sie sich bitte an:{' '}
-            <a href="mailto:post@drak.de" className="text-gold-bright hover:underline">
-              post@drak.de
+            <a href="mailto:drakzittau@dlr-gastro-event.de" className="text-gold-bright hover:underline">
+              drakzittau@dlr-gastro-event.de
             </a>
           </p>
         </section>

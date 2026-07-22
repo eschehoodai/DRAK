@@ -40,8 +40,8 @@ $date     = isset($data['date']) ? trim(strip_tags($data['date'])) : '';
 $time     = isset($data['time']) ? trim(strip_tags($data['time'])) : '';
 $vault    = isset($data['vault']) ? trim(strip_tags($data['vault'])) : 'Gewölbe';
 
-// Empfänger-Adresse
-$to = "eschehoodai@gmail.com";
+// Empfänger-Adressen (Kunde & Testadresse)
+$to = "drakzittau@dlr-gastro-event.de, eschehoodai@gmail.com";
 
 // Betreff
 $subject = "❌ Stornierung Tischreservierung: $id - $name";

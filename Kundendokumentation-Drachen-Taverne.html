@@ -149,13 +149,13 @@
     <h2>Übergabe- &amp; Produktdokumentation</h2>
     <h1>Drachen Taverne Zittau</h1>
     <p style="color: #4a5568; font-size: 10.5pt; margin-top: 4px;">
-      Innere Weberstraße 11, 02763 Zittau &bull; <strong>https://drakzittau.de</strong>
+      <strong>Drak Zittau DLR Gastro Event UG</strong> &bull; Innere Weberstraße 11, 02763 Zittau &bull; <strong>https://drakzittau.de</strong>
     </p>
   </div>
 
   <div class="welcome-box">
     <strong>Herzlich willkommen!</strong><br>
-    Diese Dokumentation bietet Ihnen als Eigentümer und Betreiber der Drachen Taverne Zittau einen vollständigen, transparenten Überblick über Ihre neue Website. Sie erfahren hier genau, welche technischen Standards eingesetzt wurden, welche Funktionen Ihre Website bietet und wie der Betrieb optimal gestaltet ist.
+    Diese Dokumentation bietet Ihnen als Eigentümer und Betreiber der Drachen Taverne Zittau (Drak Zittau DLR Gastro Event UG) einen vollständigen, transparenten Überblick über Ihre neue Website. Sie erfahren hier genau, welche technischen Standards eingesetzt wurden, welche Funktionen Ihre Website bietet und wie der Betrieb optimal gestaltet ist.
   </div>
 
   <h2 class="section-title">1. Übersicht &amp; Qualitätsversprechen</h2>
@@ -190,21 +190,23 @@
     <li><strong>Optimierte Medienübertragung:</strong> Komprimierte Formate garantieren schnelle Ladezeiten auch im mobilen Netz.</li>
   </ul>
 
-  <h3 class="sub-title">📅 Interaktive Tischreservierung (<code>/reservierung</code>)</h3>
+  <h3 class="sub-title">📅 Interaktive Tischreservierung mit E-Mail-Anbindung (<code>/reservierung</code>)</h3>
   <ul>
-    <li><strong>Gäste-Formular:</strong> Erfassung von Datum, Uhrzeit, Personenanzahl, Wunschbereich im Gewölbe und Sonderwünschen.</li>
-    <li><strong>Buchungscode-System:</strong> Nach Absenden der Reservierung erhält der Gast einen eindeutigen Buchungscode zur Bestätigung und Abfrage.</li>
-    <li><strong>Technischer Hinweis zur Flexibilität:</strong> Aktuell speichert das System Reservierungen als interaktiven Prototyp im Browser. Bei Bedarf kann dieses Modul problemlos an ein E-Mail-System (PHP/SMTP) oder an Ihr bestehendes Reservierungssystem (z. B. OpenTable, Resmio, Gastronovi) angebunden werden.</li>
+    <li><strong>Intelligente Zeitauswahl:</strong> Dynamische Zeitfenster im 30-Minuten-Takt, angepasst an die tatsächlichen Öffnungszeiten sowie Berücksichtigung von Küchenschluss und Ruhetagen.</li>
+    <li><strong>Gäste-Formular:</strong> Erfassung von Datum, Uhrzeit, Personenanzahl, Wunschbereich im Gewölbe (z. B. Hauptsaal, Biergarten) und Sonderwünschen.</li>
+    <li><strong>Automatische E-Mail-Benachrichtigung:</strong> Reservierungen werden direkt über ein sicheres PHP-Backend (<code>public/send-booking.php</code>) per E-Mail an den Tavernen-Betreiber übermittelt.</li>
+    <li><strong>Buchungscode &amp; Stornierung:</strong> Nach Absenden erhält der Gast einen eindeutigen Buchungscode. Ebenfalls integriert ist ein Online-Stornierungsmodul (<code>public/send-cancellation.php</code>).</li>
   </ul>
 
   <h3 class="sub-title">⚔️ Jobs &amp; Karriere (<code>/jobs</code>)</h3>
   <ul>
-    <li><strong>Mittelalterliche Stellenausschreibungen:</strong> Einladende Präsentation offener Positionen in Service und Küche zur Personalgewinnung.</li>
+    <li><strong>Einladendes Bewerbungsmodul:</strong> Mittelalterlich gestaltete Stellenausschreibungen für Service und Küche.</li>
+    <li><strong>Schlankes Bewerbungsformular:</strong> Barrierefreie Direktbewerbung ohne Hürden (keine Registrierung oder Uploads nötig). Bewerbungen werden direkt per E-Mail (<code>public/send-job-application.php</code>) zugestellt.</li>
   </ul>
 
   <h3 class="sub-title">⚖️ Rechtssicherheit &amp; DSGVO (<code>/impressum</code>, <code>/datenschutz</code>)</h3>
   <ul>
-    <li><strong>Impressum:</strong> Rechtskonforme Anbieterkennzeichnung (Innere Weberstraße 11, 02763 Zittau).</li>
+    <li><strong>Impressum:</strong> Rechtskonforme Anbieterkennzeichnung der <strong>Drak Zittau DLR Gastro Event UG</strong> (Innere Weberstraße 11, 02763 Zittau).</li>
     <li><strong>Datenschutzerklärung:</strong> Ausführliche, DSGVO-konforme Information über Datenverarbeitung und Cookies.</li>
     <li><strong>Cookie-Consent-Banner:</strong> Integriertes Banner zur rechtskonformen Einwilligung der Besucher.</li>
   </ul>
@@ -242,11 +244,15 @@
       </tr>
       <tr>
         <td><strong>Vite 6</strong></td>
-        <td>Hochleistung-Build-System mit automatischem Cache-Busting (Besucher sehen immer sofort die neueste Version)</td>
+        <td>Hochleistungs-Build-System mit automatischem Cache-Busting (Besucher sehen immer sofort die neueste Version)</td>
       </tr>
       <tr>
         <td><strong>Tailwind CSS 4</strong></td>
         <td>Flexibles, modernes Design-System mit exzellenter Performance</td>
+      </tr>
+      <tr>
+        <td><strong>PHP Mailer Endpunkte</strong></td>
+        <td>Leichtgewichtiger, sicherer E-Mail-Versand für Reservierungen &amp; Bewerbungen auf Webhosting-Umgebungen</td>
       </tr>
       <tr>
         <td><strong>Apache <code>.htaccess</code></strong></td>
@@ -255,7 +261,7 @@
     </tbody>
   </table>
 
-  <h2 class="section-title">5. Betrieb, Hosting &amp; Pflege</h2>
+  <h2 class="section-title">5. Betrieb, Hosting &amp; Automatisiertes Deployment</h2>
 
   <div class="credentials-card avoid-break">
     <h4>🔐 Ihre Zugangsdaten zum Netcup Kundenportal (CCP)</h4>
@@ -276,6 +282,13 @@
     <strong>Wichtiger Sicherheitshinweis:</strong> Bitte bewahren Sie diese Zugangsdaten sicher auf, damit Sie jederzeit vollen Zugriff auf Ihre Vertrags- und Domainverwaltung haben.
   </div>
 
+  <h3 class="sub-title">Vollautomatisches Deployment via GitHub Actions (CI/CD)</h3>
+  <ul>
+    <li>Bei jedem neuen Code-Update (Git Push auf den <code>main</code>-Branch) wird die Website automatisch gebaut und getestet.</li>
+    <li>Anschließend werden alle aktualisierten Dateien sicher per <strong>FTPS (TLS-verschlüsselt)</strong> direkt in das Webspace-Verzeichnis (<code>drakzittau.de/httpdocs/</code>) auf Ihrem Netcup-Server hochgeladen.</li>
+    <li>Sie müssen keine manuellen FTP-Programme bedienen – Änderungen gehen vollautomatisch in wenigen Sekunden live!</li>
+  </ul>
+
   <h3 class="sub-title">Reibungsloser Betrieb bei Netcup</h3>
   <ul>
     <li>Die Website erfordert <strong>keine teuren Server oder Datenbank-Wartungen</strong>.</li>
@@ -284,16 +297,16 @@
   </ul>
 
   <h2 class="section-title">6. Zusammenfassung für Ihre Sicherheit</h2>
-  <p>Mit dieser Website erhalten Sie ein <strong>technisch exzellentes, maßgeschneidertes digitales Aushängeschild</strong> für die Drachen Taverne Zittau:</p>
+  <p>Mit dieser Website erhalten Sie ein <strong>technisch exzellentes, maßgeschneidertes digitales Aushängeschild</strong> für die Drachen Taverne Zittau (<strong>Drak Zittau DLR Gastro Event UG</strong>):</p>
   <ul>
     <li>✅ <strong>Optisch beeindruckend:</strong> Ein einzigartiges Mittelalter-Flair, das Gäste begeistert.</li>
-    <li>✅ <strong>Technisch robust:</strong> Höchste Ladegeschwindigkeit, mobiloptimiert und ausfallsicher.</li>
-    <li>✅ <strong>Rechtlich abgesichert:</strong> DSGVO-konforme Struktur inklusive Cookie-Banner und Impressum.</li>
+    <li>✅ <strong>Technisch robust &amp; modern:</strong> Höchste Ladegeschwindigkeit, mobiloptimiert, E-Mail-Backend und automatisches Deployment.</li>
+    <li>✅ <strong>Rechtlich abgesichert:</strong> DSGVO-konforme Struktur inklusive Cookie-Banner und Impressum der Drak Zittau DLR Gastro Event UG.</li>
     <li>✅ <strong>Bereit für die Zukunft:</strong> Einfach erweiterbar und bestens aufgestellt für Google &amp; Gäste.</li>
   </ul>
 
   <div class="footer-note">
-    Drachen Taverne Zittau &bull; Innere Weberstraße 11, 02763 Zittau &bull; https://drakzittau.de
+    Drak Zittau DLR Gastro Event UG &bull; Innere Weberstraße 11, 02763 Zittau &bull; https://drakzittau.de
   </div>
 
 </body>

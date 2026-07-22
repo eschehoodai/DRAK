@@ -49,8 +49,8 @@ if (empty($name) || empty($email) || empty($date)) {
     exit();
 }
 
-// Empfänger-Adresse (Testadresse)
-$to = "eschehoodai@gmail.com";
+// Empfänger-Adressen (Kunde & Testadresse)
+$to = "drakzittau@dlr-gastro-event.de, eschehoodai@gmail.com";
 
 // Betreff
 $subject = "🐉 Neue Tischreservierung: $id - $name";
