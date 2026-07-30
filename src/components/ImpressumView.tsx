@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Shield, Building2, Scale, HelpCircle } from 'lucide-react';
+import { Shield, Building2, Scale, FileText } from 'lucide-react';
 
 export default function ImpressumView() {
   return (
@@ -12,7 +12,7 @@ export default function ImpressumView() {
       {/* Background ambient highlights */}
       <div className="absolute top-[30%] left-1/2 -translate-x-1/2 h-96 w-96 rounded-full bg-gold-secondary/5 blur-3xl pointer-events-none" />
 
-      {/* Main Container Frame exactly matching screen mockup */}
+      {/* Main Container Frame */}
       <div id="impressum-gold-frame" className="relative border border-gold-secondary pb-16 pt-16 px-6 md:px-16 bg-tavern-dark/35">
         {/* Absolute Positioning Corner Flourishes */}
         <div className="gilded-corner gilded-corner-tl" />
@@ -31,24 +31,43 @@ export default function ImpressumView() {
             Angaben gemäß § 5 TMG
           </h2>
           <div className="font-serif text-sm text-cream-parchment/80 leading-relaxed max-w-md">
-            <p className="font-bold text-base text-cream-parchment">Drak Zittau DLR Gastro Event UG</p>
+            <p className="font-bold text-base text-cream-parchment">DLR Gastro Event UG (haftungsbeschränkt)</p>
             <p>Innere Weberstraße 11</p>
             <p>02763 Zittau</p>
           </div>
           <div className="font-serif text-sm text-cream-parchment/80 leading-relaxed max-w-md pt-2">
-            <p className="italic text-cream-parchment/60">Vertreten durch:</p>
+            <p className="italic text-cream-parchment/60">Verantwortlicher / Vertreten durch:</p>
             <p className="font-bold">Robert Koch</p>
           </div>
         </div>
 
-        {/* Medieval Divider 1 (Scales/Legal) */}
+        {/* Medieval Divider 1 */}
+        <div className="my-12 flex items-center justify-center space-x-6">
+          <div className="h-[1px] w-24 bg-gradient-to-r from-transparent to-gold-secondary/40" />
+          <Building2 className="h-5 w-5 text-gold-secondary shrink-0" />
+          <div className="h-[1px] w-24 bg-gradient-to-l from-transparent to-gold-secondary/40" />
+        </div>
+
+        {/* Section 2: Handelsregister */}
+        <div className="text-center flex flex-col items-center space-y-4">
+          <h2 id="imp-hdr-register" className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase">
+            Handelsregister
+          </h2>
+          <div className="font-serif text-sm text-cream-parchment/80 leading-relaxed max-w-md">
+            <p className="text-cream-parchment/60">Eintragung im Handelsregister:</p>
+            <p className="font-bold">Amtsgericht Dresden</p>
+            <p className="font-mono text-gold-bright tracking-wider font-bold">HRB 45464</p>
+          </div>
+        </div>
+
+        {/* Medieval Divider 2 */}
         <div className="my-12 flex items-center justify-center space-x-6">
           <div className="h-[1px] w-24 bg-gradient-to-r from-transparent to-gold-secondary/40" />
           <Scale className="h-5 w-5 text-gold-secondary shrink-0" />
           <div className="h-[1px] w-24 bg-gradient-to-l from-transparent to-gold-secondary/40" />
         </div>
 
-        {/* Section 2: Kontakt */}
+        {/* Section 3: Kontakt */}
         <div className="text-center flex flex-col items-center space-y-4">
           <h2 id="imp-hdr-kontakt" className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase">
             Kontakt
@@ -58,19 +77,19 @@ export default function ImpressumView() {
               <span className="text-cream-parchment/50">Telefon:</span> 03583 5495389
             </p>
             <p>
-              <span className="text-cream-parchment/50">E-Mail:</span> drakzittau@dlr-gastro-event.de
+              <span className="text-cream-parchment/50">E-Mail:</span> finanzen@dlr-gastro-event.de
             </p>
           </div>
         </div>
 
-        {/* Medieval Divider 2 (Shield/Security) */}
+        {/* Medieval Divider 3 */}
         <div className="my-12 flex items-center justify-center space-x-6">
           <div className="h-[1px] w-24 bg-gradient-to-r from-transparent to-gold-secondary/40" />
           <Shield className="h-5 w-5 text-gold-secondary shrink-0" />
           <div className="h-[1px] w-24 bg-gradient-to-l from-transparent to-gold-secondary/40" />
         </div>
 
-        {/* Section 3: Umsatzsteuer-ID */}
+        {/* Section 4: Umsatzsteuer-ID */}
         <div className="text-center flex flex-col items-center space-y-4">
           <h2 id="imp-hdr-ustid" className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase">
             Umsatzsteuer-ID
@@ -81,14 +100,14 @@ export default function ImpressumView() {
           </div>
         </div>
 
-        {/* Medieval Divider 3 (Building/Courthouse) */}
+        {/* Medieval Divider 4 */}
         <div className="my-12 flex items-center justify-center space-x-6">
           <div className="h-[1px] w-24 bg-gradient-to-r from-transparent to-gold-secondary/40" />
-          <Building2 className="h-5 w-5 text-gold-secondary shrink-0" />
+          <FileText className="h-5 w-5 text-gold-secondary shrink-0" />
           <div className="h-[1px] w-24 bg-gradient-to-l from-transparent to-gold-secondary/40" />
         </div>
 
-        {/* Section 4: Streitschlichtung */}
+        {/* Section 5: Streitschlichtung */}
         <div className="text-center flex flex-col items-center space-y-4">
           <h2 id="imp-hdr-streit" className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase">
             Streitschlichtung
@@ -118,3 +137,4 @@ export default function ImpressumView() {
     </section>
   );
 }
+

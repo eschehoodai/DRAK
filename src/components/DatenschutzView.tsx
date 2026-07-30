@@ -30,21 +30,23 @@ export default function DatenschutzView() {
         </p>
         <ol className="list-decimal list-inside space-y-1.5 text-sm text-cream-parchment/70">
           {[
-            ['sec-verantwortlicher', 'Verantwortlicher'],
-            ['sec-dsb', 'Datenschutzbeauftragter'],
-            ['sec-logfiles', 'Server-Logfiles'],
-            ['sec-cookies', 'Cookies'],
-            ['sec-reservierung', 'Reservierungsformular'],
-            ['sec-bewerbung', 'Bewerbungsformular'],
-            ['sec-fonts', 'Google Fonts'],
-            ['sec-empfaenger', 'Empfänger der Daten'],
-            ['sec-drittland', 'Drittlandtransfer'],
-            ['sec-rechte', 'Ihre Rechte als betroffene Person'],
-            ['sec-widerruf', 'Widerrufsrecht'],
-            ['sec-beschwerde', 'Beschwerderecht'],
-            ['sec-bereitstellung', 'Pflicht zur Bereitstellung von Daten'],
-            ['sec-profiling', 'Automatisierte Entscheidungsfindung'],
-            ['sec-stand', 'Aktualität und Änderung'],
+            ['sec-hinweise', 'Allgemeine Hinweise zur Datensicherheit'],
+            ['sec-verantwortlicher', '1. Verantwortlicher'],
+            ['sec-dsb', '2. Datenschutzbeauftragter'],
+            ['sec-logfiles', '3. Server-Logfiles'],
+            ['sec-cookies', '4. Cookies'],
+            ['sec-reservierung', '5. Reservierungsformular'],
+            ['sec-bewerbung', '6. Bewerbungsformular'],
+            ['sec-fonts', '7. Google Fonts'],
+            ['sec-empfaenger', '8. Empfänger der Daten'],
+            ['sec-drittland', '9. Drittlandtransfer'],
+            ['sec-rechte', '10. Ihre Rechte als betroffene Person'],
+            ['sec-widerruf', '11. Widerrufsrecht bei Einwilligung'],
+            ['sec-beschwerde', '12. Beschwerderecht bei einer Aufsichtsbehörde'],
+            ['sec-bereitstellung', '13. Pflicht zur Bereitstellung von Daten'],
+            ['sec-loeschung', '14. Routinemäßige Löschung und Sperrung von personenbezogenen Daten'],
+            ['sec-profiling', '15. Automatisierte Entscheidungsfindung'],
+            ['sec-stand', '16. Aktualität und Änderung dieser Datenschutzerklärung'],
           ].map(([id, label]) => (
             <li key={id}>
               <button
@@ -60,6 +62,21 @@ export default function DatenschutzView() {
 
       {/* ── Inhalt ── */}
       <div className="space-y-10 text-sm leading-relaxed text-cream-parchment/80 print:text-black print:leading-normal">
+
+        {/* Allgemeine Hinweise zur Datensicherheit */}
+        <section id="sec-hinweise">
+          <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
+            Allgemeine Hinweise zur Datensicherheit
+          </h2>
+          <p>
+            Die DLR Gastro Event UG hat als für die Verarbeitung Verantwortlicher zahlreiche technische und
+            organisatorische Maßnahmen umgesetzt, um einen möglichst lückenlosen Schutz der über diese Internetseite
+            verarbeiteten personenbezogenen Daten sicherzustellen. Dennoch können Internetbasierte Datenübertragungen
+            grundsätzlich Sicherheitslücken aufweisen, sodass ein absoluter Schutz nicht gewährleistet werden kann.
+            Aus diesem Grund steht es jeder betroffenen Person frei, personenbezogene Daten auch auf alternativen Wegen,
+            beispielsweise telefonisch, an uns zu übermitteln.
+          </p>
+        </section>
 
         {/* 1. Verantwortlicher */}
         <section id="sec-verantwortlicher">
@@ -187,7 +204,7 @@ export default function DatenschutzView() {
           </p>
           <ul className="list-disc list-inside mt-2 space-y-1 pl-2">
             <li>Name</li>
-            <li>E-Mail-Adresse</li>
+            <li>Telefonnummer</li>
             <li>Anzahl der Gäste</li>
             <li>Gewünschtes Datum und Uhrzeit</li>
             <li>Gewünschter Bereich</li>
@@ -212,10 +229,8 @@ export default function DatenschutzView() {
             <li>Name</li>
             <li>E-Mail-Adresse</li>
             <li>Telefonnummer (optional)</li>
-            <li>WhatsApp-Erreichbarkeit</li>
             <li>Gewünschte Position</li>
             <li>Freitext zur Person (optional)</li>
-            <li>Lebenslauf als Dateianhang (optional)</li>
           </ul>
           <div className="mt-3 space-y-1">
             <p><span className="text-gold-secondary font-bold">Zweck:</span> Durchführung des Bewerbungsverfahrens.</p>
@@ -291,13 +306,17 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 10. Betroffenenrechte */}
+        {/* 10. Ihre Rechte als betroffene Person */}
         <section id="sec-rechte">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
             10. Ihre Rechte als betroffene Person
           </h2>
           <p>Sie haben nach der DSGVO folgende Rechte:</p>
           <ul className="list-disc list-inside mt-2 space-y-2 pl-2">
+            <li>
+              <span className="text-cream-parchment font-bold">Recht auf Bestätigung:</span>{' '}
+              Jede betroffene Person hat das Recht, von dem für die Verarbeitung Verantwortlichen eine Bestätigung darüber zu verlangen, ob sie betreffende personenbezogene Daten verarbeitet werden.
+            </li>
             <li>
               <span className="text-cream-parchment font-bold">Auskunftsrecht (Art. 15 DSGVO):</span>{' '}
               Sie haben das Recht, Auskunft über Ihre von uns verarbeiteten personenbezogenen Daten zu verlangen.
@@ -331,7 +350,7 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 11. Widerrufsrecht */}
+        {/* 11. Widerrufsrecht bei Einwilligung */}
         <section id="sec-widerruf">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
             11. Widerrufsrecht bei Einwilligung
@@ -354,7 +373,7 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 12. Beschwerderecht */}
+        {/* 12. Beschwerderecht bei einer Aufsichtsbehörde */}
         <section id="sec-beschwerde">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
             12. Beschwerderecht bei einer Aufsichtsbehörde
@@ -370,36 +389,41 @@ export default function DatenschutzView() {
             <p className="font-bold text-cream-parchment">Sächsischer Datenschutzbeauftragter</p>
             <p>Devrientstraße 1</p>
             <p>01067 Dresden</p>
-            <p className="pt-1">
-              <a
-                href="https://www.saechsdsb.de"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gold-bright hover:underline"
-              >
-                www.saechsdsb.de
-              </a>
-            </p>
           </address>
         </section>
 
-        {/* 13. Pflicht zur Bereitstellung */}
+        {/* 13. Pflicht zur Bereitstellung von Daten */}
         <section id="sec-bereitstellung">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
             13. Pflicht zur Bereitstellung von Daten
           </h2>
           <p>
-            Die Bereitstellung personenbezogener Daten ist weder gesetzlich noch vertraglich
-            vorgeschrieben. Für die Nutzung unserer Reservierungsfunktion ist die Angabe
-            bestimmter Daten (Name, E-Mail, Gästeanzahl) jedoch erforderlich. Ohne diese Angaben
-            kann die Reservierung nicht durchgeführt werden.
+            Wir klären Sie darüber auf, dass die Bereitstellung personenbezogener Daten zum Teil
+            gesetzlich vorgeschrieben ist (z.B. Steuervorschriften) oder sich auch aus vertraglichen
+            Regelungen (z.B. Angaben zum Vertragspartner) ergeben kann. Für die Nutzung unserer
+            Reservierungsfunktion ist die Angabe bestimmter Daten (Name, E-Mail, Gästeanzahl) jedoch
+            zwingend erforderlich. Ohne diese Angaben kann die Reservierung nicht durchgeführt werden.
           </p>
         </section>
 
-        {/* 14. Automatisierte Entscheidungsfindung */}
+        {/* 14. Routinemäßige Löschung und Sperrung von personenbezogenen Daten */}
+        <section id="sec-loeschung">
+          <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
+            14. Routinemäßige Löschung und Sperrung von personenbezogenen Daten
+          </h2>
+          <p>
+            Das Kriterium für die Dauer der Speicherung von personenbezogenen Daten ist die jeweilige
+            gesetzliche Aufbewahrungsfrist. Entfällt der Speicherungszweck oder läuft eine vom
+            Europäischen Richtlinien- und Verordnungsgeber oder einem anderen zuständigen Gesetzgeber
+            vorgeschriebene Speicherfrist ab, werden die personenbezogenen Daten routinemäßig und
+            entsprechend den gesetzlichen Vorschriften gesperrt oder gelöscht.
+          </p>
+        </section>
+
+        {/* 15. Automatisierte Entscheidungsfindung */}
         <section id="sec-profiling">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            14. Automatisierte Entscheidungsfindung
+            15. Automatisierte Entscheidungsfindung
           </h2>
           <p>
             Es findet keine automatisierte Entscheidungsfindung einschließlich Profiling gemäß
@@ -407,10 +431,10 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 15. Stand */}
+        {/* 16. Aktualität und Änderung dieser Datenschutzerklärung */}
         <section id="sec-stand">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            15. Aktualität und Änderung dieser Datenschutzerklärung
+            16. Aktualität und Änderung dieser Datenschutzerklärung
           </h2>
           <p>
             Wir behalten uns vor, diese Datenschutzerklärung anzupassen, um sie an geänderte
@@ -421,7 +445,7 @@ export default function DatenschutzView() {
 
         {/* Datum */}
         <div className="pt-6 mt-6 border-t border-gold-secondary/15 text-xs text-cream-parchment/40 font-mono">
-          Stand: Juni 2026
+          Stand: Juli 2026
         </div>
       </div>
     </section>

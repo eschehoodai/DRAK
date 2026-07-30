@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Screen, MenuItem, MenuVariant } from '../types';
+import Wochenangebot from './Wochenangebot';
 
 interface MenuViewProps {
   onNavigate: (screen: Screen, initialNotes?: string) => void;
@@ -12,170 +13,6 @@ interface MenuViewProps {
 
 /* ============================================================
  *  MENU DATA — grouped by section & sub-category
- * ============================================================ */
-
-const vorspeisenWarm: MenuItem[] = [
-  {
-    id: 'vw1',
-    name: 'Knoblauchsuppe',
-    price: '6 Silber & 90 Kupfer',
-    description: 'Kräftige Knoblauchbrühe nach Wikinger Art – vertreibt Schwäche und Unholde.',
-    type: 'vorspeise',
-  },
-  {
-    id: 'vw2',
-    name: 'Linsensuppe',
-    price: '6 Silber & 90 Kupfer',
-    description: 'Deftiger Linsentopf mit Kassler, würzig wie ein Feuerschlag.',
-    type: 'vorspeise',
-  },
-  {
-    id: 'vw3',
-    name: 'Linsensuppe im Brotleib',
-    price: '9 Silber & 90 Kupfer',
-    description: 'Selbiger Eintopf aufgetischt im hohlen Brotleib zum Auslöffeln.',
-    type: 'vorspeise',
-  },
-];
-
-const vorspeisenKalt: MenuItem[] = [
-  {
-    id: 'vk1',
-    name: 'Drakplatte',
-    price: '14 Silber & 90 Kupfer',
-    description: 'Brett mit Romaschinken, Pragerschinken, Braten, Käse und Beilagensalat.',
-    type: 'vorspeise',
-  },
-  {
-    id: 'vk2',
-    name: 'Fischplatte',
-    price: '17 Silber & 90 Kupfer',
-    description: 'Geräucherter Fisch, Makrele, Spiegelkarpfen mit Krautsalat und Brot.',
-    type: 'vorspeise',
-  },
-  {
-    id: 'vk3',
-    name: 'Mittelalter Salat',
-    price: '14 Silber & 90 Kupfer',
-    description: 'Frisches Grünzeug mit Tomate, Gurke, wahlweise mit Huhn oder Honig-Hühnerfackeln.',
-    type: 'vorspeise',
-  },
-];
-
-const hauptErwachsene: MenuItem[] = [
-  {
-    id: 'h1',
-    name: 'Draks Feuer – Sächsischer Feuerfleisch',
-    price: '16 Silber & 90 Kupfer',
-    description: 'Feuriger Schweinegulasch mit Zwiebeln und Möhren im scharfen Sud.',
-    type: 'hauptgang',
-    isSpecial: true,
-  },
-  {
-    id: 'h2',
-    name: 'Honigfackel-Fleischspieß vom Schwein mit Allerlei',
-    price: '18 Silber & 90 Kupfer',
-    description: 'Drey süß-würziger Spieß vom Schwein mit Grillgemüse.',
-    type: 'hauptgang',
-  },
-  {
-    id: 'h3',
-    name: 'Ritterpfanne – Kassler mit Sauerkraut',
-    price: '15 Silber & 90 Kupfer',
-    description: 'Würziger Kassler gebettet auf mildem Kraut.',
-    type: 'hauptgang',
-  },
-  {
-    id: 'h4',
-    name: 'Hänschen Schenkel',
-    price: '19 Silber & 90 Kupfer',
-    description: 'Hähnchenschenkel in Weißwein-Orange getränkt, mit Zitronenhauch.',
-    type: 'hauptgang',
-  },
-  {
-    id: 'h5',
-    name: 'Fleischklops – Hausgemachter Burger',
-    description: 'Im gerösteten Wecken mit Salat, Tomate, Käse, Zwiebel, Speck und Krautsalat.',
-    type: 'hauptgang',
-    variants: [
-      { label: 'mit Rind', price: '18 Silber & 90 Kupfer' },
-      { label: 'mit Wildschwein', price: '19 Silber & 90 Kupfer' },
-      { label: 'mit Hirsch', price: '19 Silber & 90 Kupfer' },
-    ],
-  },
-  {
-    id: 'h6',
-    name: 'Forelle aus dem Ofen',
-    price: '21 Silber & 90 Kupfer',
-    description: 'Ganze Forelle frisch aus dem Rohr mit Kräutern und Petersilien-Erdäpfeln.',
-    type: 'hauptgang',
-  },
-  {
-    id: 'h7',
-    name: 'Grillgemüse mit Ofenkartoffeln',
-    price: '12 Silber & 95 Kupfer',
-    description: 'Buntes Gemüse vom Rost mit Erdäpfeln aus dem Rohr und Joghurt-Tunke.',
-    type: 'hauptgang',
-  },
-  {
-    id: 'h8',
-    name: 'Rustikal Platte',
-    price: '27 Silber & 90 Kupfer',
-    description: 'Schwein, Huhn und Rindersteak mit Grillgemüse, Maiskolben und Erdäpfelecken.',
-    type: 'hauptgang',
-  },
-];
-
-const hauptKinder: MenuItem[] = [
-  {
-    id: 'hk1',
-    name: 'Drachennest',
-    price: '7 Silber & 90 Kupfer',
-    description: 'Hackbällchen, Spaghetti und milde Tomatensoße.',
-    type: 'hauptgang',
-  },
-  {
-    id: 'hk2',
-    name: 'Fischstäbchen',
-    price: '8 Silber & 90 Kupfer',
-    description: 'Drey goldene Fischstäbchen mit Erdäpfelstangen und roter/weißer Tunke.',
-    type: 'hauptgang',
-  },
-  {
-    id: 'hk3',
-    name: 'Kartoffeltaler mit Apfelmus',
-    price: '4 Silber & 90 Kupfer',
-    description: 'Drey Reiberkuchen mit mildem Apfelmus.',
-    type: 'hauptgang',
-  },
-];
-
-const nachspeisen: MenuItem[] = [
-  {
-    id: 'n1',
-    name: 'Pfefferkirschen',
-    price: '5 Silber & 90 Kupfer',
-    description: 'Süßkirschen im Rotweinsud mit Pfeffer-Hauch.',
-    type: 'nachspeise',
-  },
-  {
-    id: 'n2',
-    name: 'Bratapfel',
-    price: '7 Silber & 90 Kupfer',
-    description: 'Apfelring im Teigmantel mit Zimt und Zucker bestäubt.',
-    type: 'nachspeise',
-  },
-  {
-    id: 'n3',
-    name: 'Birnenpudding',
-    price: '4 Silber & 90 Kupfer',
-    description: 'Hausgemachte Pudding mit saftigen Birnenstücken.',
-    type: 'nachspeise',
-  },
-];
-
-/* ============================================================
- *  HELPERS
  * ============================================================ */
 
 /**
@@ -195,21 +32,164 @@ function variants(...pairs: [string, number][]): MenuVariant[] {
 }
 
 /* ============================================================
- *  DRINKS DATA — grouped by section & sub-category
+ *  MENU DATA — strikt nach DOCX „Getränke Karte DRAK 290726“
+ * ============================================================ */
+
+const vorspeisenWarm: MenuItem[] = [
+  {
+    id: 'vw1',
+    name: 'Knoblauchsuppe',
+    price: coin(6.9),
+    description: 'Kräftige Knoblauchbrühe nach Wikinger Art – vertreibt Schwäche und Unholde.',
+    type: 'vorspeise',
+  },
+];
+
+const vorspeisenKalt: MenuItem[] = [
+  {
+    id: 'vk1',
+    name: 'Drakplatte',
+    price: coin(17.9),
+    description: 'Brett beschmückt mit Romaschinken, Pragerschinken, Braten, Käse und Beilagen Salat.',
+    type: 'vorspeise',
+  },
+  {
+    id: 'vk2',
+    name: 'Mittelalter Salat',
+    price: coin(14.9),
+    description: 'Frisches Grünzeug mit Tomate, Gurke. Wahlweise mit Huhn oder Honig-Huhnfackeln.',
+    type: 'vorspeise',
+  },
+];
+
+const hauptErwachsene: MenuItem[] = [
+  {
+    id: 'h1',
+    name: 'Draks Feuer – Sächsisches Feuerfleisch',
+    price: coin(16.9),
+    description: 'Feuriger Schweinegulasch mit Zwiebeln und Möhren im scharfen Sud.',
+    type: 'hauptgang',
+    isSpecial: true,
+  },
+  {
+    id: 'h2',
+    name: 'Honigfackel-Fleischspieße mit Allerlei',
+    price: coin(18.9),
+    description: 'Süß-würzige Spieße vom Schwein oder Hähnchen.',
+    type: 'hauptgang',
+  },
+  {
+    id: 'h3',
+    name: 'Ritterpfanne – Kassler mit Sauerkraut',
+    price: coin(15.9),
+    description: 'Würziger Kassler gebettet auf mildem Kraut.',
+    type: 'hauptgang',
+  },
+  {
+    id: 'h4',
+    name: 'Pökelbraten Schwein',
+    price: coin(19.9),
+    description: 'Pökelbraten mit Sauerkraut und Knödel.',
+    type: 'hauptgang',
+  },
+  {
+    id: 'h5',
+    name: 'Fleischklops – Hausgemachter Burger',
+    description: 'Im gerösteten Wecken mit Salat, Tomate, Käse, Zwiebel, Speck und Krautsalat.',
+    type: 'hauptgang',
+    variants: [
+      { label: 'mit Rind', price: coin(18.9) },
+      { label: 'mit Wildschwein', price: coin(19.9) },
+      { label: 'mit Hirsch', price: coin(19.9) },
+    ],
+  },
+  {
+    id: 'h6',
+    name: 'Forelle aus dem Ofen',
+    price: coin(21.9),
+    description: 'Ganze Forelle frisch aus dem Rohr mit Kräutern und Petersilien-Erdäpfeln.',
+    type: 'hauptgang',
+  },
+  {
+    id: 'h7',
+    name: 'Grillgemüse mit Ofenkartoffeln',
+    price: coin(12.9),
+    description: 'Buntes Gemüse vom Rost mit Erdäpfeln aus dem Rohr und Joghurt-Tunke.',
+    type: 'hauptgang',
+  },
+  {
+    id: 'h8',
+    name: 'Rustikalplatte',
+    price: coin(27.9),
+    description: 'Schwein, Huhn und Rindersteak mit Grillgemüse, Maiskolben und Erdäpfelecken.',
+    type: 'hauptgang',
+  },
+];
+
+const hauptKinder: MenuItem[] = [
+  {
+    id: 'hk1',
+    name: 'Drachennest',
+    price: coin(7.9),
+    description: 'Hackbällchen, Spaghetti und einer milden Tomatensoße.',
+    type: 'hauptgang',
+  },
+  {
+    id: 'hk2',
+    name: 'Fischstäbchen',
+    price: coin(8.9),
+    description: 'Drei goldene Fischstäbchen mit Erdäpfelstangen und roter/weißer Tunke.',
+    type: 'hauptgang',
+  },
+  {
+    id: 'hk3',
+    name: 'Kartoffeltaler mit Apfelmus',
+    price: coin(6.9),
+    description: 'Drei Reiberkuchen mit mildem Apfelmus.',
+    type: 'hauptgang',
+  },
+];
+
+const nachspeisen: MenuItem[] = [
+  {
+    id: 'n1',
+    name: 'Pfefferkirschen',
+    price: coin(5.9),
+    description: 'Süßkirschen im Rotweinsud mit Pfeffer-Hauch.',
+    type: 'nachspeise',
+  },
+  {
+    id: 'n2',
+    name: 'Bratapfel',
+    price: coin(7.9),
+    description: 'Apfelring im Teigmantel mit Zimt und Zucker bestäubt.',
+    type: 'nachspeise',
+  },
+  {
+    id: 'n3',
+    name: 'Birnenpudding',
+    price: coin(5.9),
+    description: 'Hausgemachte Pudding mit saftigen Birnenstücken.',
+    type: 'nachspeise',
+  },
+];
+
+/* ============================================================
+ *  DRINKS DATA — strikt nach DOCX
  * ============================================================ */
 
 /* ---- Geistiges aus der Alchemistenküche (Liköre, 2cl / 4cl) ---- */
 const likoere: MenuItem[] = [
-  { id: 'lik1', name: 'Maraska Kršikovac', description: 'Fruchtiger Birnenlikör', variants: variants(['2cl', 2.9], ['4cl', 5.1]), type: 'getraenk' },
-  { id: 'lik2', name: 'Maraska Orahovec', description: 'Kräuterlikör', variants: variants(['2cl', 2.9], ['4cl', 5.1]), type: 'getraenk' },
-  { id: 'lik3', name: 'Maraska Pelinkovac', description: 'Bitterlikör mit Wermut', variants: variants(['2cl', 2.9], ['4cl', 5.1]), type: 'getraenk' },
-  { id: 'lik4', name: 'Bärenjäger', description: 'Honiglikör', variants: variants(['2cl', 3.7], ['4cl', 7.0]), type: 'getraenk' },
-  { id: 'lik5', name: 'Marie Brizard Menthe Verte', description: 'Minzlikör', variants: variants(['2cl', 3.7], ['4cl', 7.0]), type: 'getraenk' },
-  { id: 'lik6', name: 'Waldgeist', description: 'Waldmeisterlikör', variants: variants(['2cl', 2.0], ['4cl', 4.0]), type: 'getraenk' },
-  { id: 'lik7', name: 'Bols', description: 'Holunderblütenlikör', variants: variants(['2cl', 3.0], ['4cl', 5.1]), type: 'getraenk' },
+  { id: 'lik1', name: 'Maraska Krsikovac', description: 'Fruchtiger Birnenlikör mit weichem süßem Geschmack', variants: variants(['2cl', 2.9], ['4cl', 5.1]), type: 'getraenk' },
+  { id: 'lik2', name: 'Maraska Orahovec', description: 'Kräuterlikör mit würzig-herbem Charakter', variants: variants(['2cl', 2.9], ['4cl', 5.1]), type: 'getraenk' },
+  { id: 'lik3', name: 'Maraska Pelinkovac', description: 'Intensiver Bitterlikör mit Wermut und kräftigen Kräuternoten', variants: variants(['2cl', 2.9], ['4cl', 5.1]), type: 'getraenk' },
+  { id: 'lik4', name: 'Bärenjäger', description: 'Kräftiger Honiglikör mit intensiver Süße und leicht würziger Note', variants: variants(['2cl', 3.7], ['4cl', 7.0]), type: 'getraenk' },
+  { id: 'lik5', name: 'Marei Brizzard Menthe Verte', description: 'Frischer Minzlikör mit intensiver kühlender Note', variants: variants(['2cl', 3.7], ['4cl', 7.0]), type: 'getraenk' },
+  { id: 'lik6', name: 'Waldgeist', description: 'Mild-süßer Likör mit typischem Waldmeisteraroma', variants: variants(['2cl', 2.0], ['4cl', 4.0]), type: 'getraenk' },
+  { id: 'lik7', name: 'Bols', description: 'Floraler Holunderblütenlikör, leicht und frisch mit dezenter Süße', variants: variants(['2cl', 3.0], ['4cl', 5.1]), type: 'getraenk' },
 ];
 
-/* ---- Agrest & Verjus (Fruchtsäfte, 0,2L / 0,4L) ---- */
+/* ---- Agrest/Verjus (Fruchtsäfte, 0,2L / 0,4L) ---- */
 const saefte: MenuItem[] = [
   { id: 'saf1', name: 'Orange', variants: variants(['0,2L', 3.2], ['0,4L', 4.1]), type: 'getraenk' },
   { id: 'saf2', name: 'Multivitamin', variants: variants(['0,2L', 3.2], ['0,4L', 4.1]), type: 'getraenk' },
@@ -226,28 +206,28 @@ const wasser: MenuItem[] = [
   { id: 'was3', name: 'Spritzig', variants: variants(['0,2L', 2.5], ['0,4L', 3.8], ['0,75L', 6.5]), type: 'getraenk' },
 ];
 
-/* ---- Absud & Kraut (Heißgetränke) ---- */
+/* ---- Absud/Kraut (Heißgetränke) ---- */
 const heissGetraenke: MenuItem[] = [
-  { id: 'heg1', name: 'Tee nach Wahl', price: coin(3.8), type: 'getraenk' },
-  { id: 'heg2', name: 'Tschechischer Tee', description: 'Becherovka, Orangen- & Zitronensaft, Orange', price: coin(4.8), type: 'getraenk' },
-  { id: 'heg3', name: 'Tschechischer Türkischer Kaffee', price: coin(2.8), type: 'getraenk' },
+  { id: 'heg1', name: 'Tee (nach Wahl)', price: coin(3.8), type: 'getraenk' },
+  { id: 'heg2', name: 'Tschechischer Tee', description: 'Becherovka, Orangensaft, Zitronensaft, Orange', price: coin(4.8), type: 'getraenk' },
+  { id: 'heg3', name: 'Türkischer Kaffee / Espresso', price: coin(2.8), type: 'getraenk' },
 ];
 
 /* ---- Vinum (Weine, 0,2L / 0,75L) ---- */
 const weine: MenuItem[] = [
-  { id: 'win1', name: 'Dornfelder Rot', description: 'Trocken', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
-  { id: 'win2', name: 'Dornfelder Rot', description: 'Halbtrocken', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
-  { id: 'win3', name: 'Dornfelder Rosé', description: 'Halbtrocken', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
-  { id: 'win4', name: 'Grauburgunder Weiß', description: 'Trocken', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
-  { id: 'win5', name: 'Vinumschorle', description: 'Weinschorle · 0,2 L', price: coin(5.1), type: 'getraenk' },
-  { id: 'win6', name: 'Rotkäppchen Piccolo', description: 'Piccolo 0,2 L · trocken, rosé oder alkoholfrei', price: coin(4.5), type: 'getraenk' },
+  { id: 'win1', name: 'Dornfelder Rot (trocken)', description: 'Kräftiger Rotwein mit dunkeln Beeren', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
+  { id: 'win2', name: 'Dornfelder Rot (halbtrocken)', description: 'Samtiger Rotwein mit dunkeln Beeren und milder Süße', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
+  { id: 'win3', name: 'Dornfelder Rosé (halbtrocken)', description: 'Fruchtiger Rosé mit feiner Süße und frischen Beerenaromen', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
+  { id: 'win4', name: 'Grauburgunder Weiß (trocken)', description: 'Eleganter Weißwein mit dezenter Frucht und leichter Würze', variants: variants(['0,2L', 5.9], ['0,75L', 18.9]), type: 'getraenk' },
+  { id: 'win5', name: 'Vinumschorle', description: 'Des Fürsten bevorzugtes Sprudelwasser', price: coin(5.1), type: 'getraenk' },
+  { id: 'win6', name: 'Rotkäppchen Piccolo', description: 'trocken / rosé / alkoholfrei · 0,2 L', price: coin(4.5), type: 'getraenk' },
 ];
 
 /* ---- Trunk der Asen (Met, je 0,25 L) ---- */
 const met: MenuItem[] = [
-  { id: 'met1', name: 'Thors Trunk', description: 'Weißer Met', price: coin(5.5), type: 'getraenk' },
-  { id: 'met2', name: 'Drachenblut', description: 'Roter Met', price: coin(5.5), type: 'getraenk' },
-  { id: 'met3', name: 'Hanf-Met', price: coin(5.5), type: 'getraenk' },
+  { id: 'met1', name: 'Thors Trunk – Weißer Met', description: 'Original Wikinger', price: coin(5.5), type: 'getraenk' },
+  { id: 'met2', name: 'Drachenblut – roter Met', price: coin(5.5), type: 'getraenk' },
+  { id: 'met3', name: 'Hanf Met', price: coin(5.5), type: 'getraenk' },
 ];
 
 /* ---- Ungebrautes (alkoholfrei) ---- */
@@ -265,33 +245,88 @@ const zuckerwasserFlasche: MenuItem[] = [
 ];
 
 const bitterzuckerwasser: MenuItem[] = [
-  { id: 'biz1', name: 'Ginger Ale', price: coin(3.2), type: 'getraenk' },
-  { id: 'biz2', name: 'Tonic Water', price: coin(3.2), type: 'getraenk' },
+  { id: 'biz1', name: 'Ginger Ale', description: '0,2 L', price: coin(3.2), type: 'getraenk' },
+  { id: 'biz2', name: 'Tonic Water', description: '0,2 L', price: coin(3.2), type: 'getraenk' },
 ];
 
-/* ---- Gebräu (Biere, 0,3L / 0,5L) ---- */
+/* ---- Gebräu (Biere) ---- */
 const biere: MenuItem[] = [
-  { id: 'bie1', name: 'Cervisia – Der Mönche Gebräu', description: 'Wechselnde Sorten: Svijany 450, Geschnittenes Bier, Baronin Dunkles u. a.', variants: variants(['0,3L', 3.1], ['0,5L', 4.9]), type: 'getraenk' },
-  { id: 'bie2', name: 'Radler', variants: variants(['0,3L', 3.1], ['0,5L', 4.9]), type: 'getraenk' },
-  { id: 'bie3', name: 'Lübzer', description: 'Alkoholfrei', variants: variants(['0,3L', 3.8], ['0,5L', 4.9]), type: 'getraenk' },
-  { id: 'bie4', name: 'Erdinger Weizen', description: 'Alkoholfrei', variants: variants(['0,3L', 3.8], ['0,5L', 4.9]), type: 'getraenk' },
+  {
+    id: 'bie1',
+    name: 'Svijany 450 (Pils)',
+    description: 'Cervisia – Der Mönche Gebräu',
+    variants: variants(['0,3L', 3.1], ['0,5L', 4.9]),
+    type: 'getraenk',
+  },
+  {
+    id: 'bie2',
+    name: 'Geschnittenes Bier',
+    description: 'Cervisia – Der Mönche Gebräu',
+    variants: variants(['0,3L', 3.1], ['0,5L', 4.9]),
+    type: 'getraenk',
+  },
+  {
+    id: 'bie3',
+    name: 'Baronin (Dunkles Bier)',
+    description: 'Cervisia – Der Mönche Gebräu',
+    variants: variants(['0,3L', 3.1], ['0,5L', 4.9]),
+    type: 'getraenk',
+  },
+  {
+    id: 'bie4',
+    name: 'Radler',
+    variants: variants(['0,3L', 3.1], ['0,5L', 4.1]),
+    type: 'getraenk',
+  },
+  {
+    id: 'bie5',
+    name: 'Lübzer Alkoholfrei',
+    description: 'Der Mönche Gebräu unecht',
+    price: coin(3.8),
+    type: 'getraenk',
+  },
+  {
+    id: 'bie6',
+    name: 'Erdinger Weizen Alkoholfrei',
+    description: 'Der Mönche Gebräu unecht',
+    price: coin(4.9),
+    type: 'getraenk',
+  },
 ];
 
 /* ---- Spezialitäten (2cl / 4cl) ---- */
 const spezialitaeten: MenuItem[] = [
-  { id: 'spz1', name: 'Madame Geneva Gin', description: '44 %', variants: variants(['2cl', 5.1], ['4cl', 9.0]), type: 'getraenk' },
-  { id: 'spz2', name: 'Madame Geneva Gin', description: '41,9 %', variants: variants(['2cl', 4.7], ['4cl', 8.5]), type: 'getraenk' },
-  { id: 'spz3', name: 'Herzdame', description: '21 %', variants: variants(['2cl', 4.0], ['4cl', 7.1]), type: 'getraenk' },
-  { id: 'spz4', name: 'Kreuzritter', description: 'Kräuterschnaps · 30 %', variants: variants(['2cl', 4.1], ['4cl', 9.0]), type: 'getraenk' },
-  { id: 'spz5', name: 'Zingiba Aperitivum', description: '20 %', variants: variants(['2cl', 3.0], ['4cl', 5.1]), type: 'getraenk' },
-  { id: 'spz6', name: 'Williams Birne', description: 'Birnenlikör', variants: variants(['2cl', 4.4], ['4cl', 7.9]), type: 'getraenk' },
+  { id: 'spz1', name: 'Madame Geneva Gin (44 %)', description: 'Kräftiger Premium-Gin mit komplexen Kräutern und Zitrusnoten', variants: variants(['2cl', 5.1], ['4cl', 9.0]), type: 'getraenk' },
+  { id: 'spz2', name: 'Madame Geneva Gin (41,9 %)', description: 'Fruchtig-würziger Gin mit roten Beeren und feinen Botanicals', variants: variants(['2cl', 4.7], ['4cl', 8.5]), type: 'getraenk' },
+  { id: 'spz3', name: 'Herzdame 21 %', description: 'Sanfte Likör mit süß-fruchtigem Charakter', variants: variants(['2cl', 4.0], ['4cl', 7.1]), type: 'getraenk' },
+  { id: 'spz4', name: 'Kreuzritter (Kräuterschnaps) 30 %', description: 'Kräftiger Kräuterlikör mit würziger Tiefe', variants: variants(['2cl', 4.1], ['4cl', 9.0]), type: 'getraenk' },
+  { id: 'spz5', name: 'Zingiba Aperitivum 20 %', description: 'Fruchtig-süßer Likör mit leichter Zitrusnote', variants: variants(['2cl', 3.0], ['4cl', 5.1]), type: 'getraenk' },
+  { id: 'spz6', name: 'Williams Birne Likör', variants: variants(['2cl', 4.4], ['4cl', 7.9]), type: 'getraenk' },
 ];
 
 /* ---- Hexens Gebräu (Cocktails, je 0,4 L) ---- */
 const cocktails: MenuItem[] = [
-  { id: 'cok1', name: 'Aperol Spritz', price: coin(7.9), type: 'getraenk' },
-  { id: 'cok2', name: 'Gin Tonic', price: coin(7.9), type: 'getraenk' },
-  { id: 'cok3', name: '43er Kirsch', price: coin(7.9), type: 'getraenk' },
+  {
+    id: 'cok1',
+    name: 'Aperol Spritz',
+    description: 'Aperol 4 cl, Prosecco, Mineralwasser · 0,4 L',
+    price: coin(7.9),
+    type: 'getraenk',
+  },
+  {
+    id: 'cok2',
+    name: 'Gin Tonic',
+    description: 'Gin, Tonic, Zitrone · 0,4 L',
+    price: coin(7.9),
+    type: 'getraenk',
+  },
+  {
+    id: 'cok3',
+    name: '43er Kirsch',
+    description: '43er 4 cl, Sauerkirschsaft, Prosecco, Mineralwasser · 0,4 L',
+    price: coin(7.9),
+    type: 'getraenk',
+  },
 ];
 
 /* ============================================================
@@ -494,7 +529,11 @@ export default function MenuView(_props: MenuViewProps) {
         </p>
       </div>
 
+      {/* ================= WOCHENANGEBOT ================= */}
+      <Wochenangebot />
+
       {/* ================= VORSPEISEN ================= */}
+
       <MenuPanel id="section-vorspeisen" title="Vorspeisen" subtitle="Gustatio" className="mt-16">
         <SubHeader label="Warm" />
         <DishGrid items={vorspeisenWarm} />

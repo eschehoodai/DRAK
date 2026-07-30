@@ -53,3 +53,10 @@ export interface JobApplication {
   phone?: string;
   about?: string;
 }
+
+export interface WochenangebotItem {
+  name: string;
+  preis: string;
+  beschreibung?: string;
+}
+

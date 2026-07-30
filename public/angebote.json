@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Kassler Schnitzel",
+    "preis": "17 Silber & 90 Kupfer",
+    "beschreibung": "Mit Grillgemüse und Kartoffelecken"
+  },
+  {
+    "name": "BBQ-Spare Rips",
+    "preis": "19 Silber & 90 Kupfer",
+    "beschreibung": "Mit Krautsalat und Brot"
+  },
+  {
+    "name": "Biergulasch",
+    "preis": "16 Silber & 90 Kupfer",
+    "beschreibung": "Mit Semmelknödel"
+  },
+  {
+    "name": "Panierter Käse",
+    "preis": "16 Silber & 90 Kupfer",
+    "beschreibung": "Mit Grillgemüse oder Salat"
+  },
+  {
+    "name": "Hectors Hülsenfrucht-Sinfonie",
+    "preis": "9 Silber & 90 Kupfer",
+    "beschreibung": "Deftiger Bohneneintopf mit Brot"
+  },
+  {
+    "name": "Armer Ritter",
+    "preis": "6 Silber & 90 Kupfer",
+    "beschreibung": "Mit Vanilleeis"
+  }
+]
