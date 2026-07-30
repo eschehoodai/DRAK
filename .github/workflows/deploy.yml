@@ -44,6 +44,6 @@ jobs:
           set ftp:ssl-protect-data true
           set ssl:verify-certificate no
           open -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_SERVER"
-          mirror -R --delete --parallel=4 --verbose dist/ drakzittau.de/httpdocs/
+          mirror -R --delete --exclude angebote.json --parallel=4 --verbose dist/ drakzittau.de/httpdocs/
           EOF
           lftp -f /tmp/deploy.lftp

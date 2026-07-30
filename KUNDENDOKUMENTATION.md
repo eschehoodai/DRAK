@@ -44,10 +44,10 @@ Ihre neue Website wurde als hochmoderne **Single-Page-Application (SPA)** konzip
 - **Einladendes Bewerbungsmodul:** Mittelalterlich gestaltete Stellenausschreibungen für Service und Küche.
 - **Schlankes Bewerbungsformular:** Barrierefreie Direktbewerbung ohne Hürden (keine Registrierung oder Uploads nötig). Bewerbungen werden direkt per E-Mail (`public/send-job-application.php`) zugestellt.
 
-### ⚖️ Rechtssicherheit & DSGVO (`/impressum`, `/datenschutz`)
-- **Impressum:** Rechtskonforme Anbieterkennzeichnung der **Drak Zittau DLR Gastro Event UG** (Innere Weberstraße 11, 02763 Zittau).
-- **Datenschutzerklärung:** Ausführliche, DSGVO-konforme Information über Datenverarbeitung und Cookies.
-- **Cookie-Consent-Banner:** Integriertes Banner zur rechtskonformen Einwilligung der Besucher.
+### 🍲 Eigenständige Verwaltung der Wochenangebote (`/admin.php`)
+- **Einfaches Admin-Modul:** Über die Unterseite `https://drakzittau.de/admin.php` können Sie die Wochenangebote (Tageskarten/Sondergerichte) jederzeit direkt im Browser selbstständig anpassen, neue Gerichte hinzufügen oder alte löschen.
+- **Passwortschutz:** Der Zugang ist mit dem Passwort `Zittau2026!` geschützt.
+- **Automatischer Schutz:** Durch den integrierten Deployment-Filter bleiben Ihre im Admin-Bereich gepflegten Angebote auch bei zukünftigen Website-Updates auf dem Server erhalten.
 
 ---
 
