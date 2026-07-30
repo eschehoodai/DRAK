@@ -15,7 +15,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
   return (
     <div className="relative overflow-hidden">
       {/* ================= HERO BANNER SECTION ================= */}
-      <section className="relative h-[650px] w-full border-b border-gold-secondary/30 bg-void-black">
+      <section className="relative min-h-[580px] sm:h-[650px] w-full border-b border-gold-secondary/30 bg-void-black">
         {/* Hero Video Background */}
         <div className="absolute inset-0 h-full w-full overflow-hidden">
           <video
@@ -40,14 +40,14 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
         </div>
 
         {/* Hero Content */}
-        <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-14 sm:pb-20 md:px-8">
-          <div className="max-w-2xl space-y-5 sm:space-y-6">
+        <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-center sm:justify-end px-4 py-8 sm:py-0 sm:pb-20 md:px-8">
+          <div className="max-w-2xl space-y-4 sm:space-y-6">
             <div className="inline-flex items-center space-x-2 border border-gold-primary/40 bg-void-black/80 px-4 py-1 font-cinzel text-[10px] tracking-widest text-gold-primary uppercase font-bold">
               <Flame className="h-3 w-3 text-gold-primary candle-glow" />
               <span>Gegründet im Jahre des Herrn MMXIV</span>
             </div>
 
-            <h1 className="font-cinzel text-[clamp(1.625rem,7.5vw,4.5rem)] font-black tracking-normal text-gold-bright sm:tracking-widest leading-tight sm:leading-none">
+            <h1 className="font-cinzel text-[clamp(1.5rem,6.5vw,4.5rem)] font-black tracking-normal text-gold-bright sm:tracking-widest leading-tight sm:leading-none">
               DRACHENTAVERNE ZITTAU
             </h1>
 
