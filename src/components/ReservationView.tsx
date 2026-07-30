@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { Screen, Reservation } from '../types';
 import { 
-  Calendar, User, Mail, Hourglass, Shield, Search, Sparkles, Trash2,
+  Calendar, User, Mail, Phone, Hourglass, Shield, Search, Sparkles, Trash2,
   ChevronLeft, ChevronRight, Clock, AlertTriangle, Check, X
 } from 'lucide-react';
 
@@ -294,7 +294,7 @@ function CustomCalendarModal({ isOpen, onClose, selectedDate, onSelectDate }: Cu
 /* ================= MAIN RESERVATION VIEW COMPONENT ================= */
 export default function ReservationView({ initialNotes, onClearNotes }: ReservationViewProps) {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [guests, setGuests] = useState(2);
   
   // Initialize default date to next open day
@@ -376,7 +376,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
 
   const handleCreateReservation = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !date) {
+    if (!name || !date) {
       alert('Seid gegrüßt! Bitte füllt alle Pflichtfelder aus, um Eure Zunft anzumelden.');
       return;
     }
@@ -395,7 +395,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     const newRes: Reservation = {
       id,
       name,
-      email,
+      phone: phone.trim() || undefined,
       guests,
       date,
       time,
@@ -424,7 +424,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     
     // Clear form
     setName('');
-    setEmail('');
+    setPhone('');
     setNotes('');
   };
 
@@ -439,13 +439,16 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     }
 
     const target = reservations.find(
-      (r) => r.id.toLowerCase() === searchCode.trim().toLowerCase() || r.email.toLowerCase() === searchCode.trim().toLowerCase()
+      (r) =>
+        r.id.toLowerCase() === searchCode.trim().toLowerCase() ||
+        (r.phone && r.phone.toLowerCase() === searchCode.trim().toLowerCase()) ||
+        (r.email && r.email.toLowerCase() === searchCode.trim().toLowerCase())
     );
 
     if (target) {
       setSearchedReservation(target);
     } else {
-      setSearchError('Kein Zunftbrief unter dieser Nummer oder E-Mail gefunden. Überprüft Eure Inschrift.');
+      setSearchError('Kein Zunftbrief unter dieser Nummer oder Telefonnummer gefunden. Überprüft Eure Inschrift.');
     }
   };
 
@@ -564,6 +567,9 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
               <div className="my-8 border-y border-gold-secondary/30 py-6 space-y-3 font-serif text-base">
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Nummer:</span> <strong className="text-gold-bright">{lastCreated.id}</strong></p>
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Truppführer:</span> {lastCreated.name}</p>
+                {lastCreated.phone && (
+                  <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Telefon:</span> {lastCreated.phone}</p>
+                )}
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gefährten:</span> {lastCreated.guests} Krieger</p>
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Festmahl-Zeit:</span> {formatGermanDate(lastCreated.date)} um {lastCreated.time} Uhr</p>
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gewölbe:</span> {lastCreated.vault}</p>
@@ -573,7 +579,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
               </div>
 
               <p className="font-serif text-xs text-cream-parchment/60 mb-8 max-w-md mx-auto">
-                Notiert Euch Euren Buchungscode <strong>{lastCreated.id}</strong>. Ihr könnt damit jederzeit Euren Zunftbrief einsehen oder stornieren. Eine Brieftaube (E-Mail) wurde versendet.
+                Notiert Euch Euren Buchungscode <strong>{lastCreated.id}</strong>. Ihr könnt damit jederzeit Euren Zunftbrief einsehen oder stornieren.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -604,12 +610,29 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
               <div className="gilded-corner gilded-corner-bl" />
               <div className="gilded-corner gilded-corner-br" />
 
-              <div className="text-center mb-8">
+              <div className="text-center mb-6">
                 <h3 className="font-cinzel text-2xl font-bold tracking-widest text-gold-bright uppercase">
                   EINE TAFEL RESERVIEREN
                 </h3>
                 <p className="font-serif text-xs italic text-cream-parchment/60 mt-1">
                   Sichert Euch Euer Festmahl rechtzeitig bei Kerzenschein
+                </p>
+              </div>
+
+              {/* Phone reservation direct banner */}
+              <div className="mb-8 border border-gold-primary/40 bg-gold-primary/15 p-4 text-center gilded-border">
+                <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-gold-bright flex items-center justify-center gap-2">
+                  <Phone className="h-4 w-4 text-gold-primary shrink-0" />
+                  <span>Lieber persönlich am Telefon reservieren?</span>
+                </p>
+                <p className="font-serif text-sm text-cream-parchment/90 mt-1">
+                  Ruft unsere Wirtsleute direkt in der Taverne an:{' '}
+                  <a 
+                    href="tel:035835495389" 
+                    className="font-bold text-gold-bright hover:text-gold-primary underline tracking-wider inline-flex items-center gap-1"
+                  >
+                    03583 5495389
+                  </a>
                 </p>
               </div>
 
@@ -633,15 +656,14 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
 
                   <div className="flex flex-col space-y-2">
                     <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center gap-1.5">
-                      <Mail className="h-3.5 w-3.5" /> Inschrift (E-Mail) *
+                      <Phone className="h-3.5 w-3.5" /> Telefonnummer <span className="text-[10px] font-normal lowercase opacity-75">(optional)</span>
                     </label>
                     <input
-                      id="input-email"
-                      type="email"
-                      required
-                      placeholder="barde@drak.de"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      id="input-phone"
+                      type="tel"
+                      placeholder="z.B. 0170 1234567"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
                       className="border-0 border-b-2 border-gold-secondary/40 bg-transparent py-2 font-serif text-base text-cream-parchment placeholder:text-cream-parchment/30 outline-none focus:border-gold-primary focus:drop-shadow-[0_4px_6px_rgba(212,175,55,0.15)] transition-all"
                     />
                   </div>
@@ -856,13 +878,13 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
             className="flex flex-col space-y-4 border border-gold-secondary/30 p-6 bg-tavern-dark/20 mb-8"
           >
             <label className="font-cinzel text-xs font-black tracking-widest text-gold-primary uppercase">
-              RESERVIERUNGSCODE ODER SCHREIBER-EMAIL EINGEBEN
+              RESERVIERUNGSCODE ODER TELEFONNUMMER EINGEBEN
             </label>
             <div className="flex flex-col sm:flex-row gap-4">
               <input
                 id="search-input"
                 type="text"
-                placeholder="z.B. DRAK-MMXXVI-145 oder barde@drak.de"
+                placeholder="z.B. DRAK-MMXXVI-145 oder 0170 1234567"
                 value={searchCode}
                 onChange={(e) => setSearchCode(e.target.value)}
                 className="flex-1 border-0 border-b-2 border-gold-secondary bg-transparent py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary tracking-wider"
@@ -891,7 +913,8 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
               </div>
               <div className="space-y-1">
                 <p><strong>Name:</strong> {searchedReservation.name}</p>
-                <p><strong>E-Mail:</strong> {searchedReservation.email}</p>
+                {searchedReservation.phone && <p><strong>Telefon:</strong> {searchedReservation.phone}</p>}
+                {searchedReservation.email && <p><strong>E-Mail:</strong> {searchedReservation.email}</p>}
                 <p><strong>Krieger:</strong> {searchedReservation.guests} Personen</p>
                 <p><strong>Zeitpunkt:</strong> {formatGermanDate(searchedReservation.date)} um {searchedReservation.time} Uhr</p>
                 {searchedReservation.notes && <p><strong>Wünsche:</strong> {searchedReservation.notes}</p>}

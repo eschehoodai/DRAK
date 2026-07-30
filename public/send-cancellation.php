@@ -34,6 +34,7 @@ if (!$data) {
 // Pflichtfelder auslesen & bereinigen
 $id       = isset($data['id']) ? trim(strip_tags($data['id'])) : 'UNBEKANNT';
 $name     = isset($data['name']) ? trim(strip_tags($data['name'])) : 'Unbekannt';
+$phone    = isset($data['phone']) ? trim(strip_tags($data['phone'])) : '';
 $email    = isset($data['email']) ? filter_var(trim($data['email']), FILTER_SANITIZE_EMAIL) : '';
 $guests   = isset($data['guests']) ? intval($data['guests']) : 1;
 $date     = isset($data['date']) ? trim(strip_tags($data['date'])) : '';
@@ -58,7 +59,10 @@ $message .= "Folgende Tischreservierung wurde soeben vom Gast storniert:\n\n";
 $message .= "--------------------------------------------------------\n";
 $message .= "Stornierter Buchungscode: " . $id . "\n";
 $message .= "Name des Gastes         : " . $name . "\n";
-$message .= "E-Mail Gast             : " . $email . "\n";
+$message .= "Telefonnummer           : " . ($phone ? $phone : "Keine angegeben") . "\n";
+if (!empty($email)) {
+    $message .= "E-Mail Gast             : " . $email . "\n";
+}
 $message .= "Anzahl Personen         : " . $guests . " Person(en)\n";
 $message .= "Datum                   : " . $formattedDate . "\n";
 $message .= "Uhrzeit                 : " . $time . " Uhr\n";
@@ -68,9 +72,10 @@ $message .= "Der Tisch im Gewölbe steht somit für andere Gäste wieder zur Ver
 $message .= "Diese Benachrichtigung wurde automatisch über drakzittau.de versendet.\n";
 
 // Header konfigurieren
+$replyToHeader = !empty($email) ? ($name . ' <' . $email . '>') : 'Drachen Taverne Stornierungen <noreply@drakzittau.de>';
 $headers = array(
     'From' => 'Drachen Taverne Stornierungen <noreply@drakzittau.de>',
-    'Reply-To' => $name . ' <' . $email . '>',
+    'Reply-To' => $replyToHeader,
     'X-Mailer' => 'PHP/' . phpversion(),
     'Content-Type' => 'text/plain; charset=UTF-8'
 );

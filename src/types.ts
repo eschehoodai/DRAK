@@ -34,7 +34,8 @@ export interface MenuItem {
 
 export interface Reservation {
   name: string;
-  email: string;
+  phone?: string;
+  email?: string;
   guests: number;
   date: string;
   time: string;

@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Screen } from '../types';
-import { ShieldAlert, Calendar } from 'lucide-react';
+import { ShieldAlert, Calendar, Phone } from 'lucide-react';
 
 interface HeaderProps {
   currentScreen: Screen;
@@ -105,14 +105,23 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
           </button>
         </nav>
 
-        {/* CTA Button */}
-        <div>
+        {/* CTA Buttons (Phone & Table Reservation) */}
+        <div className="flex items-center space-x-3">
+          <a
+            id="hdr-cta-phone"
+            href="tel:035835495389"
+            className="hidden sm:flex items-center space-x-1.5 border border-gold-secondary/40 bg-gold-primary/10 px-3 py-2 font-cinzel text-xs font-bold text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all duration-300 cursor-pointer"
+            title="Direkt in der Taverne anrufen"
+          >
+            <Phone className="h-3.5 w-3.5 shrink-0" />
+            <span>03583 5495389</span>
+          </a>
           <button
             id="hdr-cta-reserve"
             onClick={() => onNavigate(Screen.RESERVE)}
-            className="flex items-center space-x-2 border border-gold-primary bg-gold-primary px-5 py-2.5 text-center font-cinzel text-xs font-black uppercase tracking-wider text-void-black transition-all duration-300 hover:bg-gold-bright hover:border-gold-bright active:scale-95 cursor-pointer"
+            className="flex items-center space-x-2 border border-gold-primary bg-gold-primary px-4 sm:px-5 py-2.5 text-center font-cinzel text-xs font-black uppercase tracking-wider text-void-black transition-all duration-300 hover:bg-gold-bright hover:border-gold-bright active:scale-95 cursor-pointer"
           >
-            <Calendar className="h-4 w-4" />
+            <Calendar className="h-4 w-4 shrink-0" />
             <span>Tisch Reservieren</span>
           </button>
         </div>

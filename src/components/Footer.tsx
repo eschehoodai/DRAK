@@ -46,9 +46,14 @@ export default function Footer({ onNavigate }: FooterProps) {
               Kontakt
             </h4>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-start space-x-3">
-                <Phone className="mt-0.5 h-4 w-4 text-gold-secondary shrink-0" />
-                <span className="font-serif">Telefon: 03583 5495389</span>
+              <li className="flex items-center space-x-3">
+                <Phone className="h-4 w-4 text-gold-primary shrink-0" />
+                <a 
+                  href="tel:035835495389" 
+                  className="font-serif font-bold text-gold-bright hover:text-gold-primary hover:underline transition-colors"
+                >
+                  Telefon: 03583 5495389
+                </a>
               </li>
               <li className="flex items-start space-x-3">
                 <Mail className="mt-0.5 h-4 w-4 text-gold-secondary shrink-0" />

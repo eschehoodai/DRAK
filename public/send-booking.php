@@ -35,6 +35,7 @@ if (!$data) {
 // Pflichtfelder auslesen & bereinigen
 $id       = isset($data['id']) ? trim(strip_tags($data['id'])) : 'DRAK-PROTOTYP';
 $name     = isset($data['name']) ? trim(strip_tags($data['name'])) : '';
+$phone    = isset($data['phone']) ? trim(strip_tags($data['phone'])) : '';
 $email    = isset($data['email']) ? filter_var(trim($data['email']), FILTER_SANITIZE_EMAIL) : '';
 $guests   = isset($data['guests']) ? intval($data['guests']) : 1;
 $date     = isset($data['date']) ? trim(strip_tags($data['date'])) : '';
@@ -43,9 +44,9 @@ $vault    = isset($data['vault']) ? trim(strip_tags($data['vault'])) : 'Gewölbe
 $notes    = isset($data['notes']) ? trim(strip_tags($data['notes'])) : 'Keine Sonderwünsche';
 
 // Validierung
-if (empty($name) || empty($email) || empty($date)) {
+if (empty($name) || empty($date)) {
     http_response_code(400);
-    echo json_encode(["success" => false, "error" => "Bitte alle Pflichtfelder (Name, E-Mail, Datum) ausfüllen."]);
+    echo json_encode(["success" => false, "error" => "Bitte alle Pflichtfelder (Name, Datum) ausfüllen."]);
     exit();
 }
 
@@ -67,7 +68,10 @@ $message .= "Eine neue Hoftafel-Reservierung ist für die Drachen Taverne Zittau
 $message .= "--------------------------------------------------------\n";
 $message .= "Buchungscode : " . $id . "\n";
 $message .= "Name des Gastes: " . $name . "\n";
-$message .= "E-Mail Gast    : " . $email . "\n";
+$message .= "Telefonnummer  : " . ($phone ? $phone : "Keine angegeben") . "\n";
+if (!empty($email)) {
+    $message .= "E-Mail Gast    : " . $email . "\n";
+}
 $message .= "Anzahl Personen: " . $guests . " Person(en)\n";
 $message .= "Datum          : " . $formattedDate . "\n";
 $message .= "Uhrzeit        : " . $time . " Uhr\n";
@@ -77,9 +81,10 @@ $message .= "--------------------------------------------------------\n\n";
 $message .= "E-Mail wurde automatisch über das Reservierungsformular auf drakzittau.de versendet.\n";
 
 // Header konfigurieren
+$replyToHeader = !empty($email) ? ($name . ' <' . $email . '>') : 'Drachen Taverne <noreply@drakzittau.de>';
 $headers = array(
     'From' => 'Drachen Taverne Reservierung <noreply@drakzittau.de>',
-    'Reply-To' => $name . ' <' . $email . '>',
+    'Reply-To' => $replyToHeader,
     'X-Mailer' => 'PHP/' . phpversion(),
     'Content-Type' => 'text/plain; charset=UTF-8'
 );

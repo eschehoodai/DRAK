@@ -1,11 +1,6 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React from 'react';
 import { Screen } from '../types';
-import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin } from 'lucide-react';
+import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin, Phone } from 'lucide-react';
 import candlelitGobletImage from '../assets/images/Speise2.webp';
 import logoDrak from '../assets/images/logo-drak.webp';
 import headerVideo from '../assets/images/headervideo.webm';
@@ -68,17 +63,25 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
               <button
                 id="hero-btn-menu"
                 onClick={() => onNavigate(Screen.MENU)}
-                className="bg-gold-primary border border-gold-primary px-8 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer text-center"
+                className="bg-gold-primary border border-gold-primary px-6 py-3.5 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer text-center"
               >
                 Die Speisekarte studieren
               </button>
               <button
                 id="hero-btn-reserve"
                 onClick={() => onNavigate(Screen.RESERVE)}
-                className="border border-gold-secondary bg-void-black/60 backdrop-blur-sm px-8 py-4 font-cinzel text-xs font-bold uppercase tracking-widest text-gold-secondary hover:text-gold-bright hover:bg-gold-secondary/15 transition-all cursor-pointer text-center"
+                className="border border-gold-secondary bg-void-black/60 backdrop-blur-sm px-6 py-3.5 font-cinzel text-xs font-bold uppercase tracking-widest text-gold-secondary hover:text-gold-bright hover:bg-gold-secondary/15 transition-all cursor-pointer text-center"
               >
                 Hoftafel Reservieren
               </button>
+              <a
+                id="hero-btn-phone"
+                href="tel:035835495389"
+                className="border border-gold-primary/60 bg-gold-primary/10 backdrop-blur-sm px-6 py-3.5 font-cinzel text-xs font-bold uppercase tracking-widest text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all cursor-pointer text-center flex items-center justify-center gap-2"
+              >
+                <Phone className="h-4 w-4 shrink-0" />
+                <span>03583 5495389</span>
+              </a>
             </div>
           </div>
         </div>
@@ -317,13 +320,23 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
             <p className="font-serif text-sm text-cream-parchment/70 max-w-xl mx-auto leading-relaxed mb-8">
               Die Kessel brutzeln und die Krüge stehen bereit. Eilt Euch, edler Gefährte – unsere Gewölbe sind begehrt im gesamten Drachenfelsland!
             </p>
-            <button
-              id="bottom-cta-reserve"
-              onClick={() => onNavigate(Screen.RESERVE)}
-              className="bg-gold-primary border border-gold-primary px-8 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer"
-            >
-              Tafel für heute buchen
-            </button>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <button
+                id="bottom-cta-reserve"
+                onClick={() => onNavigate(Screen.RESERVE)}
+                className="bg-gold-primary border border-gold-primary px-8 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer text-center"
+              >
+                Tafel Online Buchen
+              </button>
+              <a
+                id="bottom-cta-phone"
+                href="tel:035835495389"
+                className="border border-gold-secondary/60 bg-gold-primary/10 px-8 py-4 font-cinzel text-xs font-bold uppercase tracking-widest text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all cursor-pointer text-center flex items-center justify-center gap-2"
+              >
+                <Phone className="h-4 w-4 shrink-0" />
+                <span>03583 5495389</span>
+              </a>
+            </div>
           </div>
         </div>
       </section>
