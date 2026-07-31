@@ -10,6 +10,7 @@ session_start();
 define('ADMIN_PASSWORD', 'Zittau2026!');
 define('JSON_FILE_PATH', __DIR__ . '/angebote.json');
 define('SPEISEKARTE_JSON_PATH', __DIR__ . '/speisekarte.json');
+define('SPEISEKARTE_DEFAULT_JSON_PATH', __DIR__ . '/speisekarte.default.json');
 
 $message = null;
 $messageType = 'info'; // 'success' | 'error' | 'info'
@@ -159,14 +160,17 @@ if ($isLoggedIn && file_exists(JSON_FILE_PATH)) {
     }
 }
 
-// Aktuelle Speisekarte laden
+// Aktuelle Speisekarte laden (falls speisekarte.json noch nicht existiert, verwende speisekarte.default.json als Vorbelegung)
 $speisekarteData = [];
-if ($isLoggedIn && file_exists(SPEISEKARTE_JSON_PATH)) {
-    $jsonContent = @file_get_contents(SPEISEKARTE_JSON_PATH);
-    if ($jsonContent) {
-        $decoded = json_decode($jsonContent, true);
-        if (is_array($decoded)) {
-            $speisekarteData = $decoded;
+if ($isLoggedIn) {
+    $targetPath = file_exists(SPEISEKARTE_JSON_PATH) ? SPEISEKARTE_JSON_PATH : SPEISEKARTE_DEFAULT_JSON_PATH;
+    if (file_exists($targetPath)) {
+        $jsonContent = @file_get_contents($targetPath);
+        if ($jsonContent) {
+            $decoded = json_decode($jsonContent, true);
+            if (is_array($decoded)) {
+                $speisekarteData = $decoded;
+            }
         }
     }
 }
