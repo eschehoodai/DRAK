@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { Screen, MenuItem, MenuVariant } from '../types';
+import React, { useEffect, useState } from 'react';
+import { Screen, MenuItem, MenuVariant, SpeisekarteData } from '../types';
 import Wochenangebot from './Wochenangebot';
 
 interface MenuViewProps {
@@ -41,6 +41,13 @@ const vorspeisenWarm: MenuItem[] = [
     name: 'Knoblauchsuppe',
     price: coin(6.9),
     description: 'Kräftige Knoblauchbrühe nach Wikinger Art – vertreibt Schwäche und Unholde.',
+    type: 'vorspeise',
+  },
+  {
+    id: 'vw2',
+    name: 'Hectors Hülsenfrucht-Sinfonie',
+    price: coin(9.9),
+    description: 'Deftiger Bohneneintopf mit Brot',
     type: 'vorspeise',
   },
 ];
@@ -124,6 +131,27 @@ const hauptErwachsene: MenuItem[] = [
     description: 'Schwein, Huhn und Rindersteak mit Grillgemüse, Maiskolben und Erdäpfelecken.',
     type: 'hauptgang',
   },
+  {
+    id: 'h9',
+    name: 'Kassler Schnitzel',
+    price: coin(17.9),
+    description: 'Mit Grillgemüse und Kartoffelecken',
+    type: 'hauptgang',
+  },
+  {
+    id: 'h10',
+    name: 'BBQ-Rippen',
+    price: coin(19.9),
+    description: 'Mit Krautsalat und Brot oder Beilage nach Wahl',
+    type: 'hauptgang',
+  },
+  {
+    id: 'h11',
+    name: 'Panierter Käse',
+    price: coin(16.9),
+    description: 'Mit Grillgemüse oder Salat',
+    type: 'hauptgang',
+  },
 ];
 
 const hauptKinder: MenuItem[] = [
@@ -170,6 +198,13 @@ const nachspeisen: MenuItem[] = [
     name: 'Birnenpudding',
     price: coin(5.9),
     description: 'Hausgemachte Pudding mit saftigen Birnenstücken.',
+    type: 'nachspeise',
+  },
+  {
+    id: 'n4',
+    name: 'Armer Ritter',
+    price: coin(6.9),
+    description: 'Mit Vanilleeis',
     type: 'nachspeise',
   },
 ];
@@ -503,6 +538,67 @@ function GroupHeading({
  * ============================================================ */
 
 export default function MenuView(_props: MenuViewProps) {
+  const [data, setData] = useState<SpeisekarteData>({
+    vorspeisenWarm,
+    vorspeisenKalt,
+    hauptErwachsene,
+    hauptKinder,
+    nachspeisen,
+    saefte,
+    wasser,
+    zuckerwasserFass,
+    zuckerwasserFlasche,
+    bitterzuckerwasser,
+    heissGetraenke,
+    likoere,
+    weine,
+    met,
+    biere,
+    spezialitaeten,
+    cocktails,
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    const timestamp = new Date().getTime();
+
+    fetch(`/speisekarte.json?t=${timestamp}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+        return res.json();
+      })
+      .then((json: SpeisekarteData) => {
+        if (isMounted && json && typeof json === 'object') {
+          setData((prev) => ({ ...prev, ...json }));
+        }
+      })
+      .catch((err) => {
+        console.warn('speisekarte.json konnte nicht geladen werden, nutze Standardwerte:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const vWarm = data.vorspeisenWarm || vorspeisenWarm;
+  const vKalt = data.vorspeisenKalt || vorspeisenKalt;
+  const hErwachsene = data.hauptErwachsene || hauptErwachsene;
+  const hKinder = data.hauptKinder || hauptKinder;
+  const nachsp = data.nachspeisen || nachspeisen;
+  const saef = data.saefte || saefte;
+  const wass = data.wasser || wasser;
+  const zwFass = data.zuckerwasserFass || zuckerwasserFass;
+  const zwFlasche = data.zuckerwasserFlasche || zuckerwasserFlasche;
+  const bitZw = data.bitterzuckerwasser || bitterzuckerwasser;
+  const heissG = data.heissGetraenke || heissGetraenke;
+  const lik = data.likoere || likoere;
+  const wei = data.weine || weine;
+  const me = data.met || met;
+  const bie = data.biere || biere;
+  const spez = data.spezialitaeten || spezialitaeten;
+  const cock = data.cocktails || cocktails;
+
   return (
     <section className="relative mx-auto max-w-5xl px-4 py-16 md:px-8">
       {/* Background radial highlight */}
@@ -536,11 +632,11 @@ export default function MenuView(_props: MenuViewProps) {
 
       <MenuPanel id="section-vorspeisen" title="Vorspeisen" subtitle="Gustatio" className="mt-16">
         <SubHeader label="Warm" />
-        <DishGrid items={vorspeisenWarm} />
+        <DishGrid items={vWarm} />
 
         <div className="mt-14">
           <SubHeader label="Kalt" />
-          <DishGrid items={vorspeisenKalt} />
+          <DishGrid items={vKalt} />
         </div>
       </MenuPanel>
 
@@ -549,11 +645,11 @@ export default function MenuView(_props: MenuViewProps) {
       {/* ================= HAUPTSPEISEN ================= */}
       <MenuPanel id="section-hauptspeisen" title="Hauptspeisen">
         <SubHeader label="Für Erwachsene" />
-        <DishGrid items={hauptErwachsene} />
+        <DishGrid items={hErwachsene} />
 
         <div className="mt-14">
           <SubHeader label="Für Kinder" note="Prinzessinnen & Knaben" />
-          <DishGrid items={hauptKinder} />
+          <DishGrid items={hKinder} />
         </div>
       </MenuPanel>
 
@@ -561,7 +657,7 @@ export default function MenuView(_props: MenuViewProps) {
 
       {/* ================= NACHSPEISEN ================= */}
       <MenuPanel id="section-nachspeisen" title="Nachspeisen">
-        <DishGrid items={nachspeisen} />
+        <DishGrid items={nachsp} />
       </MenuPanel>
 
       <SectionDivider />
@@ -591,7 +687,7 @@ export default function MenuView(_props: MenuViewProps) {
       {/* ================= AGREST & VERJUS ================= */}
       <MenuPanel id="section-saefte" title="Agrest & Verjus" className="mt-16">
         <SubHeader label="Fruchtsäfte" note="0,2L / 0,4L" />
-        <DishGrid items={saefte} />
+        <DishGrid items={saef} />
       </MenuPanel>
 
       <SectionDivider />
@@ -599,7 +695,7 @@ export default function MenuView(_props: MenuViewProps) {
       {/* ================= WASSER ================= */}
       <MenuPanel id="section-wasser" title="Wasser" subtitle="Aqua">
         <SubHeader label="Quellwasser" note="Still · Medium · Spritzig" />
-        <DishGrid items={wasser} />
+        <DishGrid items={wass} />
       </MenuPanel>
 
       <SectionDivider />
@@ -607,16 +703,16 @@ export default function MenuView(_props: MenuViewProps) {
       {/* ================= UNGEBRAUTES ================= */}
       <MenuPanel id="section-ungebrautes" title="Ungebrautes">
         <SubHeader label="Zuckerwasser vom Fass" note="0,2L / 0,4L" />
-        <DishGrid items={zuckerwasserFass} />
+        <DishGrid items={zwFass} />
 
         <div className="mt-14">
           <SubHeader label="Zuckerwasser aus der Vlesche" note="0,2L / 0,4L" />
-          <DishGrid items={zuckerwasserFlasche} />
+          <DishGrid items={zwFlasche} />
         </div>
 
         <div className="mt-14">
           <SubHeader label="Bitterzuckerwasser" note="Je 0,2 Liter" />
-          <DishGrid items={bitterzuckerwasser} />
+          <DishGrid items={bitZw} />
         </div>
       </MenuPanel>
 
@@ -625,7 +721,7 @@ export default function MenuView(_props: MenuViewProps) {
       {/* ================= ABSUD & KRAUT ================= */}
       <MenuPanel id="section-absud" title="Absud & Kraut">
         <SubHeader label="Heiße Tränke" />
-        <DishGrid items={heissGetraenke} />
+        <DishGrid items={heissG} />
       </MenuPanel>
 
       {/* ----- Gruppe: Alkoholisch ----- */}
@@ -634,7 +730,7 @@ export default function MenuView(_props: MenuViewProps) {
       {/* ================= GEISTIGES ================= */}
       <MenuPanel id="section-geistiges" title="Geistiges" subtitle="Aqua vitae" className="mt-16">
         <SubHeader label="Aus der Alchemistenküche" note="Liköre & Geistiges · Preise je 2cl / 4cl" />
-        <DishGrid items={likoere} />
+        <DishGrid items={lik} />
       </MenuPanel>
 
       <SectionDivider />
@@ -642,11 +738,11 @@ export default function MenuView(_props: MenuViewProps) {
       {/* ================= AEGIS TRUNK ================= */}
       <MenuPanel id="section-aegis" title="Aegis Trunk" subtitle="Aus den deutschen Grafschaften & Fürstentümern">
         <SubHeader label="Vinum" note="Weine · 0,2L / 0,75L" />
-        <DishGrid items={weine} />
+        <DishGrid items={wei} />
 
         <div className="mt-14">
           <SubHeader label="Trunk der Asen" note="Met · je 0,25 Liter" />
-          <DishGrid items={met} />
+          <DishGrid items={me} />
         </div>
       </MenuPanel>
 
@@ -655,7 +751,7 @@ export default function MenuView(_props: MenuViewProps) {
       {/* ================= GEBRÄU ================= */}
       <MenuPanel id="section-gebraeu" title="Gebräu" subtitle="Cervisia">
         <SubHeader label="Biere" note="0,3L / 0,5L" />
-        <DishGrid items={biere} />
+        <DishGrid items={bie} />
       </MenuPanel>
 
       <SectionDivider />
@@ -663,14 +759,15 @@ export default function MenuView(_props: MenuViewProps) {
       {/* ================= SPEZIALITÄTEN ================= */}
       <MenuPanel id="section-spezialitaeten" title="Spezialitäten">
         <SubHeader label="Hochprozentiges" note="Preise je 2cl / 4cl" />
-        <DishGrid items={spezialitaeten} />
+        <DishGrid items={spez} />
 
         <div className="mt-14">
           <SubHeader label="Hexens Gebräu" note="Cocktails · je 0,4 Liter" />
-          <DishGrid items={cocktails} />
+          <DishGrid items={cock} />
         </div>
       </MenuPanel>
 
     </section>
   );
 }
+

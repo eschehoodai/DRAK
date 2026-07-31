@@ -1,0 +1,891 @@
+{
+    "vorspeisenWarm": [
+        {
+            "id": "vw1",
+            "name": "Knoblauchsuppe",
+            "price": "6 Silber & 90 Kupfer",
+            "description": "Kräftige Knoblauchbrühe nach Wikinger Art – vertreibt Schwäche und Unholde.",
+            "type": "vorspeise"
+        },
+        {
+            "id": "vw2",
+            "name": "Hectors Hülsenfrucht-Sinfonie",
+            "price": "9 Silber & 90 Kupfer",
+            "description": "Deftiger Bohneneintopf mit Brot",
+            "type": "vorspeise"
+        }
+    ],
+    "vorspeisenKalt": [
+        {
+            "id": "vk1",
+            "name": "Drakplatte",
+            "price": "17 Silber & 90 Kupfer",
+            "description": "Brett beschmückt mit Romaschinken, Pragerschinken, Braten, Käse und Beilagen Salat.",
+            "type": "vorspeise"
+        },
+        {
+            "id": "vk2",
+            "name": "Mittelalter Salat",
+            "price": "14 Silber & 90 Kupfer",
+            "description": "Frisches Grünzeug mit Tomate, Gurke. Wahlweise mit Huhn oder Honig-Huhnfackeln.",
+            "type": "vorspeise"
+        }
+    ],
+    "hauptErwachsene": [
+        {
+            "id": "h1",
+            "name": "Draks Feuer – Sächsisches Feuerfleisch",
+            "price": "16 Silber & 90 Kupfer",
+            "description": "Feuriger Schweinegulasch mit Zwiebeln und Möhren im scharfen Sud.",
+            "type": "hauptgang",
+            "isSpecial": true
+        },
+        {
+            "id": "h2",
+            "name": "Honigfackel-Fleischspieße mit Allerlei",
+            "price": "18 Silber & 90 Kupfer",
+            "description": "Süß-würzige Spieße vom Schwein oder Hähnchen.",
+            "type": "hauptgang"
+        },
+        {
+            "id": "h3",
+            "name": "Ritterpfanne – Kassler mit Sauerkraut",
+            "price": "15 Silber & 90 Kupfer",
+            "description": "Würziger Kassler gebettet auf mildem Kraut.",
+            "type": "hauptgang"
+        },
+        {
+            "id": "h4",
+            "name": "Pökelbraten Schwein",
+            "price": "19 Silber & 90 Kupfer",
+            "description": "Pökelbraten mit Sauerkraut und Knödel.",
+            "type": "hauptgang"
+        },
+        {
+            "id": "h5",
+            "name": "Fleischklops – Hausgemachter Burger",
+            "description": "Im gerösteten Wecken mit Salat, Tomate, Käse, Zwiebel, Speck und Krautsalat.",
+            "type": "hauptgang",
+            "variants": [
+                {
+                    "label": "mit Rind",
+                    "price": "18 Silber & 90 Kupfer"
+                },
+                {
+                    "label": "mit Wildschwein",
+                    "price": "19 Silber & 90 Kupfer"
+                },
+                {
+                    "label": "mit Hirsch",
+                    "price": "19 Silber & 90 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "h6",
+            "name": "Forelle aus dem Ofen",
+            "price": "21 Silber & 90 Kupfer",
+            "description": "Ganze Forelle frisch aus dem Rohr mit Kräutern und Petersilien-Erdäpfeln.",
+            "type": "hauptgang"
+        },
+        {
+            "id": "h7",
+            "name": "Grillgemüse mit Ofenkartoffeln",
+            "price": "12 Silber & 90 Kupfer",
+            "description": "Buntes Gemüse vom Rost mit Erdäpfeln aus dem Rohr und Joghurt-Tunke.",
+            "type": "hauptgang"
+        },
+        {
+            "id": "h8",
+            "name": "Rustikalplatte",
+            "price": "27 Silber & 90 Kupfer",
+            "description": "Schwein, Huhn und Rindersteak mit Grillgemüse, Maiskolben und Erdäpfelecken.",
+            "type": "hauptgang"
+        },
+        {
+            "id": "h9",
+            "name": "Kassler Schnitzel",
+            "price": "17 Silber & 90 Kupfer",
+            "description": "Mit Grillgemüse und Kartoffelecken",
+            "type": "hauptgang"
+        },
+        {
+            "id": "h10",
+            "name": "BBQ-Rippen",
+            "price": "19 Silber & 90 Kupfer",
+            "description": "Mit Krautsalat und Brot oder Beilage nach Wahl",
+            "type": "hauptgang"
+        },
+        {
+            "id": "h11",
+            "name": "Panierter Käse",
+            "price": "16 Silber & 90 Kupfer",
+            "description": "Mit Grillgemüse oder Salat",
+            "type": "hauptgang"
+        }
+    ],
+    "hauptKinder": [
+        {
+            "id": "hk1",
+            "name": "Drachennest",
+            "price": "7 Silber & 90 Kupfer",
+            "description": "Hackbällchen, Spaghetti und einer milden Tomatensoße.",
+            "type": "hauptgang"
+        },
+        {
+            "id": "hk2",
+            "name": "Fischstäbchen",
+            "price": "8 Silber & 90 Kupfer",
+            "description": "Drei goldene Fischstäbchen mit Erdäpfelstangen und roter\/weißer Tunke.",
+            "type": "hauptgang"
+        },
+        {
+            "id": "hk3",
+            "name": "Kartoffeltaler mit Apfelmus",
+            "price": "6 Silber & 90 Kupfer",
+            "description": "Drei Reiberkuchen mit mildem Apfelmus.",
+            "type": "hauptgang"
+        }
+    ],
+    "nachspeisen": [
+        {
+            "id": "n1",
+            "name": "Pfefferkirschen",
+            "price": "5 Silber & 90 Kupfer",
+            "description": "Süßkirschen im Rotweinsud mit Pfeffer-Hauch.",
+            "type": "nachspeise"
+        },
+        {
+            "id": "n2",
+            "name": "Bratapfel",
+            "price": "7 Silber & 90 Kupfer",
+            "description": "Apfelring im Teigmantel mit Zimt und Zucker bestäubt.",
+            "type": "nachspeise"
+        },
+        {
+            "id": "n3",
+            "name": "Birnenpudding",
+            "price": "5 Silber & 90 Kupfer",
+            "description": "Hausgemachte Pudding mit saftigen Birnenstücken.",
+            "type": "nachspeise"
+        },
+        {
+            "id": "n4",
+            "name": "Armer Ritter",
+            "price": "6 Silber & 90 Kupfer",
+            "description": "Mit Vanilleeis",
+            "type": "nachspeise"
+        }
+    ],
+    "saefte": [
+        {
+            "id": "saf1",
+            "name": "Orange",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 20 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "saf2",
+            "name": "Multivitamin",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 20 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "saf3",
+            "name": "Banane",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 20 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "saf4",
+            "name": "Sauerkirsche",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 20 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "saf5",
+            "name": "Apfel",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 20 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "saf6",
+            "name": "Apfelschorle",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 20 Kupfer"
+                }
+            ]
+        }
+    ],
+    "wasser": [
+        {
+            "id": "was1",
+            "name": "Still",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "2 Silber & 50 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "3 Silber & 80 Kupfer"
+                },
+                {
+                    "label": "0,75L",
+                    "price": "6 Silber & 50 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "was2",
+            "name": "Medium",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "2 Silber & 50 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "3 Silber & 80 Kupfer"
+                },
+                {
+                    "label": "0,75L",
+                    "price": "6 Silber & 50 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "was3",
+            "name": "Spritzig",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "2 Silber & 50 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "3 Silber & 80 Kupfer"
+                },
+                {
+                    "label": "0,75L",
+                    "price": "6 Silber & 50 Kupfer"
+                }
+            ]
+        }
+    ],
+    "zuckerwasserFass": [
+        {
+            "id": "zwf1",
+            "name": "Himbeere",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 20 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "zwf2",
+            "name": "Cola",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 20 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "zwf3",
+            "name": "Traube",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 20 Kupfer"
+                }
+            ]
+        }
+    ],
+    "zuckerwasserFlasche": [
+        {
+            "id": "zwv1",
+            "name": "Fanta",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 20 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "zwv2",
+            "name": "Sprite",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 20 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "zwv3",
+            "name": "Mezzo Mix",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 20 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "zwv4",
+            "name": "Kofola",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,4L",
+                    "price": "4 Silber & 20 Kupfer"
+                }
+            ]
+        }
+    ],
+    "bitterzuckerwasser": [
+        {
+            "id": "biz1",
+            "name": "Ginger Ale",
+            "price": "3 Silber & 20 Kupfer",
+            "description": "0,2 L",
+            "type": "getraenk"
+        },
+        {
+            "id": "biz2",
+            "name": "Tonic Water",
+            "price": "3 Silber & 20 Kupfer",
+            "description": "0,2 L",
+            "type": "getraenk"
+        }
+    ],
+    "heissGetraenke": [
+        {
+            "id": "heg1",
+            "name": "Tee (nach Wahl)",
+            "price": "3 Silber & 80 Kupfer",
+            "type": "getraenk"
+        },
+        {
+            "id": "heg2",
+            "name": "Tschechischer Tee",
+            "price": "4 Silber & 80 Kupfer",
+            "description": "Becherovka, Orangensaft, Zitronensaft, Orange",
+            "type": "getraenk"
+        },
+        {
+            "id": "heg3",
+            "name": "Türkischer Kaffee \/ Espresso",
+            "price": "2 Silber & 80 Kupfer",
+            "type": "getraenk"
+        }
+    ],
+    "likoere": [
+        {
+            "id": "lik1",
+            "name": "Maraska Krsikovac",
+            "description": "Fruchtiger Birnenlikör mit weichem süßem Geschmack",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "2 Silber & 90 Kupfer"
+                },
+                {
+                    "label": "4cl",
+                    "price": "5 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "lik2",
+            "name": "Maraska Orahovec",
+            "description": "Kräuterlikör mit würzig-herbem Charakter",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "2 Silber & 90 Kupfer"
+                },
+                {
+                    "label": "4cl",
+                    "price": "5 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "lik3",
+            "name": "Maraska Pelinkovac",
+            "description": "Intensiver Bitterlikör mit Wermut und kräftigen Kräuternoten",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "2 Silber & 90 Kupfer"
+                },
+                {
+                    "label": "4cl",
+                    "price": "5 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "lik4",
+            "name": "Bärenjäger",
+            "description": "Kräftiger Honiglikör mit intensiver Süße und leicht würziger Note",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "3 Silber & 70 Kupfer"
+                },
+                {
+                    "label": "4cl",
+                    "price": "7 Silber"
+                }
+            ]
+        },
+        {
+            "id": "lik5",
+            "name": "Marei Brizzard Menthe Verte",
+            "description": "Frischer Minzlikör mit intensiver kühlender Note",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "3 Silber & 70 Kupfer"
+                },
+                {
+                    "label": "4cl",
+                    "price": "7 Silber"
+                }
+            ]
+        },
+        {
+            "id": "lik6",
+            "name": "Waldgeist",
+            "description": "Mild-süßer Likör mit typischem Waldmeisteraroma",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "2 Silber"
+                },
+                {
+                    "label": "4cl",
+                    "price": "4 Silber"
+                }
+            ]
+        },
+        {
+            "id": "lik7",
+            "name": "Bols",
+            "description": "Floraler Holunderblütenlikör, leicht und frisch mit dezenter Süße",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "3 Silber"
+                },
+                {
+                    "label": "4cl",
+                    "price": "5 Silber & 10 Kupfer"
+                }
+            ]
+        }
+    ],
+    "weine": [
+        {
+            "id": "win1",
+            "name": "Dornfelder Rot (trocken)",
+            "description": "Kräftiger Rotwein mit dunkeln Beeren",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "5 Silber & 90 Kupfer"
+                },
+                {
+                    "label": "0,75L",
+                    "price": "18 Silber & 90 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "win2",
+            "name": "Dornfelder Rot (halbtrocken)",
+            "description": "Samtiger Rotwein mit dunkeln Beeren und milder Süße",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "5 Silber & 90 Kupfer"
+                },
+                {
+                    "label": "0,75L",
+                    "price": "18 Silber & 90 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "win3",
+            "name": "Dornfelder Rosé (halbtrocken)",
+            "description": "Fruchtiger Rosé mit feiner Süße und frischen Beerenaromen",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "5 Silber & 90 Kupfer"
+                },
+                {
+                    "label": "0,75L",
+                    "price": "18 Silber & 90 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "win4",
+            "name": "Grauburgunder Weiß (trocken)",
+            "description": "Eleganter Weißwein mit dezenter Frucht und leichter Würze",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,2L",
+                    "price": "5 Silber & 90 Kupfer"
+                },
+                {
+                    "label": "0,75L",
+                    "price": "18 Silber & 90 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "win5",
+            "name": "Vinumschorle",
+            "price": "5 Silber & 10 Kupfer",
+            "description": "Des Fürsten bevorzugtes Sprudelwasser",
+            "type": "getraenk"
+        },
+        {
+            "id": "win6",
+            "name": "Rotkäppchen Piccolo",
+            "price": "4 Silber & 50 Kupfer",
+            "description": "trocken \/ rosé \/ alkoholfrei · 0,2 L",
+            "type": "getraenk"
+        }
+    ],
+    "met": [
+        {
+            "id": "met1",
+            "name": "Thors Trunk – Weißer Met",
+            "price": "5 Silber & 50 Kupfer",
+            "description": "Original Wikinger",
+            "type": "getraenk"
+        },
+        {
+            "id": "met2",
+            "name": "Drachenblut – roter Met",
+            "price": "5 Silber & 50 Kupfer",
+            "type": "getraenk"
+        },
+        {
+            "id": "met3",
+            "name": "Hanf Met",
+            "price": "5 Silber & 50 Kupfer",
+            "type": "getraenk"
+        }
+    ],
+    "biere": [
+        {
+            "id": "bie1",
+            "name": "Svijany 450 (Pils)",
+            "description": "Cervisia – Der Mönche Gebräu",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,3L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,5L",
+                    "price": "4 Silber & 90 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "bie2",
+            "name": "Geschnittenes Bier",
+            "description": "Cervisia – Der Mönche Gebräu",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,3L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,5L",
+                    "price": "4 Silber & 90 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "bie3",
+            "name": "Baronin (Dunkles Bier)",
+            "description": "Cervisia – Der Mönche Gebräu",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,3L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,5L",
+                    "price": "4 Silber & 90 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "bie4",
+            "name": "Radler",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "0,3L",
+                    "price": "3 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "0,5L",
+                    "price": "4 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "bie5",
+            "name": "Lübzer Alkoholfrei",
+            "price": "3 Silber & 80 Kupfer",
+            "description": "Der Mönche Gebräu unecht",
+            "type": "getraenk"
+        },
+        {
+            "id": "bie6",
+            "name": "Erdinger Weizen Alkoholfrei",
+            "price": "4 Silber & 90 Kupfer",
+            "description": "Der Mönche Gebräu unecht",
+            "type": "getraenk"
+        }
+    ],
+    "spezialitaeten": [
+        {
+            "id": "spz1",
+            "name": "Madame Geneva Gin (44 %)",
+            "description": "Kräftiger Premium-Gin mit komplexen Kräutern und Zitrusnoten",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "5 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "4cl",
+                    "price": "9 Silber"
+                }
+            ]
+        },
+        {
+            "id": "spz2",
+            "name": "Madame Geneva Gin (41,9 %)",
+            "description": "Fruchtig-würziger Gin mit roten Beeren und feinen Botanicals",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "4 Silber & 70 Kupfer"
+                },
+                {
+                    "label": "4cl",
+                    "price": "8 Silber & 50 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "spz3",
+            "name": "Herzdame 21 %",
+            "description": "Sanfte Likör mit süß-fruchtigem Charakter",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "4 Silber"
+                },
+                {
+                    "label": "4cl",
+                    "price": "7 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "spz4",
+            "name": "Kreuzritter (Kräuterschnaps) 30 %",
+            "description": "Kräftiger Kräuterlikör mit würziger Tiefe",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "4 Silber & 10 Kupfer"
+                },
+                {
+                    "label": "4cl",
+                    "price": "9 Silber"
+                }
+            ]
+        },
+        {
+            "id": "spz5",
+            "name": "Zingiba Aperitivum 20 %",
+            "description": "Fruchtig-süßer Likör mit leichter Zitrusnote",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "3 Silber"
+                },
+                {
+                    "label": "4cl",
+                    "price": "5 Silber & 10 Kupfer"
+                }
+            ]
+        },
+        {
+            "id": "spz6",
+            "name": "Williams Birne Likör",
+            "type": "getraenk",
+            "variants": [
+                {
+                    "label": "2cl",
+                    "price": "4 Silber & 40 Kupfer"
+                },
+                {
+                    "label": "4cl",
+                    "price": "7 Silber & 90 Kupfer"
+                }
+            ]
+        }
+    ],
+    "cocktails": [
+        {
+            "id": "cok1",
+            "name": "Aperol Spritz",
+            "price": "7 Silber & 90 Kupfer",
+            "description": "Aperol 4 cl, Prosecco, Mineralwasser · 0,4 L",
+            "type": "getraenk"
+        },
+        {
+            "id": "cok2",
+            "name": "Gin Tonic",
+            "price": "7 Silber & 90 Kupfer",
+            "description": "Gin, Tonic, Zitrone · 0,4 L",
+            "type": "getraenk"
+        },
+        {
+            "id": "cok3",
+            "name": "43er Kirsch",
+            "price": "7 Silber & 90 Kupfer",
+            "description": "43er 4 cl, Sauerkirschsaft, Prosecco, Mineralwasser · 0,4 L",
+            "type": "getraenk"
+        }
+    ]
+}

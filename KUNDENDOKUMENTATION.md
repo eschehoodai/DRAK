@@ -44,10 +44,12 @@ Ihre neue Website wurde als hochmoderne **Single-Page-Application (SPA)** konzip
 - **Einladendes Bewerbungsmodul:** Mittelalterlich gestaltete Stellenausschreibungen für Service und Küche.
 - **Schlankes Bewerbungsformular:** Barrierefreie Direktbewerbung ohne Hürden (keine Registrierung oder Uploads nötig). Bewerbungen werden direkt per E-Mail (`public/send-job-application.php`) zugestellt.
 
-### 🍲 Eigenständige Verwaltung der Wochenangebote (`/admin.php`)
-- **Einfaches Admin-Modul:** Über die Unterseite `https://drakzittau.de/admin.php` können Sie die Wochenangebote (Tageskarten/Sondergerichte) jederzeit direkt im Browser selbstständig anpassen, neue Gerichte hinzufügen oder alte löschen.
+### 🍲 Eigenständige Verwaltung von Speisekarte & Wochenangeboten (`/admin.php`)
+- **Vollständiges Wirt-Admin-Modul:** Über die Unterseite `https://drakzittau.de/admin.php` können Sie per Tab-Steuerung sowohl die **Wochenangebote** (`angebote.json`) als auch die **gesamte Speisekarte & Getränkekarte** (`speisekarte.json`) jederzeit selbstständig im Browser anpassen.
+- **Rubriken-Verwaltung:** Gerichte und Tränke sind übersichtlich nach Kategorien geordnet (Vorspeisen, Hauptspeisen, Nachspeisen, Säfte, Wasser, Biere, Met, Spezialitäten etc.). Sie können Preise, Beschreibungen, Haus-Spezialitäten und Portionsvarianten (z. B. 0,2L / 0,4L) bearbeiten, alte Gerichte löschen und neue hinzufügen.
 - **Passwortschutz:** Der Zugang ist mit dem Passwort `Zittau2026!` geschützt.
-- **Automatischer Schutz:** Durch den integrierten Deployment-Filter bleiben Ihre im Admin-Bereich gepflegten Angebote auch bei zukünftigen Website-Updates auf dem Server erhalten.
+- **Automatischer Deployment-Schutz:** Sowohl `angebote.json` als auch `speisekarte.json` sind im automatischen Deployment-Filter exkludiert, sodass Ihre im Admin-Bereich gepflegten Daten bei zukünftigen Website-Updates auf dem Server **vollständig erhalten bleiben**.
+
 
 ---
 

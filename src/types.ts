@@ -61,3 +61,25 @@ export interface WochenangebotItem {
   beschreibung?: string;
 }
 
+export interface SpeisekarteData {
+  vorspeisenWarm?: MenuItem[];
+  vorspeisenKalt?: MenuItem[];
+  hauptErwachsene?: MenuItem[];
+  hauptKinder?: MenuItem[];
+  nachspeisen?: MenuItem[];
+  saefte?: MenuItem[];
+  wasser?: MenuItem[];
+  zuckerwasserFass?: MenuItem[];
+  zuckerwasserFlasche?: MenuItem[];
+  bitterzuckerwasser?: MenuItem[];
+  heissGetraenke?: MenuItem[];
+  likoere?: MenuItem[];
+  weine?: MenuItem[];
+  met?: MenuItem[];
+  biere?: MenuItem[];
+  spezialitaeten?: MenuItem[];
+  cocktails?: MenuItem[];
+  [key: string]: MenuItem[] | undefined;
+}
+
+
