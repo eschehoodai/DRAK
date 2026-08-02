@@ -109,41 +109,6 @@ const formatGermanDate = (dateStr: string): string => {
   return `${dayName}, ${formattedDay}.${formattedMonth}.${d.getFullYear()}`;
 };
 
-/**
- * Generates quick selection date options for the user
- */
-const getQuickChips = () => {
-  const today = new Date();
-  const chips: { label: string; dateStr: string }[] = [];
-
-  // Heute
-  chips.push({ label: 'Heute', dateStr: formatYYYYMMDD(today) });
-
-  // Morgen
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  chips.push({ label: 'Morgen', dateStr: formatYYYYMMDD(tomorrow) });
-
-  // Nächster Freitag
-  const nextFriday = new Date(today);
-  let daysUntilFri = (5 - today.getDay() + 7) % 7;
-  nextFriday.setDate(today.getDate() + daysUntilFri);
-  chips.push({ label: 'Diesen Fr', dateStr: formatYYYYMMDD(nextFriday) });
-
-  // Nächster Samstag
-  const nextSat = new Date(today);
-  let daysUntilSat = (6 - today.getDay() + 7) % 7;
-  nextSat.setDate(today.getDate() + daysUntilSat);
-  chips.push({ label: 'Diesen Sa', dateStr: formatYYYYMMDD(nextSat) });
-
-  // Nächster Sonntag
-  const nextSun = new Date(today);
-  let daysUntilSun = (0 - today.getDay() + 7) % 7;
-  nextSun.setDate(today.getDate() + daysUntilSun);
-  chips.push({ label: 'Diesen So', dateStr: formatYYYYMMDD(nextSun) });
-
-  return chips;
-};
 
 /* ================= CUSTOM CALENDAR MODAL COMPONENT ================= */
 interface CustomCalendarModalProps {
@@ -484,7 +449,6 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
 
   const isTuesdaySelected = getDayOfWeek(date) === 2;
   const availableSlots = getTimeSlotsForDate(date);
-  const quickChips = getQuickChips();
 
   return (
     <section className="relative mx-auto max-w-5xl px-4 py-12 md:px-8">
@@ -674,7 +638,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   {/* Guests Selector */}
                   <div className="flex flex-col space-y-2">
                     <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase">
-                      Anzahl Gefährten
+                      Anzahl Gefährten *
                     </label>
                     <select
                       id="select-guests"
@@ -682,12 +646,19 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                       onChange={(e) => setGuests(parseInt(e.target.value))}
                       className="border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer"
                     >
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => (
+                      {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
                         <option key={num} value={num} className="bg-void-black text-cream-parchment py-2">
-                          {num} {num === 1 ? 'Krieger' : 'Krieger'}
+                          {num} Krieger
                         </option>
                       ))}
                     </select>
+                    <p className="text-[11px] font-serif italic text-cream-parchment/60 leading-tight pt-1">
+                      * Für mehr als 20 Gäste bedarf es einer{' '}
+                      <a href="tel:035835495389" className="text-gold-bright underline hover:text-gold-primary">
+                        telefonischen Reservierung
+                      </a>{' '}
+                      & persönlichen Planung.
+                    </p>
                   </div>
 
                   {/* Date Input with Custom Visual Calendar */}
@@ -758,34 +729,6 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   </div>
                 </div>
 
-                {/* Quick Date Select Chips */}
-                <div className="flex items-center flex-wrap gap-2 pt-1 pb-2">
-                  <span className="font-cinzel text-[10px] font-bold uppercase tracking-wider text-gold-secondary/70 mr-1">
-                    Schnellwahl:
-                  </span>
-                  {quickChips.map((chip) => {
-                    const isSelected = date === chip.dateStr;
-                    const isChipTuesday = getDayOfWeek(chip.dateStr) === 2;
-                    return (
-                      <button
-                        key={chip.label}
-                        type="button"
-                        onClick={() => setDate(chip.dateStr)}
-                        className={`px-3 py-1 text-xs font-serif rounded transition-all border cursor-pointer ${
-                          isSelected
-                            ? 'border-gold-primary bg-gold-primary/20 text-gold-bright font-bold'
-                            : isChipTuesday
-                            ? 'border-red-500/30 bg-red-950/20 text-red-300/60 hover:border-red-500/60'
-                            : 'border-gold-secondary/20 bg-void-black/40 text-cream-parchment/70 hover:border-gold-secondary/50 hover:text-cream-parchment'
-                        }`}
-                      >
-                        {chip.label}
-                        {isChipTuesday && <span className="ml-1 text-[9px] text-red-400">(Ruhe)</span>}
-                      </button>
-                    );
-                  })}
-                </div>
-
                 {/* Tuesday Ruhetag Warning Banner */}
                 {isTuesdaySelected && (
                   <div className="p-4 border border-red-500/50 bg-red-950/30 text-red-200 text-xs md:text-sm font-serif flex items-start space-x-3 rounded animate-in fade-in duration-200">
@@ -795,7 +738,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                         Dienstags ist die Taverne geschlossen
                       </p>
                       <p className="mt-1 text-cream-parchment/80 leading-relaxed">
-                        An Dienstagen ruhen Drachen und Wirtsleute. Bitte wählt über die Schnellauswahl oder den Kalender einen anderen Tag für Eure Tischreservierung!
+                        An Dienstagen ruhen Drachen und Wirtsleute. Bitte wählt über den Kalender einen anderen Tag für Eure Tischreservierung!
                       </p>
                     </div>
                   </div>

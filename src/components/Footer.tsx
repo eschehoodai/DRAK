@@ -33,7 +33,7 @@ export default function Footer({ onNavigate }: FooterProps) {
               DRACHEN TAVERNE
             </h3>
             <p className="font-serif text-sm leading-relaxed max-w-xs text-cream-parchment/60">
-              Edle Speisen und kräftige Tränke, zubereitet nach uralten Rezepten aus den tiefsten Gewölben unserer Taverne.
+              Dein mittelalterliches Erlebnis-Restaurant in Zittau: Edle Speisen und kräftige Tränke, zubereitet nach uralten Rezepten aus den tiefsten Gewölben unserer Taverne.
             </p>
             <div className="pt-4 text-xs font-mono text-gold-secondary/80">
               © MMXXVI Drachen Taverne. Alle Rechte vorbehalten.

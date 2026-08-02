@@ -2,6 +2,7 @@ import React from 'react';
 import { Screen } from '../types';
 import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin, Phone } from 'lucide-react';
 import candlelitGobletImage from '../assets/images/Speise2.webp';
+import essenDrakImage from '../assets/images/essen-restaurant-zittau-drak.jpg';
 import logoDrak from '../assets/images/logo-drak.webp';
 import headerVideo from '../assets/images/headervideo.webm';
 import gewoelbeVideo from '../assets/images/gewölbe.mp4';
@@ -52,11 +53,11 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
             </h1>
 
             <p className="font-cinzel text-xs tracking-widest text-gold-primary/80 -mt-2 sm:-mt-4">
-              Regionale Küche · Biergarten · Tischreservierung
+              Mittelalterliches Erlebnis-Restaurant in Zittau · Biergarten · Tischreservierung
             </p>
 
             <p className="font-serif text-lg leading-relaxed text-cream-parchment/90 md:text-xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              Wo edle Recken, kluge Kleriker und dürstige Abenteurer an schweren Eichentischen zusammenkommen. Tretet ein und labt Euch an unseren Braten — regionale Küche aus Zittau, frisch zubereitet im Herzen der Oberlausitz. Reserviert jetzt Euren Tisch im gemütlichen Gasthaus oder im schattigen Biergarten.
+              Wo edle Recken, kluge Kleriker und dürstige Abenteurer an schweren Eichentischen zusammenkommen. Tretet ein und labt Euch an unseren Braten — regionale Küche aus Zittau, frisch zubereitet im Herzen der Oberlausitz. Reserviert jetzt Euren Tisch in unserem Restaurant &amp; Gasthaus oder im schattigen Biergarten.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -106,12 +107,12 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
               <span>Unsere Sage</span>
             </div>
             <h2 className="font-cinzel text-3xl font-bold tracking-widest text-gold-bright uppercase">
-              Die Drachentaverne — Regionale Küche mit Geschichte
+              Die Drachentaverne - Euer Mittelalter-Restaurant in Zittau mit regionaler Küche mit Geschichte
             </h2>
 
             <p className="font-serif text-cream-parchment/80 leading-relaxed text-base pt-2">
               <span className="float-left mr-3 font-cinzel text-6xl font-black text-gold-primary leading-none mt-2">I</span>
-              m Herzen von Zittau, am Fuße des Zittauer Gebirges und unweit der berühmten Zittauer Fastentücher, lädt die Drachentaverne zu regionalen Genüssen aus der Oberlausitz ein. Was vor Jahrhunderten als Herberge für Reisende, Handwerker und Händler begann, ist heute ein Gasthaus mit Charakter: deftige Hausmannskost, Fleischgerichte vom heimischen Metzger, täglich frisches Brot aus der Region und ein kühles Bier aus sächsischer Brautradition.
+              m Herzen von Zittau, am Fuße des Zittauer Gebirges und unweit der berühmten Zittauer Fastentücher, lädt die Drachentaverne als einzigartiges Mittelalter-Restaurant in Zittau zu regionalen Genüssen aus der Oberlausitz ein. Was vor Jahrhunderten als Herberge für Reisende, Handwerker und Händler begann, ist heute ein Gasthaus mit Charakter: deftige Hausmannskost, Fleischgerichte vom heimischen Metzger, täglich frisches Brot aus der Region und ein kühles Bier aus sächsischer Brautradition.
             </p>
 
             <p className="font-serif text-cream-parchment/80 leading-relaxed text-base">
@@ -119,15 +120,23 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
             </p>
 
             {/* Facts + reserve CTA */}
-            <div className="border-t border-gold-secondary/25 pt-6 flex flex-col gap-4">
-              <div className="flex items-center gap-x-6">
-                <div>
-                  <p className="font-cinzel text-2xl font-black text-gold-primary tracking-wide">II</p>
-                  <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Gewölbe</p>
+            <div className="border-t border-gold-secondary/25 pt-6 flex flex-col gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-gold-secondary/25 w-full">
+                <div className="pr-0 sm:pr-4">
+                  <p className="font-cinzel text-base sm:text-lg font-bold text-gold-primary tracking-wider uppercase leading-snug">
+                    Mittelalter Restaurant
+                  </p>
+                  <p className="font-serif text-xs text-cream-parchment/60 uppercase tracking-widest mt-1">
+                    Historisches Gewölbe
+                  </p>
                 </div>
-                <div className="border-l border-gold-secondary/25 pl-6">
-                  <p className="font-cinzel text-2xl font-black text-gold-primary tracking-wide">Regional</p>
-                  <p className="font-serif text-xs text-cream-parchment/50 uppercase tracking-widest mt-1">Oberlausitz</p>
+                <div className="pt-3 sm:pt-0 sm:pl-6">
+                  <p className="font-cinzel text-base sm:text-lg font-bold text-gold-primary tracking-wider uppercase leading-snug">
+                    Regionale Küche
+                  </p>
+                  <p className="font-serif text-xs text-cream-parchment/60 uppercase tracking-widest mt-1">
+                    + Oberlausitzer Spezialitäten
+                  </p>
                 </div>
               </div>
               <button
@@ -141,7 +150,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
             </div>
           </div>
 
-          {/* Cozy candlelit image */}
+          {/* Regional food image */}
           <div className="relative border border-gold-secondary/30 p-2 bg-void-black/40 min-h-[24rem]">
             <div className="gilded-corner gilded-corner-tl" />
             <div className="gilded-corner gilded-corner-tr" />
@@ -150,18 +159,18 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
 
             <div className="relative h-full w-full overflow-hidden border border-gold-secondary/15">
               <img
-                src={candlelitGobletImage}
-                alt="DRAK Cozy Candlelit Setting"
+                src={essenDrakImage}
+                alt="Oberlausitzer Spezialitäten in der Drachentaverne Zittau"
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover opacity-80 filter saturate-100 contrast-110 brightness-100"
+                className="w-full h-full object-cover object-center opacity-90 filter saturate-100 contrast-105 brightness-100 transition-transform duration-700 hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-void-black/90 via-void-black/20 to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6">
+              <div className="absolute inset-0 bg-gradient-to-t from-void-black/90 via-void-black/25 to-transparent pointer-events-none" />
+              <div className="absolute bottom-6 left-6 right-6 pointer-events-none">
                 <h4 className="font-cinzel text-sm font-black text-gold-bright tracking-widest uppercase">
-                  Kerzenschein & Gusseisen
+                  Deftige Regional-Küche
                 </h4>
-                <p className="font-serif text-xs text-cream-parchment/70 leading-relaxed mt-1">
-                  Verbringt Eure Abende in behaglicher, geschichtsträchtiger Atmosphäre bei authentischen Klängen und gedämpftem Licht.
+                <p className="font-serif text-xs text-cream-parchment/80 leading-relaxed mt-1">
+                  Frisch zubereitete Oberlausitzer Spezialitäten und herzhafte Braten in behaglicher Tafelatmosphäre.
                 </p>
               </div>
             </div>
