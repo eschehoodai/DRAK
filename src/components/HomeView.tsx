@@ -101,52 +101,51 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
               aria-hidden="true"
               className="pointer-events-none select-none absolute inset-0 h-full w-full opacity-30 object-contain"
             />
-            <div className="relative z-10 space-y-6">
-            <div className="flex items-center space-x-2 text-gold-primary font-cinzel text-xs font-extrabold tracking-widest uppercase">
-              <BookOpen className="h-4 w-4" />
-              <span>Unsere Sage</span>
-            </div>
-            <h2 className="font-cinzel text-3xl font-bold tracking-widest text-gold-bright uppercase">
-              Die Drachentaverne - Euer Mittelalter-Restaurant in Zittau mit regionaler Küche mit Geschichte
-            </h2>
-
-            <p className="font-serif text-cream-parchment/80 leading-relaxed text-base pt-2">
-              <span className="float-left mr-3 font-cinzel text-6xl font-black text-gold-primary leading-none mt-2">I</span>
-              m Herzen von Zittau, am Fuße des Zittauer Gebirges und unweit der berühmten Zittauer Fastentücher, lädt die Drachentaverne als einzigartiges Mittelalter-Restaurant in Zittau zu regionalen Genüssen aus der Oberlausitz ein. Was vor Jahrhunderten als Herberge für Reisende, Handwerker und Händler begann, ist heute ein Gasthaus mit Charakter: deftige Hausmannskost, Fleischgerichte vom heimischen Metzger, täglich frisches Brot aus der Region und ein kühles Bier aus sächsischer Brautradition.
-            </p>
-
-            <p className="font-serif text-cream-parchment/80 leading-relaxed text-base">
-              Ob nach einem Bummel durch Zittaus Altstadt, einem Besuch der Frauenkirche oder einer Wanderung durch das Zittauer Gebirge — in der Drachentaverne kehrt Ihr ein, wo seit jeher Gäste willkommen sind.
-            </p>
-
-            {/* Facts + reserve CTA */}
-            <div className="border-t border-gold-secondary/25 pt-6 flex flex-col gap-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-gold-secondary/25 w-full">
-                <div className="pr-0 sm:pr-4">
-                  <p className="font-cinzel text-base sm:text-lg font-bold text-gold-primary tracking-wider uppercase leading-snug">
-                    Mittelalter Restaurant
-                  </p>
-                  <p className="font-serif text-xs text-cream-parchment/60 uppercase tracking-widest mt-1">
-                    Historisches Gewölbe
-                  </p>
-                </div>
-                <div className="pt-3 sm:pt-0 sm:pl-6">
-                  <p className="font-cinzel text-base sm:text-lg font-bold text-gold-primary tracking-wider uppercase leading-snug">
-                    Regionale Küche
-                  </p>
-                  <p className="font-serif text-xs text-cream-parchment/60 uppercase tracking-widest mt-1">
-                    + Oberlausitzer Spezialitäten
-                  </p>
-                </div>
+            <div className="relative z-10 space-y-6 text-center">
+              <div className="flex items-center justify-center space-x-2 text-gold-primary font-cinzel text-xs font-extrabold tracking-widest uppercase">
+                <BookOpen className="h-4 w-4" />
+                <span>Unsere Sage</span>
               </div>
-              <button
-                id="sage-btn-reserve"
-                onClick={() => onNavigate(Screen.RESERVE)}
-                className="w-full bg-gold-primary border border-gold-primary px-6 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer text-center whitespace-nowrap"
-              >
-                Jetzt Reservieren
-              </button>
-            </div>
+              <h2 className="font-cinzel text-2xl sm:text-3xl font-bold tracking-widest text-gold-bright uppercase text-center">
+                Die Drachentaverne - Euer Mittelalter-Restaurant in Zittau mit Regionaler Küche und Geschichte
+              </h2>
+
+              <p className="font-serif text-cream-parchment/80 leading-relaxed text-base pt-2 text-center">
+                Im Herzen von Zittau, am Fuße des Zittauer Gebirges und unweit der berühmten Zittauer Fastentücher, lädt die Drachentaverne als einzigartiges Mittelalter-Restaurant in Zittau zu regionalen Genüssen aus der Oberlausitz ein. Was vor Jahrhunderten als Herberge für Reisende, Handwerker und Händler begann, ist heute ein Gasthaus mit Charakter: deftige Hausmannskost, Fleischgerichte vom heimischen Metzger, täglich frisches Brot aus der Region und ein kühles Bier aus sächsischer Brautradition.
+              </p>
+
+              <p className="font-serif text-cream-parchment/80 leading-relaxed text-base text-center">
+                Ob nach einem Bummel durch Zittaus Altstadt, einem Besuch der Frauenkirche oder einer Wanderung durch das Zittauer Gebirge — in der Drachentaverne kehrt Ihr ein, wo seit jeher Gäste willkommen sind.
+              </p>
+
+              {/* Facts + reserve CTA */}
+              <div className="border-t border-gold-secondary/25 pt-6 flex flex-col gap-5 items-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-gold-secondary/25 w-full text-center">
+                  <div className="px-2">
+                    <p className="font-cinzel text-base sm:text-lg font-bold text-gold-primary tracking-wider uppercase leading-snug">
+                      Mittelalter Restaurant
+                    </p>
+                    <p className="font-serif text-xs text-cream-parchment/60 uppercase tracking-widest mt-1">
+                      Historisches Gewölbe
+                    </p>
+                  </div>
+                  <div className="pt-3 sm:pt-0 px-2">
+                    <p className="font-cinzel text-base sm:text-lg font-bold text-gold-primary tracking-wider uppercase leading-snug">
+                      Regionale Küche
+                    </p>
+                    <p className="font-serif text-xs text-cream-parchment/60 uppercase tracking-widest mt-1">
+                      + Oberlausitzer Spezialitäten
+                    </p>
+                  </div>
+                </div>
+                <button
+                  id="sage-btn-reserve"
+                  onClick={() => onNavigate(Screen.RESERVE)}
+                  className="w-full bg-gold-primary border border-gold-primary px-6 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer text-center whitespace-nowrap"
+                >
+                  Jetzt Reservieren
+                </button>
+              </div>
             </div>
           </div>
 
