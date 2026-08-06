@@ -15,24 +15,8 @@ interface ReservationViewProps {
   onClearNotes?: () => void;
 }
 
-// Öffnungszeiten-Konfiguration
-interface DayHours {
-  isOpen: boolean;
-  open: string;
-  close: string;
-  lastSlot: string;
-  label: string;
-}
+import { OPENING_HOURS, useIsTavernOpen } from '../utils/openingHours';
 
-const OPENING_HOURS: Record<number, DayHours> = {
-  0: { isOpen: true, open: '11:00', close: '21:00', lastSlot: '20:30', label: 'So: 11:00–21:00' },
-  1: { isOpen: true, open: '17:00', close: '21:00', lastSlot: '20:30', label: 'Mo: 17:00–21:00' },
-  2: { isOpen: false, open: '', close: '', lastSlot: '', label: 'Di: Geschlossen' },
-  3: { isOpen: true, open: '17:00', close: '21:00', lastSlot: '20:30', label: 'Mi: 17:00–21:00' },
-  4: { isOpen: true, open: '17:00', close: '21:00', lastSlot: '20:30', label: 'Do: 17:00–21:00' },
-  5: { isOpen: true, open: '17:00', close: '22:00', lastSlot: '21:30', label: 'Fr: 17:00–22:00' },
-  6: { isOpen: true, open: '11:00', close: '22:00', lastSlot: '21:30', label: 'Sa: 11:00–22:00' },
-};
 
 /**
  * Format a Date object to YYYY-MM-DD using local time
@@ -258,6 +242,7 @@ function CustomCalendarModal({ isOpen, onClose, selectedDate, onSelectDate }: Cu
 
 /* ================= MAIN RESERVATION VIEW COMPONENT ================= */
 export default function ReservationView({ initialNotes, onClearNotes }: ReservationViewProps) {
+  const isTavernOpenNow = useIsTavernOpen();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [guests, setGuests] = useState(2);
@@ -584,21 +569,33 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
               </div>
 
               {/* Phone reservation direct banner */}
-              <div className="mb-8 border border-gold-primary/40 bg-gold-primary/15 p-4 text-center gilded-border">
-                <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-gold-bright flex items-center justify-center gap-2">
-                  <Phone className="h-4 w-4 text-gold-primary shrink-0" />
-                  <span>Lieber persönlich am Telefon reservieren?</span>
-                </p>
-                <p className="font-serif text-sm text-cream-parchment/90 mt-1">
-                  Ruft unsere Wirtsleute direkt in der Taverne an:{' '}
-                  <a 
-                    href="tel:035835495389" 
-                    className="font-bold text-gold-bright hover:text-gold-primary underline tracking-wider inline-flex items-center gap-1"
-                  >
-                    03583 5495389
-                  </a>
-                </p>
-              </div>
+              {isTavernOpenNow ? (
+                <div className="mb-8 border border-gold-primary/40 bg-gold-primary/15 p-4 text-center gilded-border">
+                  <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-gold-bright flex items-center justify-center gap-2">
+                    <Phone className="h-4 w-4 text-gold-primary shrink-0" />
+                    <span>Lieber persönlich am Telefon reservieren?</span>
+                  </p>
+                  <p className="font-serif text-sm text-cream-parchment/90 mt-1">
+                    Ruft unsere Wirtsleute direkt in der Taverne an:{' '}
+                    <a 
+                      href="tel:035835495389" 
+                      className="font-bold text-gold-bright hover:text-gold-primary underline tracking-wider inline-flex items-center gap-1"
+                    >
+                      03583 5495389
+                    </a>
+                  </p>
+                </div>
+              ) : (
+                <div className="mb-8 border border-gold-secondary/30 bg-tavern-dark/60 p-4 text-center gilded-border">
+                  <p className="font-cinzel text-xs font-bold uppercase tracking-wider text-gold-secondary flex items-center justify-center gap-2">
+                    <Clock className="h-4 w-4 text-gold-secondary shrink-0" />
+                    <span>Die Taverne hat aktuell geschlossen</span>
+                  </p>
+                  <p className="font-serif text-sm text-cream-parchment/80 mt-1">
+                    Reserviert Euren Tisch bequem online oder ruft uns zu den Öffnungszeiten persönlich an.
+                  </p>
+                </div>
+              )}
 
               <div className="space-y-6">
                 {/* Name & Email inputs */}
@@ -654,9 +651,13 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     </select>
                     <p className="text-[11px] font-serif italic text-cream-parchment/60 leading-tight pt-1">
                       * Für mehr als 20 Gäste bedarf es einer{' '}
-                      <a href="tel:035835495389" className="text-gold-bright underline hover:text-gold-primary">
-                        telefonischen Reservierung
-                      </a>{' '}
+                      {isTavernOpenNow ? (
+                        <a href="tel:035835495389" className="text-gold-bright underline hover:text-gold-primary">
+                          telefonischen Reservierung
+                        </a>
+                      ) : (
+                        'telefonischen Reservierung (zu den Öffnungszeiten)'
+                      )}{' '}
                       & persönlichen Planung.
                     </p>
                   </div>

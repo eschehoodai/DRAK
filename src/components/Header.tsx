@@ -6,6 +6,7 @@
 import React from 'react';
 import { Screen } from '../types';
 import { ShieldAlert, Calendar, Phone } from 'lucide-react';
+import { useIsTavernOpen } from '../utils/openingHours';
 
 interface HeaderProps {
   currentScreen: Screen;
@@ -13,6 +14,8 @@ interface HeaderProps {
 }
 
 export default function Header({ currentScreen, onNavigate }: HeaderProps) {
+  const isTavernOpenNow = useIsTavernOpen();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gold-secondary/20 bg-void-black/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
@@ -25,77 +28,76 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
           <span id="hdr-logo-text" className="font-cinzel text-3xl font-extrabold tracking-widest text-gold-primary transition-colors group-hover:text-gold-bright">
             DRAK
           </span>
+          <span className="hidden font-cinzel text-xs uppercase tracking-widest text-cream-parchment/60 md:inline-block">
+            | Zittau
+          </span>
         </div>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center space-x-8">
+        {/* Desktop Navigation links */}
+        <nav className="hidden items-center space-x-8 md:flex">
           <button
-            id="nav-link-home"
+            id="hdr-nav-home"
             onClick={() => onNavigate(Screen.HOME)}
-            className={`font-cinzel text-sm font-bold tracking-wider uppercase transition-all duration-300 relative py-2 ${
+            className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
               currentScreen === Screen.HOME
                 ? 'text-gold-bright'
-                : 'text-cream-parchment/70 hover:text-gold-bright'
+                : 'text-cream-parchment/70 hover:text-gold-primary'
             }`}
           >
-            Startseite
+            Start
             {currentScreen === Screen.HOME && (
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
             )}
           </button>
-          
           <button
-            id="nav-link-menu"
+            id="hdr-nav-menu"
             onClick={() => onNavigate(Screen.MENU)}
-            className={`font-cinzel text-sm font-bold tracking-wider uppercase transition-all duration-300 relative py-2 ${
+            className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
               currentScreen === Screen.MENU
                 ? 'text-gold-bright'
-                : 'text-cream-parchment/70 hover:text-gold-bright'
+                : 'text-cream-parchment/70 hover:text-gold-primary'
             }`}
           >
-            Speisekarte
+            Speisen & Trank
             {currentScreen === Screen.MENU && (
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
             )}
           </button>
-          
           <button
-            id="nav-link-gallery"
-            onClick={() => onNavigate(Screen.GALLERY)}
-            className={`font-cinzel text-sm font-bold tracking-wider uppercase transition-all duration-300 relative py-2 ${
-              currentScreen === Screen.GALLERY
+            id="hdr-nav-reserve"
+            onClick={() => onNavigate(Screen.RESERVE)}
+            className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
+              currentScreen === Screen.RESERVE
                 ? 'text-gold-bright'
-                : 'text-cream-parchment/70 hover:text-gold-bright'
+                : 'text-cream-parchment/70 hover:text-gold-primary'
             }`}
           >
-            Galerie
-            {currentScreen === Screen.GALLERY && (
+            Reservierung
+            {currentScreen === Screen.RESERVE && (
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
             )}
           </button>
-
           <button
-            id="nav-link-jobs"
+            id="hdr-nav-jobs"
             onClick={() => onNavigate(Screen.JOBS)}
-            className={`font-cinzel text-sm font-bold tracking-wider uppercase transition-all duration-300 relative py-2 ${
+            className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
               currentScreen === Screen.JOBS
                 ? 'text-gold-bright'
-                : 'text-cream-parchment/70 hover:text-gold-bright'
+                : 'text-cream-parchment/70 hover:text-gold-primary'
             }`}
           >
-            Jobs
+            Zunft (Jobs)
             {currentScreen === Screen.JOBS && (
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
             )}
           </button>
-
           <button
-            id="nav-link-impressum"
+            id="hdr-nav-impressum"
             onClick={() => onNavigate(Screen.IMPRESSUM)}
-            className={`font-cinzel text-sm font-bold tracking-wider uppercase transition-all duration-300 relative py-2 ${
+            className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
               currentScreen === Screen.IMPRESSUM
                 ? 'text-gold-bright'
-                : 'text-cream-parchment/70 hover:text-gold-bright'
+                : 'text-cream-parchment/70 hover:text-gold-primary'
             }`}
           >
             Impressum
@@ -107,15 +109,17 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
 
         {/* CTA Buttons (Phone & Table Reservation) */}
         <div className="flex items-center space-x-3">
-          <a
-            id="hdr-cta-phone"
-            href="tel:035835495389"
-            className="hidden sm:flex items-center space-x-1.5 border border-gold-secondary/40 bg-gold-primary/10 px-3 py-2 font-cinzel text-xs font-bold text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all duration-300 cursor-pointer"
-            title="Direkt in der Taverne anrufen"
-          >
-            <Phone className="h-3.5 w-3.5 shrink-0" />
-            <span>03583 5495389</span>
-          </a>
+          {isTavernOpenNow && (
+            <a
+              id="hdr-cta-phone"
+              href="tel:035835495389"
+              className="hidden sm:flex items-center space-x-1.5 border border-gold-secondary/40 bg-gold-primary/10 px-3 py-2 font-cinzel text-xs font-bold text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all duration-300 cursor-pointer"
+              title="Direkt in der Taverne anrufen"
+            >
+              <Phone className="h-3.5 w-3.5 shrink-0" />
+              <span>03583 5495389</span>
+            </a>
+          )}
           <button
             id="hdr-cta-reserve"
             onClick={() => onNavigate(Screen.RESERVE)}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Screen } from '../types';
 import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin, Phone } from 'lucide-react';
+import { useIsTavernOpen } from '../utils/openingHours';
 import candlelitGobletImage from '../assets/images/Speise2.webp';
 import essenDrakImage from '../assets/images/essen-restaurant-zittau-drak.jpg';
 import logoDrak from '../assets/images/logo-drak.webp';
@@ -13,6 +14,8 @@ interface HomeViewProps {
 }
 
 export default function HomeView({ onNavigate }: HomeViewProps) {
+  const isTavernOpenNow = useIsTavernOpen();
+
   return (
     <div className="relative overflow-hidden">
       {/* ================= HERO BANNER SECTION ================= */}
@@ -75,14 +78,16 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
               >
                 Hoftafel Reservieren
               </button>
-              <a
-                id="hero-btn-phone"
-                href="tel:035835495389"
-                className="border border-gold-primary/60 bg-gold-primary/10 backdrop-blur-sm px-6 py-3.5 font-cinzel text-xs font-bold uppercase tracking-widest text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all cursor-pointer text-center flex items-center justify-center gap-2"
-              >
-                <Phone className="h-4 w-4 shrink-0" />
-                <span>03583 5495389</span>
-              </a>
+              {isTavernOpenNow && (
+                <a
+                  id="hero-btn-phone"
+                  href="tel:035835495389"
+                  className="border border-gold-primary/60 bg-gold-primary/10 backdrop-blur-sm px-6 py-3.5 font-cinzel text-xs font-bold uppercase tracking-widest text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all cursor-pointer text-center flex items-center justify-center gap-2"
+                >
+                  <Phone className="h-4 w-4 shrink-0" />
+                  <span>03583 5495389</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -336,14 +341,16 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
               >
                 Tafel Online Buchen
               </button>
-              <a
-                id="bottom-cta-phone"
-                href="tel:035835495389"
-                className="border border-gold-secondary/60 bg-gold-primary/10 px-8 py-4 font-cinzel text-xs font-bold uppercase tracking-widest text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all cursor-pointer text-center flex items-center justify-center gap-2"
-              >
-                <Phone className="h-4 w-4 shrink-0" />
-                <span>03583 5495389</span>
-              </a>
+              {isTavernOpenNow && (
+                <a
+                  id="bottom-cta-phone"
+                  href="tel:035835495389"
+                  className="border border-gold-secondary/60 bg-gold-primary/10 px-8 py-4 font-cinzel text-xs font-bold uppercase tracking-widest text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all cursor-pointer text-center flex items-center justify-center gap-2"
+                >
+                  <Phone className="h-4 w-4 shrink-0" />
+                  <span>03583 5495389</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
