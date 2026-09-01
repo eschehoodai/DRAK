@@ -39,7 +39,7 @@ const getDayOfWeek = (dateStr: string): number => {
 };
 
 /**
- * Generate 30-min time slots for given YYYY-MM-DD string (last slot = 30 min before closing)
+ * Generate 30-min time slots for given YYYY-MM-DD string (up to kitchen closing, 1 hour before tavern closing)
  */
 const getTimeSlotsForDate = (dateStr: string): string[] => {
   const dayOfWeek = getDayOfWeek(dateStr);
@@ -432,7 +432,9 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     }
   };
 
-  const isTuesdaySelected = getDayOfWeek(date) === 2;
+  const selectedDayOfWeek = getDayOfWeek(date);
+  const selectedDayConfig = OPENING_HOURS[selectedDayOfWeek];
+  const isTuesdaySelected = selectedDayOfWeek === 2;
   const availableSlots = getTimeSlotsForDate(date);
 
   return (
@@ -727,6 +729,11 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                         </option>
                       )}
                     </select>
+                    {date && !isTuesdaySelected && selectedDayConfig?.isOpen && (
+                      <p className="text-[11px] font-serif italic text-cream-parchment/60 leading-tight pt-1">
+                        * Küchenschluss um {selectedDayConfig.kitchenClose} Uhr (1 Std. vor Schließung um {selectedDayConfig.close} Uhr).
+                      </p>
+                    )}
                   </div>
                 </div>
 

@@ -4,18 +4,19 @@ export interface DayHours {
   isOpen: boolean;
   open: string;
   close: string;
+  kitchenClose: string;
   lastSlot: string;
   label: string;
 }
 
 export const OPENING_HOURS: Record<number, DayHours> = {
-  0: { isOpen: true, open: '11:00', close: '21:00', lastSlot: '20:30', label: 'So: 11:00–21:00' },
-  1: { isOpen: true, open: '17:00', close: '21:00', lastSlot: '20:30', label: 'Mo: 17:00–21:00' },
-  2: { isOpen: false, open: '', close: '', lastSlot: '', label: 'Di: Geschlossen' },
-  3: { isOpen: true, open: '17:00', close: '21:00', lastSlot: '20:30', label: 'Mi: 17:00–21:00' },
-  4: { isOpen: true, open: '17:00', close: '21:00', lastSlot: '20:30', label: 'Do: 17:00–21:00' },
-  5: { isOpen: true, open: '17:00', close: '22:00', lastSlot: '21:30', label: 'Fr: 17:00–22:00' },
-  6: { isOpen: true, open: '11:00', close: '22:00', lastSlot: '21:30', label: 'Sa: 11:00–22:00' },
+  0: { isOpen: true, open: '11:00', close: '21:00', kitchenClose: '20:00', lastSlot: '20:00', label: 'So: 11:00–21:00' },
+  1: { isOpen: true, open: '17:00', close: '22:00', kitchenClose: '21:00', lastSlot: '21:00', label: 'Mo: 17:00–22:00' },
+  2: { isOpen: false, open: '', close: '', kitchenClose: '', lastSlot: '', label: 'Di: Geschlossen' },
+  3: { isOpen: true, open: '17:00', close: '22:00', kitchenClose: '21:00', lastSlot: '21:00', label: 'Mi: 17:00–22:00' },
+  4: { isOpen: true, open: '17:00', close: '22:00', kitchenClose: '21:00', lastSlot: '21:00', label: 'Do: 17:00–22:00' },
+  5: { isOpen: true, open: '17:00', close: '22:00', kitchenClose: '21:00', lastSlot: '21:00', label: 'Fr: 17:00–22:00' },
+  6: { isOpen: true, open: '11:00', close: '22:00', kitchenClose: '21:00', lastSlot: '21:00', label: 'Sa: 11:00–22:00' },
 };
 
 /**

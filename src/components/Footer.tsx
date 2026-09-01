@@ -72,11 +72,13 @@ export default function Footer({ onNavigate }: FooterProps) {
                 <Clock className="mt-0.5 h-4 w-4 text-gold-secondary shrink-0" />
                 <div className="font-serif space-y-1">
                   <p><span className="font-bold">So:</span> <span className="text-cream-parchment/60">11:00–21:00</span></p>
-                  <p><span className="font-bold">Mo:</span> <span className="text-cream-parchment/60">17:00–21:00</span></p>
+                  <p><span className="font-bold">Mo:</span> <span className="text-cream-parchment/60">17:00–22:00</span></p>
                   <p><span className="font-bold">Di:</span> <span className="text-cream-parchment/60 italic">Geschlossen</span></p>
-                  <p><span className="font-bold">Mi–Do:</span> <span className="text-cream-parchment/60">17:00–21:00</span></p>
-                  <p><span className="font-bold">Fr:</span> <span className="text-cream-parchment/60">17:00–22:00</span></p>
+                  <p><span className="font-bold">Mi–Fr:</span> <span className="text-cream-parchment/60">17:00–22:00</span></p>
                   <p><span className="font-bold">Sa:</span> <span className="text-cream-parchment/60">11:00–22:00</span></p>
+                  <p className="pt-2 text-[11px] text-gold-secondary/80 italic border-t border-gold-secondary/15 mt-1.5">
+                    * Küchenschluss 1 Stunde vor Schließung
+                  </p>
                 </div>
               </li>
             </ul>
