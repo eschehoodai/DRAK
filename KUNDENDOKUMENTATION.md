@@ -35,8 +35,8 @@ Ihre neue Website wurde als hochmoderne **Single-Page-Application (SPA)** konzip
 - **Optimierte Medienübertragung:** Komprimierte Formate garantieren schnelle Ladezeiten auch im mobilen Netz.
 
 ### 📅 Interaktive Tischreservierung mit Kapazitätsbegrenzung & E-Mail-Anbindung (`/reservierung`)
-- **Intelligente Echtzeit-Kapazitätssteuerung:** Um eine Überlastung der Taverne zu bestimmten Stoßzeiten zu verhindern, werden Reservierungen zentral erfasst (Standardlimit: 10 Personen pro 30-Minuten-Slot).
-- **Kundenfreundliche Slot-Sperre:** Hat ein Zeitslot (z. B. 18:00 Uhr) nicht mehr genügend freie Plätze für die vom Gast ausgewählte Personenanzahl, wird der Termin im Formular sofort deaktiviert und kann nicht ausgewählt werden. Das System wählt automatisch den nächsten freien Termin (z. B. 18:30 oder 19:00 Uhr).
+- **Intelligente Echtzeit-Kapazitätssteuerung:** Um eine Überlastung der Taverne zu verhindern, gilt ein Standardlimit von 10 Personen pro 30-Minuten-Slot bei gemischten Buchungen. In noch komplett ungebuchte Termine darf jedoch eine einzelne Großgruppe mit bis zu 20 Personen buchen. Sobald eine solche Großgruppe gebucht hat, wird der Slot für diesen Zeitraum sofort komplett geschlossen.
+- **Kundenfreundliche Slot-Sperre:** Hat ein Zeitslot (z. B. 18:00 Uhr) nicht genügend freie Plätze für die vom Gast ausgewählte Personenanzahl (oder ist bereits durch andere Tische für Großgruppen belegt), wird der Termin im Formular sofort deaktiviert und kann nicht ausgewählt werden. Das System wählt automatisch den nächsten passenden freien Termin (z. B. 18:30 oder 19:00 Uhr).
 - **Gäste-Formular:** Erfassung von Datum, Uhrzeit, Personenanzahl, Wunschbereich im Gewölbe (z. B. Hauptsaal, Biergarten) und Sonderwünschen.
 - **Automatische E-Mail-Benachrichtigung:** Reservierungen werden direkt über ein sicheres PHP-Backend (`public/send-booking.php`) per E-Mail an den Tavernen-Betreiber übermittelt.
 - **Buchungscode & Stornierung:** Nach Absenden erhält der Gast einen eindeutigen Buchungscode. Bei einer Stornierung über `public/send-cancellation.php` werden die Plätze für andere Gäste in Echtzeit sofort wieder freigegeben.

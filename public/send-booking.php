@@ -52,29 +52,63 @@ if (empty($name) || empty($date) || empty($time)) {
     exit();
 }
 
-// Transaktionssichere Kapazitätsprüfung & Speicherung in SQLite
+// Transaktionssichere Kapazitätsprüfung & Speicherung nach Plan B in SQLite
 try {
     $pdo = getDb();
     $pdo->beginTransaction();
 
-    // Aktuelle Belegung für den Zeitslot abfragen
+    // Aktuelle Buchungen für den Zeitslot abfragen
     $stmt = $pdo->prepare("
-        SELECT COALESCE(SUM(guests), 0) as booked
+        SELECT guests
         FROM reservations
         WHERE date = :date AND time = :time AND status = 'confirmed'
     ");
     $stmt->execute([':date' => $date, ':time' => $time]);
-    $currentBooked = (int)$stmt->fetchColumn();
+    $existingBookings = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    $remaining = max(0, MAX_SLOT_CAPACITY - $currentBooked);
+    $bookingCount = count($existingBookings);
+    $currentBooked = 0;
+    $hasLargeGroup = false;
 
-    if ($currentBooked + $guests > MAX_SLOT_CAPACITY) {
+    foreach ($existingBookings as $g) {
+        $gInt = (int)$g;
+        $currentBooked += $gInt;
+        if ($gInt > STANDARD_SLOT_CAPACITY) {
+            $hasLargeGroup = true;
+        }
+    }
+
+    $isAllowed = false;
+    $errorMessage = '';
+
+    if ($hasLargeGroup || ($bookingCount > 0 && $currentBooked >= STANDARD_SLOT_CAPACITY)) {
+        $isAllowed = false;
+        $errorMessage = "Dieser Termin (" . htmlspecialchars($time) . " Uhr) ist leider bereits vollständig ausgebucht.";
+    } else if ($bookingCount === 0) {
+        // Slot ist noch komplett ungebucht: Einzelne Großgruppe bis zu 20 Personen erlaubt
+        if ($guests <= MAX_EXCLUSIVE_GROUP_CAPACITY) {
+            $isAllowed = true;
+        } else {
+            $isAllowed = false;
+            $errorMessage = "Online-Reservierungen sind auf maximal " . MAX_EXCLUSIVE_GROUP_CAPACITY . " Personen begrenzt. Bitte ruft uns persönlich an.";
+        }
+    } else {
+        // Slot hat bereits Buchungen: Es dürfen nur noch kleinere Gruppen bis zur Standard-Kapazität (10) auffüllen
+        $remaining = max(0, STANDARD_SLOT_CAPACITY - $currentBooked);
+        if ($guests <= $remaining) {
+            $isAllowed = true;
+        } else {
+            $isAllowed = false;
+            $errorMessage = "Für " . htmlspecialchars($time) . " Uhr sind leider nur noch " . $remaining . " Plätze frei. Für größere Gruppen wählt bitte einen anderen freien Termin.";
+        }
+    }
+
+    if (!$isAllowed) {
         $pdo->rollBack();
         http_response_code(409); // Conflict: Slot voll oder nicht genügend Plätze
         echo json_encode([
-            "success"   => false,
-            "error"     => "Für " . htmlspecialchars($time) . " Uhr sind leider nur noch " . $remaining . " Plätze frei. Bitte wählt einen anderen freien Termin.",
-            "remaining" => $remaining
+            "success" => false,
+            "error"   => $errorMessage
         ]);
         exit();
     }

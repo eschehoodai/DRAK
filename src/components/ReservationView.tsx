@@ -265,9 +265,17 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   const [searchError, setSearchError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Kapazitäts- & Slot-Belegungsstatus
-  const [availability, setAvailability] = useState<{ [slotTime: string]: { booked: number; remaining: number; isFull: boolean } }>({});
-  const [maxCapacity, setMaxCapacity] = useState<number>(10);
+  // Kapazitäts- & Slot-Belegungsstatus nach Plan B
+  interface SlotInfo {
+    booked: number;
+    bookingCount: number;
+    hasLargeGroup: boolean;
+    remaining: number;
+    maxSingleGroup: number;
+    isFull: boolean;
+  }
+
+  const [availability, setAvailability] = useState<{ [slotTime: string]: SlotInfo }>({});
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
   const [slotNotice, setSlotNotice] = useState<string>('');
 
@@ -281,9 +289,6 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
         const data = await res.json();
         if (data.success) {
           setAvailability(data.slots || {});
-          if (typeof data.maxCapacity === 'number') {
-            setMaxCapacity(data.maxCapacity);
-          }
         }
       }
     } catch (err) {
@@ -300,14 +305,34 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     }
   }, [date]);
 
-  // Prüft die verbleibenden Plätze eines Zeitslots für die gewählte Gästeanzahl
+  // Prüft die Verfügbarkeit eines Zeitslots nach Plan B:
+  // - Wenn Slot noch ungebucht: Einzelgruppe bis zu 20 Personen erlaubt
+  // - Sobald eine Großgruppe (>10) bucht: Slot komplett dicht
+  // - Wenn normale Buchungen drin sind: nur noch kleine Gruppen bis max. 10 Personen gesamt
   const getSlotDetails = (slotTime: string, partySize: number) => {
     const slotInfo = availability[slotTime];
-    const booked = slotInfo ? slotInfo.booked : 0;
-    const remaining = slotInfo ? slotInfo.remaining : maxCapacity;
-    const isCompletelyFull = remaining <= 0;
+
+    // Wenn für diesen Slot noch gar keine Buchungen existieren -> komplett leer
+    if (!slotInfo || slotInfo.bookingCount === 0) {
+      const hasEnoughRoom = partySize <= 20;
+      return { booked: 0, remaining: 10, isCompletelyFull: false, hasEnoughRoom };
+    }
+
+    const { booked, hasLargeGroup, remaining, isFull } = slotInfo;
+
+    // Slot ist durch Großgruppe (>10) oder durch 10 Gäste bereits voll
+    if (isFull || hasLargeGroup) {
+      return { booked, remaining: 0, isCompletelyFull: true, hasEnoughRoom: false };
+    }
+
+    // Wenn bereits kleine Tische gebucht haben, darf keine Großgruppe (>10) mehr hinzukommen
+    if (partySize > 10) {
+      return { booked, remaining, isCompletelyFull: false, hasEnoughRoom: false };
+    }
+
+    // Für normale Gruppen (<= 10): Prüfen ob Restplätze ausreichen
     const hasEnoughRoom = remaining >= partySize;
-    return { booked, remaining, isCompletelyFull, hasEnoughRoom };
+    return { booked, remaining, isCompletelyFull: remaining <= 0, hasEnoughRoom };
   };
 
   // Zeitslot-Auswahl synchronisieren: Falls Slot belegt ist, automatisch nächsten freien Termin wählen
@@ -814,8 +839,14 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                           if (isCompletelyFull) {
                             label = `${hr} Uhr — Ausgebucht`;
                           } else if (!hasEnoughRoom) {
-                            label = `${hr} Uhr — Nur noch ${remaining} ${remaining === 1 ? 'Platz' : 'Plätze'} frei`;
-                          } else if (remaining < maxCapacity) {
+                            if (guests > 10) {
+                              label = `${hr} Uhr — Für Großgruppen belegt`;
+                            } else if (remaining > 0) {
+                              label = `${hr} Uhr — Nur noch ${remaining} ${remaining === 1 ? 'Platz' : 'Plätze'} frei`;
+                            } else {
+                              label = `${hr} Uhr — Ausgebucht`;
+                            }
+                          } else if (guests <= 10 && remaining < 10) {
                             label = `${hr} Uhr (${remaining} Plätze frei)`;
                           }
 

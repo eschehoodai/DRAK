@@ -4,8 +4,11 @@
  * Automatische Tabellenerstellung und Verwaltung der Tischreservierungen.
  */
 
-// Maximale Standard-Kapazität (Gäste) pro 30-Minuten-Slot
-define('MAX_SLOT_CAPACITY', 10);
+// Kapazitätsgrenzen:
+// Standard-Limit für gemischte kleinere Gruppen (max. 10 Personen gesamt)
+define('STANDARD_SLOT_CAPACITY', 10);
+// Maximallimit für eine einzelne Großgruppe in einem noch leeren Slot (bis zu 20 Personen)
+define('MAX_EXCLUSIVE_GROUP_CAPACITY', 20);
 
 /**
  * Gibt eine betriebsbereite PDO-Verbindung zur SQLite-Datenbank zurück.
@@ -57,25 +60,37 @@ function getDb(): PDO {
 }
 
 /**
- * Gibt die aktuelle Gäste-Auslastung je Zeitslot für ein bestimmtes Datum zurück.
+ * Gibt detaillierte Belegungsdaten je Zeitslot für ein bestimmtes Datum zurück.
+ * Erfasst Gesamtzahl der Gäste, Anzahl der Buchungen und ob eine Großgruppe (>10) gebucht hat.
  *
  * @param PDO $pdo
  * @param string $date (Format: YYYY-MM-DD)
- * @return array<string, int> Mapping von 'HH:MM' => belegte Gäste
+ * @return array<string, array{total_guests: int, booking_count: int, has_large_group: bool}>
  */
-function getOccupancyForDate(PDO $pdo, string $date): array {
+function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
     $stmt = $pdo->prepare("
-        SELECT time, SUM(guests) as total_guests
+        SELECT time, guests
         FROM reservations
         WHERE date = :date AND status = 'confirmed'
-        GROUP BY time
     ");
     $stmt->execute([':date' => $date]);
     
     $occupancy = [];
     while ($row = $stmt->fetch()) {
         $timeSlot = trim($row['time']);
-        $occupancy[$timeSlot] = (int)$row['total_guests'];
+        $guests = (int)$row['guests'];
+        if (!isset($occupancy[$timeSlot])) {
+            $occupancy[$timeSlot] = [
+                'total_guests'    => 0,
+                'booking_count'   => 0,
+                'has_large_group' => false
+            ];
+        }
+        $occupancy[$timeSlot]['total_guests'] += $guests;
+        $occupancy[$timeSlot]['booking_count']++;
+        if ($guests > STANDARD_SLOT_CAPACITY) {
+            $occupancy[$timeSlot]['has_large_group'] = true;
+        }
     }
     return $occupancy;
 }

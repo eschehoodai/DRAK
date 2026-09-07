@@ -32,23 +32,37 @@ if (empty($date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
 
 try {
     $pdo = getDb();
-    $occupancy = getOccupancyForDate($pdo, $date);
+    $occupancy = getOccupancyDetailsForDate($pdo, $date);
 
     $slotsData = [];
-    foreach ($occupancy as $slotTime => $bookedGuests) {
-        $remaining = max(0, MAX_SLOT_CAPACITY - $bookedGuests);
+    foreach ($occupancy as $slotTime => $info) {
+        $booked = $info['total_guests'];
+        $count = $info['booking_count'];
+        $hasLarge = $info['has_large_group'];
+
+        // Plan B:
+        // - Hat eine Großgruppe (> 10 Gäste) gebucht, ist der Slot sofort voll (0 Plätze frei).
+        // - Bei normalen Gruppen schließt der Slot bei STANDARD_SLOT_CAPACITY (10 Personen).
+        $isFull = $hasLarge || ($count > 0 && $booked >= STANDARD_SLOT_CAPACITY);
+        $remaining = $isFull ? 0 : max(0, STANDARD_SLOT_CAPACITY - $booked);
+        $maxSingleGroup = ($count === 0) ? MAX_EXCLUSIVE_GROUP_CAPACITY : $remaining;
+
         $slotsData[$slotTime] = [
-            "booked"    => $bookedGuests,
-            "remaining" => $remaining,
-            "isFull"    => ($remaining <= 0)
+            "booked"         => $booked,
+            "bookingCount"   => $count,
+            "hasLargeGroup"  => $hasLarge,
+            "remaining"      => $remaining,
+            "maxSingleGroup" => $maxSingleGroup,
+            "isFull"         => $isFull
         ];
     }
 
     echo json_encode([
-        "success"     => true,
-        "date"        => $date,
-        "maxCapacity" => MAX_SLOT_CAPACITY,
-        "slots"       => $slotsData
+        "success"              => true,
+        "date"                 => $date,
+        "standardCapacity"     => STANDARD_SLOT_CAPACITY,
+        "maxExclusiveCapacity" => MAX_EXCLUSIVE_GROUP_CAPACITY,
+        "slots"                => $slotsData
     ]);
 } catch (Exception $e) {
     http_response_code(500);
