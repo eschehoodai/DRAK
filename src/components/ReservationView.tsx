@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Screen, Reservation } from '../types';
 import { 
   Calendar, User, Mail, Phone, Hourglass, Shield, Search, Sparkles, Trash2,
-  ChevronLeft, ChevronRight, Clock, AlertTriangle, Check, X
+  ChevronLeft, ChevronRight, Clock, AlertTriangle, Check, X, Copy
 } from 'lucide-react';
 
 interface ReservationViewProps {
@@ -264,6 +264,15 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   const [searchedReservation, setSearchedReservation] = useState<Reservation | null>(null);
   const [searchError, setSearchError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasCopied, setHasCopied] = useState(false);
+
+  const copyBookingCode = () => {
+    if (lastCreated?.id) {
+      navigator.clipboard.writeText(lastCreated.id);
+      setHasCopied(true);
+      setTimeout(() => setHasCopied(false), 2000);
+    }
+  };
 
   // Kapazitäts- & Slot-Belegungsstatus nach Plan B
   interface SlotInfo {
@@ -433,9 +442,8 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
 
     setIsSubmitting(true);
 
-    const randomSuffix = Math.floor(Math.random() * 900) + 100;
-    const currentYearRoman = toRoman(2026);
-    const id = `DRAK-${currentYearRoman}-${randomSuffix}`;
+    const randomCode = Math.floor(1000 + Math.random() * 9000);
+    const id = `DRAK-${randomCode}`;
 
     const newRes: Reservation = {
       id,
@@ -491,17 +499,44 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     setSearchError('');
     setSearchedReservation(null);
 
-    if (!searchCode.trim()) {
-      setSearchError('Bitte tragt eine gültige Reservierungsnummer ein.');
+    const term = searchCode.trim().toLowerCase();
+    if (!term) {
+      setSearchError('Bitte tragt eine gültige Reservierungsnummer, Telefonnummer oder E-Mail ein.');
       return;
     }
 
-    const target = reservations.find(
-      (r) =>
-        r.id.toLowerCase() === searchCode.trim().toLowerCase() ||
-        (r.phone && r.phone.toLowerCase() === searchCode.trim().toLowerCase()) ||
-        (r.email && r.email.toLowerCase() === searchCode.trim().toLowerCase())
-    );
+    // Normalized alphanumeric query (e.g. "drak-4821" -> "drak4821", "#4821" -> "4821")
+    const cleanTerm = term.replace(/[^a-z0-9]/g, '');
+
+    const target = reservations.find((r) => {
+      const resId = r.id.toLowerCase();
+      const cleanResId = resId.replace(/[^a-z0-9]/g, '');
+
+      // 1. Direct ID match
+      if (resId === term || cleanResId === cleanTerm) return true;
+
+      // 2. Number-only match: e.g. user entered "4821" and ID is "DRAK-4821"
+      if (cleanTerm.length >= 3 && cleanResId.endsWith(cleanTerm)) return true;
+
+      // 3. User entered "DRAK4821" or "DRAK 4821"
+      if (cleanResId.includes(cleanTerm)) return true;
+
+      // 4. Phone match (ignoring spaces, dashes, slashes)
+      if (r.phone) {
+        const cleanPhone = r.phone.replace(/[^0-9]/g, '');
+        const cleanQueryPhone = term.replace(/[^0-9]/g, '');
+        if (cleanQueryPhone.length >= 4 && cleanPhone.includes(cleanQueryPhone)) {
+          return true;
+        }
+      }
+
+      // 5. Email match
+      if (r.email && r.email.toLowerCase().trim() === term) {
+        return true;
+      }
+
+      return false;
+    });
 
     if (target) {
       setSearchedReservation(target);
@@ -627,7 +662,28 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
               </p>
 
               <div className="my-8 border-y border-gold-secondary/30 py-6 space-y-3 font-serif text-base">
-                <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Nummer:</span> <strong className="text-gold-bright">{lastCreated.id}</strong></p>
+                <div className="flex items-center justify-center gap-2 flex-wrap">
+                  <span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-1">Nummer:</span>
+                  <strong className="text-gold-bright text-lg font-cinzel tracking-wider">{lastCreated.id}</strong>
+                  <button
+                    type="button"
+                    onClick={copyBookingCode}
+                    title="Buchungscode kopieren"
+                    className="ml-2 inline-flex items-center gap-1.5 text-xs font-cinzel text-gold-secondary hover:text-gold-bright border border-gold-secondary/40 hover:border-gold-primary px-2.5 py-1 rounded bg-tavern-dark/50 hover:bg-tavern-dark transition-all cursor-pointer"
+                  >
+                    {hasCopied ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-green-400" />
+                        <span className="text-green-400 text-[11px] font-bold">Kopiert!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3.5 w-3.5" />
+                        <span className="text-[11px]">Kopieren</span>
+                      </>
+                    )}
+                  </button>
+                </div>
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Truppführer:</span> {lastCreated.name}</p>
                 {lastCreated.phone && (
                   <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Telefon:</span> {lastCreated.phone}</p>
@@ -640,8 +696,35 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 )}
               </div>
 
-              <p className="font-serif text-xs text-cream-parchment/60 mb-8 max-w-md mx-auto">
-                Notiert Euch Euren Buchungscode <strong>{lastCreated.id}</strong>. Ihr könnt damit jederzeit Euren Zunftbrief einsehen oder stornieren.
+              {/* Notice for kitchen planning & timely cancellation */}
+              <div className="my-6 p-5 border border-gold-primary/40 bg-gold-primary/5 text-left rounded-sm relative">
+                <div className="flex items-center gap-2 mb-2 text-gold-bright font-cinzel text-xs font-bold uppercase tracking-wider">
+                  <Sparkles className="h-4 w-4 text-gold-primary shrink-0" />
+                  <span>Ein Wort unserer Küchenmeister & Schankwirte</span>
+                </div>
+                <p className="font-serif text-xs md:text-sm text-cream-parchment/90 leading-relaxed">
+                  In unserer Taverne wird jedes Festmahl mit frischen Zutaten und viel Herzblut zubereitet.
+                  Sollte Euer Bund verhindert sein oder sich Eure Pläne ändern, bitten wir Euch herzlich, uns dies so zeitig wie möglich mitzuteilen.
+                </p>
+                <div className="mt-3 pt-3 border-t border-gold-secondary/20 text-xs font-serif text-cream-parchment/80 space-y-1.5">
+                  <p>
+                    • <strong className="text-gold-bright">Online stornieren:</strong> Direkt hier unten über die rote Schaltfläche <span className="text-red-400 font-cinzel text-[11px] font-bold">„Stornieren“</span> oder später jederzeit im Reiter <span className="text-gold-primary font-cinzel text-[11px] font-bold">„Zunftbrief suchen“</span> mit Eurem Buchungscode <strong className="text-gold-bright">{lastCreated.id}</strong>.
+                  </p>
+                  <p>
+                    • <strong className="text-gold-bright">Persönlich Bescheid geben:</strong> Ruft uns gern direkt unter{' '}
+                    <a href="tel:035835495389" className="text-gold-bright hover:text-gold-primary underline font-bold">
+                      03583 5495389
+                    </a>{' '}
+                    an – besonders bei kurzfristigen Änderungen oder veränderter Gästeanzahl.
+                  </p>
+                </div>
+                <p className="mt-3 text-[11px] font-serif italic text-gold-secondary/80">
+                  So verderben keine köstlichen Speisen und andere hungrige Wanderer erhalten Einlass an die Tafel. Habt Dank für Eure Zunft-Ehre!
+                </p>
+              </div>
+
+              <p className="font-serif text-xs text-cream-parchment/60 mb-6 max-w-md mx-auto">
+                Notiert Euch Euren Buchungscode <strong>{lastCreated.id}</strong> zum späteren Nachschlagen oder Verwalten.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -962,6 +1045,9 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 >
                   {isSubmitting ? 'Brieftaube fliegt...' : 'Tischvertragsbrief absenden'}
                 </button>
+                <p className="text-[11px] font-serif italic text-cream-parchment/50 mt-3 max-w-md mx-auto">
+                  Mit Absenden haltet Ihr Eurem Bund die Plätze frei. Sollte sich Euer Plan ändern, bitten wir um baldigste Nachricht oder Stornierung.
+                </p>
               </div>
             </form>
           )}
@@ -983,7 +1069,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
               <input
                 id="search-input"
                 type="text"
-                placeholder="z.B. DRAK-MMXXVI-145 oder 0170 1234567"
+                placeholder="z.B. DRAK-4821, 4821 oder 0170 1234567"
                 value={searchCode}
                 onChange={(e) => setSearchCode(e.target.value)}
                 className="flex-1 border-0 border-b-2 border-gold-secondary bg-transparent py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary tracking-wider"
