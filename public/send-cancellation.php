@@ -41,6 +41,30 @@ $date     = isset($data['date']) ? trim(strip_tags($data['date'])) : '';
 $time     = isset($data['time']) ? trim(strip_tags($data['time'])) : '';
 $vault    = isset($data['vault']) ? trim(strip_tags($data['vault'])) : 'Gewölbe';
 
+require_once __DIR__ . '/db.php';
+
+// Stornierung in SQLite hinterlegen (Plätze sofort wieder freigeben)
+try {
+    $pdo = getDb();
+    if (!empty($id) && $id !== 'UNBEKANNT') {
+        $stmt = $pdo->prepare("
+            UPDATE reservations 
+            SET status = 'cancelled' 
+            WHERE id = :id
+        ");
+        $stmt->execute([':id' => $id]);
+    } else if (!empty($date) && !empty($time) && !empty($name)) {
+        $stmt = $pdo->prepare("
+            UPDATE reservations 
+            SET status = 'cancelled' 
+            WHERE date = :date AND time = :time AND name = :name AND status = 'confirmed'
+        ");
+        $stmt->execute([':date' => $date, ':time' => $time, ':name' => $name]);
+    }
+} catch (Exception $e) {
+    error_log("DB-Fehler bei Stornierung: " . $e->getMessage());
+}
+
 // Empfänger-Adressen (Kunde & Testadresse)
 $to = "drakzittau@dlr-gastro-event.de, eschehoodai@gmail.com";
 

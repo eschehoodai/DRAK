@@ -34,11 +34,12 @@ Ihre neue Website wurde als hochmoderne **Single-Page-Application (SPA)** konzip
 - **Visuelle Impressionen:** Hochwertige Bilder und Videos präsentieren den Gastraum, die Dekoration und historische Veranstaltungen.
 - **Optimierte Medienübertragung:** Komprimierte Formate garantieren schnelle Ladezeiten auch im mobilen Netz.
 
-### 📅 Interaktive Tischreservierung mit E-Mail-Anbindung (`/reservierung`)
-- **Intelligente Zeitauswahl:** Dynamische Zeitfenster im 30-Minuten-Takt, angepasst an die tatsächlichen Öffnungszeiten sowie Berücksichtigung von Küchenschluss und Ruhetagen.
+### 📅 Interaktive Tischreservierung mit Kapazitätsbegrenzung & E-Mail-Anbindung (`/reservierung`)
+- **Intelligente Echtzeit-Kapazitätssteuerung:** Um eine Überlastung der Taverne zu bestimmten Stoßzeiten zu verhindern, werden Reservierungen zentral erfasst (Standardlimit: 10 Personen pro 30-Minuten-Slot).
+- **Kundenfreundliche Slot-Sperre:** Hat ein Zeitslot (z. B. 18:00 Uhr) nicht mehr genügend freie Plätze für die vom Gast ausgewählte Personenanzahl, wird der Termin im Formular sofort deaktiviert und kann nicht ausgewählt werden. Das System wählt automatisch den nächsten freien Termin (z. B. 18:30 oder 19:00 Uhr).
 - **Gäste-Formular:** Erfassung von Datum, Uhrzeit, Personenanzahl, Wunschbereich im Gewölbe (z. B. Hauptsaal, Biergarten) und Sonderwünschen.
 - **Automatische E-Mail-Benachrichtigung:** Reservierungen werden direkt über ein sicheres PHP-Backend (`public/send-booking.php`) per E-Mail an den Tavernen-Betreiber übermittelt.
-- **Buchungscode & Stornierung:** Nach Absenden erhält der Gast einen eindeutigen Buchungscode. Ebenfalls integriert ist ein Online-Stornierungsmodul (`public/send-cancellation.php`).
+- **Buchungscode & Stornierung:** Nach Absenden erhält der Gast einen eindeutigen Buchungscode. Bei einer Stornierung über `public/send-cancellation.php` werden die Plätze für andere Gäste in Echtzeit sofort wieder freigegeben.
 
 ### ⚔️ Jobs & Karriere (`/jobs`)
 - **Einladendes Bewerbungsmodul:** Mittelalterlich gestaltete Stellenausschreibungen für Service und Küche.

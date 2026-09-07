@@ -265,18 +265,88 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   const [searchError, setSearchError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Synchronize available time slots when selected date changes
-  useEffect(() => {
-    if (!date) return;
-    const availableSlots = getTimeSlotsForDate(date);
-    if (availableSlots.length > 0) {
-      if (!availableSlots.includes(time)) {
-        setTime(availableSlots[0]);
+  // Kapazitäts- & Slot-Belegungsstatus
+  const [availability, setAvailability] = useState<{ [slotTime: string]: { booked: number; remaining: number; isFull: boolean } }>({});
+  const [maxCapacity, setMaxCapacity] = useState<number>(10);
+  const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
+  const [slotNotice, setSlotNotice] = useState<string>('');
+
+  // Verfügbarkeit für das gewählte Datum vom Server abrufen
+  const fetchAvailability = async (targetDate: string) => {
+    if (!targetDate) return;
+    setIsLoadingAvailability(true);
+    try {
+      const res = await fetch(`/get-availability.php?date=${encodeURIComponent(targetDate)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setAvailability(data.slots || {});
+          if (typeof data.maxCapacity === 'number') {
+            setMaxCapacity(data.maxCapacity);
+          }
+        }
       }
-    } else {
-      setTime('');
+    } catch (err) {
+      console.warn('Verfügbarkeitsprüfung fehlgeschlagen (evtl. lokale Entwicklungsumgebung):', err);
+    } finally {
+      setIsLoadingAvailability(false);
+    }
+  };
+
+  // Bei Datumsänderung Verfügbarkeiten neu laden
+  useEffect(() => {
+    if (date) {
+      fetchAvailability(date);
     }
   }, [date]);
+
+  // Prüft die verbleibenden Plätze eines Zeitslots für die gewählte Gästeanzahl
+  const getSlotDetails = (slotTime: string, partySize: number) => {
+    const slotInfo = availability[slotTime];
+    const booked = slotInfo ? slotInfo.booked : 0;
+    const remaining = slotInfo ? slotInfo.remaining : maxCapacity;
+    const isCompletelyFull = remaining <= 0;
+    const hasEnoughRoom = remaining >= partySize;
+    return { booked, remaining, isCompletelyFull, hasEnoughRoom };
+  };
+
+  // Zeitslot-Auswahl synchronisieren: Falls Slot belegt ist, automatisch nächsten freien Termin wählen
+  useEffect(() => {
+    if (!date) {
+      setTime('');
+      setSlotNotice('');
+      return;
+    }
+
+    const availableSlots = getTimeSlotsForDate(date);
+    if (availableSlots.length === 0) {
+      setTime('');
+      setSlotNotice('');
+      return;
+    }
+
+    // Prüfen, ob der aktuell gewählte Slot noch genug Plätze für 'guests' hat
+    const isCurrentTimeValid = time && availableSlots.includes(time) && getSlotDetails(time, guests).hasEnoughRoom;
+
+    if (!isCurrentTimeValid) {
+      // Nächsten freien Zeitslot finden, der noch Platz für die gesamte Gruppe hat
+      const nextAvailableSlot = availableSlots.find((s) => getSlotDetails(s, guests).hasEnoughRoom);
+
+      if (nextAvailableSlot) {
+        if (time && time !== nextAvailableSlot) {
+          setSlotNotice(`Für ${guests} Gefährten ist der nächste freie Termin um ${nextAvailableSlot} Uhr verfügbar.`);
+        } else {
+          setSlotNotice('');
+        }
+        setTime(nextAvailableSlot);
+      } else {
+        setTime('');
+        setSlotNotice(`Für ${guests} Gefährten sind an diesem Tag leider keine freien Tische mehr verfügbar. Bitte wählt einen anderen Tag oder ruft uns persönlich an.`);
+      }
+    } else {
+      setSlotNotice('');
+    }
+  }, [date, guests, availability]);
 
   // Handle incoming pre-filled notes (e.g. clicked dish from menu)
   useEffect(() => {
@@ -355,13 +425,21 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
 
     // Send email notification to server via PHP mail()
     try {
-      await fetch('/send-booking.php', {
+      const response = await fetch('/send-booking.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(newRes),
       });
+
+      const result = await response.json().catch(() => null);
+
+      if (response.status === 409 || (result && result.success === false)) {
+        alert(result?.error || 'Dieser Termin ist leider nicht mehr für die gewünschte Personenanzahl verfügbar.');
+        if (date) fetchAvailability(date);
+        return;
+      }
     } catch (err) {
       console.warn('E-Mail-Versand fehlgeschlagen (evtl. lokale Entwicklungsumgebung):', err);
     } finally {
@@ -376,6 +454,11 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     setName('');
     setPhone('');
     setNotes('');
+
+    // Verfügbarkeit sofort aktualisieren
+    if (date) {
+      fetchAvailability(date);
+    }
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -417,6 +500,9 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
           });
         } catch (err) {
           console.warn('Stornierungs-E-Mail fehlgeschlagen (evtl. lokale Entwicklungsumgebung):', err);
+        }
+        if (date) {
+          fetchAvailability(date);
         }
       }
 
@@ -710,7 +796,10 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                       id="select-time"
                       disabled={isTuesdaySelected || availableSlots.length === 0}
                       value={time}
-                      onChange={(e) => setTime(e.target.value)}
+                      onChange={(e) => {
+                        setTime(e.target.value);
+                        setSlotNotice('');
+                      }}
                       className="border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {isTuesdaySelected ? (
@@ -718,17 +807,45 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                           Geschlossen (Ruhetag)
                         </option>
                       ) : availableSlots.length > 0 ? (
-                        availableSlots.map((hr) => (
-                          <option key={hr} value={hr} className="bg-void-black text-cream-parchment">
-                            {hr} Uhr
-                          </option>
-                        ))
+                        availableSlots.map((hr) => {
+                          const { remaining, isCompletelyFull, hasEnoughRoom } = getSlotDetails(hr, guests);
+
+                          let label = `${hr} Uhr`;
+                          if (isCompletelyFull) {
+                            label = `${hr} Uhr — Ausgebucht`;
+                          } else if (!hasEnoughRoom) {
+                            label = `${hr} Uhr — Nur noch ${remaining} ${remaining === 1 ? 'Platz' : 'Plätze'} frei`;
+                          } else if (remaining < maxCapacity) {
+                            label = `${hr} Uhr (${remaining} Plätze frei)`;
+                          }
+
+                          return (
+                            <option
+                              key={hr}
+                              value={hr}
+                              disabled={!hasEnoughRoom}
+                              className={
+                                !hasEnoughRoom
+                                  ? 'bg-void-black text-cream-parchment/35 italic'
+                                  : 'bg-void-black text-cream-parchment'
+                              }
+                            >
+                              {label}
+                            </option>
+                          );
+                        })
                       ) : (
                         <option value="" className="bg-void-black text-cream-parchment">
                           Keine Zeiten verfügbar
                         </option>
                       )}
                     </select>
+                    {slotNotice && !isTuesdaySelected && (
+                      <div className="mt-2 p-2.5 border border-gold-primary/30 bg-gold-primary/10 rounded flex items-center gap-2 text-xs font-serif text-gold-bright animate-in fade-in duration-200">
+                        <Sparkles className="h-3.5 w-3.5 text-gold-primary shrink-0" />
+                        <span>{slotNotice}</span>
+                      </div>
+                    )}
                     {date && !isTuesdaySelected && selectedDayConfig?.isOpen && (
                       <p className="text-[11px] font-serif italic text-cream-parchment/60 leading-tight pt-1">
                         * Küchenschluss um {selectedDayConfig.kitchenClose} Uhr (1 Std. vor Schließung um {selectedDayConfig.close} Uhr).

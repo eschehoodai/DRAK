@@ -1,0 +1,7 @@
+# Verhindert jeglichen direkten HTTP-Zugriff auf die SQLite-Datenbank
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Deny from all
+</IfModule>

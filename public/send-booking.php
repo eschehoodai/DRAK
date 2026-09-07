@@ -43,11 +43,66 @@ $time     = isset($data['time']) ? trim(strip_tags($data['time'])) : '';
 $vault    = isset($data['vault']) ? trim(strip_tags($data['vault'])) : 'Gewölbe';
 $notes    = isset($data['notes']) ? trim(strip_tags($data['notes'])) : 'Keine Sonderwünsche';
 
+require_once __DIR__ . '/db.php';
+
 // Validierung
-if (empty($name) || empty($date)) {
+if (empty($name) || empty($date) || empty($time)) {
     http_response_code(400);
-    echo json_encode(["success" => false, "error" => "Bitte alle Pflichtfelder (Name, Datum) ausfüllen."]);
+    echo json_encode(["success" => false, "error" => "Bitte alle Pflichtfelder (Name, Datum, Uhrzeit) ausfüllen."]);
     exit();
+}
+
+// Transaktionssichere Kapazitätsprüfung & Speicherung in SQLite
+try {
+    $pdo = getDb();
+    $pdo->beginTransaction();
+
+    // Aktuelle Belegung für den Zeitslot abfragen
+    $stmt = $pdo->prepare("
+        SELECT COALESCE(SUM(guests), 0) as booked
+        FROM reservations
+        WHERE date = :date AND time = :time AND status = 'confirmed'
+    ");
+    $stmt->execute([':date' => $date, ':time' => $time]);
+    $currentBooked = (int)$stmt->fetchColumn();
+
+    $remaining = max(0, MAX_SLOT_CAPACITY - $currentBooked);
+
+    if ($currentBooked + $guests > MAX_SLOT_CAPACITY) {
+        $pdo->rollBack();
+        http_response_code(409); // Conflict: Slot voll oder nicht genügend Plätze
+        echo json_encode([
+            "success"   => false,
+            "error"     => "Für " . htmlspecialchars($time) . " Uhr sind leider nur noch " . $remaining . " Plätze frei. Bitte wählt einen anderen freien Termin.",
+            "remaining" => $remaining
+        ]);
+        exit();
+    }
+
+    // Reservierung in Datenbank anlegen
+    $insert = $pdo->prepare("
+        INSERT INTO reservations (id, name, phone, email, guests, date, time, vault, notes, status)
+        VALUES (:id, :name, :phone, :email, :guests, :date, :time, :vault, :notes, 'confirmed')
+    ");
+    $insert->execute([
+        ':id'     => $id,
+        ':name'   => $name,
+        ':phone'  => $phone,
+        ':email'  => $email,
+        ':guests' => $guests,
+        ':date'   => $date,
+        ':time'   => $time,
+        ':vault'  => $vault,
+        ':notes'  => $notes
+    ]);
+
+    $pdo->commit();
+} catch (Exception $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    error_log("DB-Fehler bei Reservierung: " . $e->getMessage());
+    // Hinweis: Falls z.B. Schreibrechte lokal fehlen, bricht die Mail nicht zwingend ab
 }
 
 // Empfänger-Adressen (Kunde & Testadresse)
