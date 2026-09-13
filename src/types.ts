@@ -30,6 +30,8 @@ export interface MenuItem {
   /** Optional price variants (e.g. burger with different meats). */
   variants?: MenuVariant[];
   isSpecial?: boolean;
+  /** 14 EU-Hauptallergene (A-N) */
+  allergens?: string[];
 }
 
 export interface Reservation {
@@ -60,6 +62,8 @@ export interface WochenangebotItem {
   name: string;
   preis: string;
   beschreibung?: string;
+  /** 14 EU-Hauptallergene (A-N) */
+  allergens?: string[];
 }
 
 export interface SpeisekarteData {

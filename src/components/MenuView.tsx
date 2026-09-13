@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { Screen, MenuItem, MenuVariant, SpeisekarteData } from '../types';
 import Wochenangebot from './Wochenangebot';
+import { getAllergensFromCodes } from '../utils/allergens';
 
 interface MenuViewProps {
   onNavigate: (screen: Screen, initialNotes?: string) => void;
@@ -436,6 +437,9 @@ function SubHeader({ label, note }: { label: string; note?: string }) {
 }
 
 function DishCard({ item }: { item: MenuItem }) {
+  const [showAllergens, setShowAllergens] = useState(false);
+  const allergens = getAllergensFromCodes(item.allergens);
+
   return (
     <div id={`menu-item-${item.id}`} className="p-2 border border-transparent">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -480,6 +484,58 @@ function DishCard({ item }: { item: MenuItem }) {
           ))}
         </div>
       )}
+
+      {/* Interaktiver Allergene-Bereich */}
+      <div className="mt-3">
+        <button
+          type="button"
+          onClick={() => setShowAllergens((prev) => !prev)}
+          className="inline-flex items-center gap-1.5 text-xs text-gold-secondary/80 hover:text-gold-bright transition-colors cursor-pointer group focus:outline-none"
+          aria-expanded={showAllergens}
+        >
+          <span className="text-[10px] text-gold-primary transition-transform duration-200 group-hover:scale-110">
+            {showAllergens ? '▾' : '▸'}
+          </span>
+          <span className="font-cinzel text-[11px] tracking-wider underline underline-offset-2 decoration-gold-secondary/40 group-hover:decoration-gold-bright">
+            {showAllergens ? 'Allergene verbergen' : 'Allergene'}
+          </span>
+          {allergens.length > 0 && !showAllergens && (
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-gold-secondary/20 bg-gold-primary/10 text-gold-secondary/90">
+              {allergens.map((a) => a.code).join(', ')}
+            </span>
+          )}
+        </button>
+
+        {showAllergens && (
+          <div className="mt-2 rounded border border-gold-secondary/30 bg-void-black/70 backdrop-blur-xs p-2.5 shadow-inner transition-all">
+            {allergens.length > 0 ? (
+              <div>
+                <div className="font-cinzel text-[10px] uppercase tracking-wider text-gold-primary mb-1.5 font-bold">
+                  Enthaltene Allergene:
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {allergens.map((allergen) => (
+                    <span
+                      key={allergen.code}
+                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-gold-primary/10 border border-gold-secondary/30 text-[11px] text-cream-parchment/90"
+                      title={allergen.description}
+                    >
+                      <span className="font-cinzel font-bold text-gold-bright bg-gold-primary/20 px-1 rounded text-[10px]">
+                        {allergen.code}
+                      </span>
+                      <span>{allergen.name}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="font-serif italic text-[11px] text-cream-parchment/60">
+                Keine kennzeichnungspflichtigen Allergene deklariert.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -766,6 +822,16 @@ export default function MenuView(_props: MenuViewProps) {
           <DishGrid items={cock} />
         </div>
       </MenuPanel>
+
+      {/* ================= ALLERGEN-HINWEIS & LEGENDE ================= */}
+      <div className="mt-16 mx-auto max-w-4xl rounded-lg border border-gold-secondary/30 bg-tavern-dark/50 p-6 text-center shadow-lg">
+        <h4 className="font-cinzel text-base font-bold tracking-widest text-gold-primary uppercase">
+          Hinweis zu den 14 EU-Hauptallergenen (LMIV)
+        </h4>
+        <p className="mt-2 font-serif text-xs md:text-sm text-cream-parchment/70 leading-relaxed max-w-2xl mx-auto">
+          Alle Speisen und Tränke können per Klick auf <span className="text-gold-bright italic">„Allergene“</span> auf ihre kennzeichnungspflichtigen Inhaltsstoffe geprüft werden. Bei Fragen zu Unverträglichkeiten oder individuellen Zubereitungswünschen sprecht gerne unser Tavernen-Gesinde an!
+        </p>
+      </div>
 
     </section>
   );

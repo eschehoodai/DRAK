@@ -12,6 +12,24 @@ define('JSON_FILE_PATH', __DIR__ . '/angebote.json');
 define('SPEISEKARTE_JSON_PATH', __DIR__ . '/speisekarte.json');
 define('SPEISEKARTE_DEFAULT_JSON_PATH', __DIR__ . '/speisekarte.default.json');
 
+// 14 EU-Hauptallergene (LMIV A-N)
+$ALLERGENS_DEF = [
+    'A' => ['name' => 'Glutenhaltiges Getreide', 'short' => 'Gluten'],
+    'B' => ['name' => 'Krebstiere & Erzeugnisse', 'short' => 'Krebstiere'],
+    'C' => ['name' => 'Eier & Eierzeugnisse', 'short' => 'Eier'],
+    'D' => ['name' => 'Fisch & Fischerzeugnisse', 'short' => 'Fisch'],
+    'E' => ['name' => 'Erdnüsse & Erzeugnisse', 'short' => 'Erdnüsse'],
+    'F' => ['name' => 'Sojabohnen & Erzeugnisse', 'short' => 'Soja'],
+    'G' => ['name' => 'Milch & Milcherzeugnisse (Laktose)', 'short' => 'Milch/Laktose'],
+    'H' => ['name' => 'Schalenfrüchte (Nüsse)', 'short' => 'Schalenfrüchte'],
+    'I' => ['name' => 'Sellerie & Erzeugnisse', 'short' => 'Sellerie'],
+    'J' => ['name' => 'Senf & Erzeugnisse', 'short' => 'Senf'],
+    'K' => ['name' => 'Sesamsamen & Erzeugnisse', 'short' => 'Sesam'],
+    'L' => ['name' => 'Schwefeldioxid & Sulfite', 'short' => 'Sulfite'],
+    'M' => ['name' => 'Lupinen & Erzeugnisse', 'short' => 'Lupinen'],
+    'N' => ['name' => 'Weichtiere & Erzeugnisse', 'short' => 'Weichtiere'],
+];
+
 $message = null;
 $messageType = 'info'; // 'success' | 'error' | 'info'
 $activeTab = $_GET['tab'] ?? $_POST['active_tab'] ?? 'wochenangebote';
@@ -54,11 +72,24 @@ if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_o
             $beschreibung = isset($item['beschreibung']) ? trim(strip_tags($item['beschreibung'])) : '';
 
             if ($name !== '') {
-                $cleanItems[] = [
+                $cleanOffer = [
                     'name' => $name,
                     'preis' => $preis,
                     'beschreibung' => $beschreibung
                 ];
+                if (isset($item['allergens']) && is_array($item['allergens'])) {
+                    $cleanAllergens = [];
+                    foreach ($item['allergens'] as $aCode) {
+                        $code = strtoupper(trim(strip_tags($aCode)));
+                        if (isset($ALLERGENS_DEF[$code])) {
+                            $cleanAllergens[] = $code;
+                        }
+                    }
+                    if (!empty($cleanAllergens)) {
+                        $cleanOffer['allergens'] = array_values(array_unique($cleanAllergens));
+                    }
+                }
+                $cleanItems[] = $cleanOffer;
             }
         }
     }
@@ -110,6 +141,20 @@ if ($isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_s
                     }
                     if ($isSpecial) {
                         $cleanItem['isSpecial'] = true;
+                    }
+
+                    // Allergene verarbeiten (14 EU-Hauptallergene A-N)
+                    if (isset($item['allergens']) && is_array($item['allergens'])) {
+                        $cleanAllergens = [];
+                        foreach ($item['allergens'] as $aCode) {
+                            $code = strtoupper(trim(strip_tags($aCode)));
+                            if (isset($ALLERGENS_DEF[$code])) {
+                                $cleanAllergens[] = $code;
+                            }
+                        }
+                        if (!empty($cleanAllergens)) {
+                            $cleanItem['allergens'] = array_values(array_unique($cleanAllergens));
+                        }
                     }
 
                     // Varianten verarbeiten (z.B. Größen 0,2L / 0,4L oder Fleischsorten)
@@ -531,6 +576,70 @@ $categoriesDef = [
             color: #fff;
         }
 
+        /* Allergene Chips & Box */
+        .allergens-box {
+            margin-top: 14px;
+            margin-bottom: 14px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 4px;
+            padding: 12px 14px;
+        }
+        .allergens-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: var(--gold-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            letter-spacing: 0.5px;
+        }
+        .allergens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 6px 8px;
+        }
+        .allergen-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 3px;
+            padding: 4px 8px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .allergen-chip:hover {
+            border-color: var(--gold-bright);
+            color: var(--text-cream);
+            background-color: rgba(212, 175, 55, 0.08);
+        }
+        .allergen-chip input[type="checkbox"] {
+            accent-color: var(--gold-bright);
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            margin: 0;
+        }
+        .allergen-chip.active,
+        .allergen-chip:has(input:checked) {
+            background-color: rgba(212, 175, 55, 0.18);
+            border-color: var(--gold-bright);
+            color: var(--gold-bright);
+            font-weight: 600;
+        }
+        .allergen-code {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: var(--gold-bright);
+            font-size: 0.85rem;
+        }
+
         @media (max-width: 600px) {
             .grid-2 {
                 grid-template-columns: 1fr;
@@ -617,6 +726,28 @@ $categoriesDef = [
                                     <label>Beschreibung</label>
                                     <textarea name="items[<?= $idx ?>][beschreibung]" rows="2" placeholder="z.B. Mit Grillgemüse und Kartoffelecken"><?= htmlspecialchars($item['beschreibung'] ?? '') ?></textarea>
                                 </div>
+
+                                <?php $offerAllergens = $item['allergens'] ?? []; ?>
+                                <div class="allergens-box">
+                                    <div class="allergens-title">
+                                        <span>14 Hauptallergene (EU-LMIV)</span>
+                                        <span style="font-size: 0.75rem; color: var(--text-muted); font-family: 'Faustina', serif; font-style: italic;">(Klick zum Auswählen)</span>
+                                    </div>
+                                    <div class="allergens-grid">
+                                        <?php foreach ($ALLERGENS_DEF as $aCode => $aMeta): ?>
+                                            <?php $isChecked = in_array($aCode, $offerAllergens, true); ?>
+                                            <label class="allergen-chip <?= $isChecked ? 'active' : '' ?>">
+                                                <input type="checkbox" 
+                                                       name="items[<?= $idx ?>][allergens][]" 
+                                                       value="<?= $aCode ?>" 
+                                                       <?= $isChecked ? 'checked' : '' ?>
+                                                       onchange="this.closest('.allergen-chip').classList.toggle('active', this.checked)">
+                                                <span class="allergen-code"><?= $aCode ?></span>
+                                                <span><?= htmlspecialchars($aMeta['short']) ?></span>
+                                            </label>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -685,6 +816,28 @@ $categoriesDef = [
                                             <label for="special_<?= $catKey ?>_<?= $itemIdx ?>">Als „HAUS-SPEZIALITÄT“ hervorheben</label>
                                         </div>
 
+                                        <?php $itemAllergens = $item['allergens'] ?? []; ?>
+                                        <div class="allergens-box">
+                                            <div class="allergens-title">
+                                                <span>14 Hauptallergene (EU-LMIV)</span>
+                                                <span style="font-size: 0.75rem; color: var(--text-muted); font-family: 'Faustina', serif; font-style: italic;">(Klick zum Auswählen)</span>
+                                            </div>
+                                            <div class="allergens-grid">
+                                                <?php foreach ($ALLERGENS_DEF as $aCode => $aMeta): ?>
+                                                    <?php $isChecked = in_array($aCode, $itemAllergens, true); ?>
+                                                    <label class="allergen-chip <?= $isChecked ? 'active' : '' ?>">
+                                                        <input type="checkbox" 
+                                                               name="categories[<?= $catKey ?>][<?= $itemIdx ?>][allergens][]" 
+                                                               value="<?= $aCode ?>" 
+                                                               <?= $isChecked ? 'checked' : '' ?>
+                                                               onchange="this.closest('.allergen-chip').classList.toggle('active', this.checked)">
+                                                        <span class="allergen-code"><?= $aCode ?></span>
+                                                        <span><?= htmlspecialchars($aMeta['short']) ?></span>
+                                                    </label>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+
                                         <!-- Preis-Varianten (z.B. 0,2L / 0,4L oder Rind / Wildschwein) -->
                                         <div class="grid-variants">
                                             <label style="margin-bottom: 8px;">Preisvarianten / Größen (Optional, z.B. 0,2L / 0,4L oder Portionsgrößen):</label>
@@ -726,6 +879,45 @@ $categoriesDef = [
                     btns[1].classList.toggle('active', tabName === 'speisekarte');
                 }
 
+                const ALLERGENS_CLIENT_LIST = [
+                    { code: 'A', short: 'Gluten' },
+                    { code: 'B', short: 'Krebstiere' },
+                    { code: 'C', short: 'Eier' },
+                    { code: 'D', short: 'Fisch' },
+                    { code: 'E', short: 'Erdnüsse' },
+                    { code: 'F', short: 'Soja' },
+                    { code: 'G', short: 'Milch/Laktose' },
+                    { code: 'H', short: 'Schalenfrüchte' },
+                    { code: 'I', short: 'Sellerie' },
+                    { code: 'J', short: 'Senf' },
+                    { code: 'K', short: 'Sesam' },
+                    { code: 'L', short: 'Sulfite' },
+                    { code: 'M', short: 'Lupinen' },
+                    { code: 'N', short: 'Weichtiere' }
+                ];
+
+                function renderAllergensBox(fieldNamePrefix) {
+                    const chips = ALLERGENS_CLIENT_LIST.map(a => `
+                        <label class="allergen-chip">
+                            <input type="checkbox" name="${fieldNamePrefix}[allergens][]" value="${a.code}" onchange="this.closest('.allergen-chip').classList.toggle('active', this.checked)">
+                            <span class="allergen-code">${a.code}</span>
+                            <span>${a.short}</span>
+                        </label>
+                    `).join('');
+
+                    return `
+                        <div class="allergens-box">
+                            <div class="allergens-title">
+                                <span>14 Hauptallergene (EU-LMIV)</span>
+                                <span style="font-size: 0.75rem; color: var(--text-muted); font-family: 'Faustina', serif; font-style: italic;">(Klick zum Auswählen)</span>
+                            </div>
+                            <div class="allergens-grid">
+                                ${chips}
+                            </div>
+                        </div>
+                    `;
+                }
+
                 /* --- WOCHENANGEBOTE SCRIPT --- */
                 function updateOfferNumbers() {
                     const cards = document.querySelectorAll('#offers-container .offer-card');
@@ -742,6 +934,11 @@ $categoriesDef = [
 
                         const descTextarea = card.querySelector('textarea[name*="[beschreibung]"]');
                         if (descTextarea) descTextarea.name = `items[${index}][beschreibung]`;
+
+                        const allergenInputs = card.querySelectorAll('input[name*="[allergens]"]');
+                        allergenInputs.forEach((aInput) => {
+                            aInput.name = `items[${index}][allergens][]`;
+                        });
                     });
                 }
 
@@ -780,6 +977,7 @@ $categoriesDef = [
                                 <label>Beschreibung</label>
                                 <textarea name="items[${newIndex}][beschreibung]" rows="2" placeholder="z.B. Mit Semmelknödel"></textarea>
                             </div>
+                            ${renderAllergensBox(`items[${newIndex}]`)}
                         </div>
                     `;
 
@@ -823,6 +1021,12 @@ $categoriesDef = [
                             const specialLabel = card.querySelector('label[for^="special_"]');
                             if (specialLabel) specialLabel.setAttribute('for', `special_${catKey}_${itemIdx}`);
                         }
+
+                        // Allergene Inputs neu indizieren
+                        const allergenInputs = card.querySelectorAll('input[name*="[allergens]"]');
+                        allergenInputs.forEach((aInput) => {
+                            aInput.name = `categories[${catKey}][${itemIdx}][allergens][]`;
+                        });
 
                         const variantRows = card.querySelectorAll('.variant-row');
                         variantRows.forEach((vRow, vIdx) => {
@@ -882,6 +1086,8 @@ $categoriesDef = [
                                 <input type="checkbox" id="special_${catKey}_${newIndex}" name="categories[${catKey}][${newIndex}][isSpecial]" value="1">
                                 <label for="special_${catKey}_${newIndex}">Als „HAUS-SPEZIALITÄT“ hervorheben</label>
                             </div>
+
+                            ${renderAllergensBox(`categories[${catKey}][${newIndex}]`)}
 
                             <div class="grid-variants">
                                 <label style="margin-bottom: 8px;">Preisvarianten / Größen (Optional):</label>
