@@ -246,6 +246,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [guests, setGuests] = useState(2);
+  const isLargeGroup = guests >= 11;
   
   // Initialize default date to next open day
   const [date, setDate] = useState(() => getNextOpenDate(new Date()));
@@ -435,6 +436,11 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
       return;
     }
 
+    if (isLargeGroup && (!phone || phone.trim().length < 5)) {
+      alert('Für Gruppen ab 11 Gefährten benötigen wir zwingend Eure Handynummer, damit unsere Wirtsleute Euch schnellstmöglich zurückrufen und alles Weitere persönlich besprechen können.');
+      return;
+    }
+
     if (getDayOfWeek(date) === 2) {
       alert('An Dienstagen ruhen Drachen und Wirtsleute. Bitte wählt einen anderen Tag für Euer Festmahl!');
       return;
@@ -454,6 +460,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
       time,
       vault,
       notes,
+      status: isLargeGroup ? 'inquiry' : 'confirmed',
     };
 
     // Send email notification to server via PHP mail()
@@ -644,26 +651,64 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
               <div className="gilded-corner gilded-corner-bl" />
               <div className="gilded-corner gilded-corner-br" />
 
-              <div className="flex justify-center mb-6 text-gold-primary candle-glow">
-                <svg className="h-16 w-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <line x1="16" y1="13" x2="8" y2="13" />
-                  <line x1="16" y1="17" x2="8" y2="17" />
-                  <polyline points="10 9 9 9 8 9" />
-                </svg>
-              </div>
+              {lastCreated.guests >= 11 ? (
+                <>
+                  <div className="flex justify-center mb-6 text-gold-primary candle-glow">
+                    <Sparkles className="h-16 w-16 text-gold-bright" />
+                  </div>
 
-              <h2 className="font-cinzel text-2xl md:text-3xl font-bold tracking-widest text-gold-bright uppercase mb-2">
-                ZUNFTBRIEF BESTÄTIGT
-              </h2>
-              <p className="font-serif text-sm italic text-gold-secondary/80 mb-6">
-                ~ Gezeichnet im Folianten der Drachen Taverne ~
-              </p>
+                  <h2 className="font-cinzel text-2xl md:text-3xl font-bold tracking-widest text-gold-bright uppercase mb-2">
+                    ANFRAGE ERFOLGREICH EINGEGANGEN
+                  </h2>
+                  <p className="font-serif text-sm italic text-gold-secondary/80 mb-6">
+                    ~ Eure Großgruppen-Anfrage wird geprüft ~
+                  </p>
+
+                  <div className="my-6 p-5 border-2 border-gold-primary bg-gold-primary/10 text-left rounded-sm relative shadow-lg">
+                    <div className="flex items-center gap-2 mb-2 text-gold-bright font-cinzel text-xs md:text-sm font-bold uppercase tracking-wider">
+                      <Sparkles className="h-4 w-4 text-gold-primary shrink-0" />
+                      <span>Eingangsbestätigung Eurer Voranfrage</span>
+                    </div>
+                    <p className="font-serif text-sm text-cream-parchment leading-relaxed">
+                      Seid gegrüßt, <strong>{lastCreated.name}</strong>! Eure Anfrage für <strong>{lastCreated.guests === 20 ? '20+' : lastCreated.guests} Gefährten</strong> am <strong>{formatGermanDate(lastCreated.date)} um {lastCreated.time} Uhr</strong> ist wohlbehalten in der Drachen Taverne eingegangen.
+                    </p>
+                    <div className="mt-3 p-3.5 bg-tavern-dark/90 border border-gold-primary/50 rounded font-serif text-xs md:text-sm text-gold-bright flex items-start sm:items-center gap-3">
+                      <Phone className="h-5 w-5 text-gold-primary shrink-0 mt-0.5 sm:mt-0" />
+                      <span>
+                        Wir werden uns <strong>schnellstmöglich telefonisch unter {lastCreated.phone}</strong> bei Euch melden, um die Tischordnung, Speisenfolge und alle weiteren Details persönlich mit Euch zu besprechen.
+                      </span>
+                    </div>
+                    <p className="mt-3 text-xs font-serif italic text-cream-parchment/75">
+                      * Nach unserer gemeinsamen telefonischen Absprache wird Eure Tafel fest und verbindlich im Folianten der Taverne eingetragen.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-center mb-6 text-gold-primary candle-glow">
+                    <svg className="h-16 w-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                      <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                  </div>
+
+                  <h2 className="font-cinzel text-2xl md:text-3xl font-bold tracking-widest text-gold-bright uppercase mb-2">
+                    ZUNFTBRIEF BESTÄTIGT
+                  </h2>
+                  <p className="font-serif text-sm italic text-gold-secondary/80 mb-6">
+                    ~ Gezeichnet im Folianten der Drachen Taverne ~
+                  </p>
+                </>
+              )}
 
               <div className="my-8 border-y border-gold-secondary/30 py-6 space-y-3 font-serif text-base">
                 <div className="flex items-center justify-center gap-2 flex-wrap">
-                  <span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-1">Nummer:</span>
+                  <span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-1">
+                    {lastCreated.guests >= 11 ? 'Anfragenummer:' : 'Nummer:'}
+                  </span>
                   <strong className="text-gold-bright text-lg font-cinzel tracking-wider">{lastCreated.id}</strong>
                   <button
                     type="button"
@@ -686,9 +731,17 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 </div>
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Truppführer:</span> {lastCreated.name}</p>
                 {lastCreated.phone && (
-                  <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Telefon:</span> {lastCreated.phone}</p>
+                  <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Telefon / Handy:</span> {lastCreated.phone}</p>
                 )}
-                <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gefährten:</span> {lastCreated.guests} Krieger</p>
+                <p>
+                  <span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gefährten:</span>
+                  {lastCreated.guests === 20 ? '20+ Krieger' : `${lastCreated.guests} Krieger`}
+                  {lastCreated.guests >= 11 && (
+                    <span className="ml-2 text-[10px] uppercase font-cinzel text-gold-bright border border-gold-primary/40 px-1.5 py-0.5 rounded bg-gold-primary/10">
+                      Großgruppen-Anfrage
+                    </span>
+                  )}
+                </p>
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Festmahl-Zeit:</span> {formatGermanDate(lastCreated.date)} um {lastCreated.time} Uhr</p>
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gewölbe:</span> {lastCreated.vault}</p>
                 {lastCreated.notes && (
@@ -696,32 +749,54 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 )}
               </div>
 
-              {/* Notice for kitchen planning & timely cancellation */}
-              <div className="my-6 p-5 border border-gold-primary/40 bg-gold-primary/5 text-left rounded-sm relative">
-                <div className="flex items-center gap-2 mb-2 text-gold-bright font-cinzel text-xs font-bold uppercase tracking-wider">
-                  <Sparkles className="h-4 w-4 text-gold-primary shrink-0" />
-                  <span>Ein Wort unserer Küchenmeister & Schankwirte</span>
-                </div>
-                <p className="font-serif text-xs md:text-sm text-cream-parchment/90 leading-relaxed">
-                  In unserer Taverne wird jedes Festmahl mit frischen Zutaten und viel Herzblut zubereitet.
-                  Sollte Euer Bund verhindert sein oder sich Eure Pläne ändern, bitten wir Euch herzlich, uns dies so zeitig wie möglich mitzuteilen.
-                </p>
-                <div className="mt-3 pt-3 border-t border-gold-secondary/20 text-xs font-serif text-cream-parchment/80 space-y-1.5">
-                  <p>
-                    • <strong className="text-gold-bright">Online stornieren:</strong> Direkt hier unten über die rote Schaltfläche <span className="text-red-400 font-cinzel text-[11px] font-bold">„Stornieren“</span> oder später jederzeit im Reiter <span className="text-gold-primary font-cinzel text-[11px] font-bold">„Zunftbrief suchen“</span> mit Eurem Buchungscode <strong className="text-gold-bright">{lastCreated.id}</strong>.
+              {lastCreated.guests >= 11 ? (
+                <div className="my-6 p-5 border border-gold-secondary/30 bg-tavern-dark/40 text-left rounded-sm">
+                  <div className="flex items-center gap-2 mb-2 text-gold-bright font-cinzel text-xs font-bold uppercase tracking-wider">
+                    <Clock className="h-4 w-4 text-gold-secondary shrink-0" />
+                    <span>Nächste Schritte & Rückfragen</span>
+                  </div>
+                  <p className="font-serif text-xs md:text-sm text-cream-parchment/90 leading-relaxed">
+                    Haltet bitte Euer Telefon bereit – unsere Wirtsleute werden sich schnellstmöglich bei Euch melden.
+                    Möchtet Ihr vorab noch etwas ändern oder habt dringende Fragen? Ihr erreicht uns zu unseren Öffnungszeiten auch direkt in der Taverne:
                   </p>
-                  <p>
-                    • <strong className="text-gold-bright">Persönlich Bescheid geben:</strong> Ruft uns gern direkt unter{' '}
-                    <a href="tel:035835495389" className="text-gold-bright hover:text-gold-primary underline font-bold">
-                      03583 5495389
-                    </a>{' '}
-                    an – besonders bei kurzfristigen Änderungen oder veränderter Gästeanzahl.
+                  <div className="mt-3 pt-3 border-t border-gold-secondary/20 text-xs font-serif text-cream-parchment/80 flex items-center gap-2">
+                    <Phone className="h-3.5 w-3.5 text-gold-primary shrink-0" />
+                    <span>
+                      Tavernen-Telefon:{' '}
+                      <a href="tel:035835495389" className="text-gold-bright hover:text-gold-primary underline font-bold">
+                        03583 5495389
+                      </a>
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                /* Notice for kitchen planning & timely cancellation */
+                <div className="my-6 p-5 border border-gold-primary/40 bg-gold-primary/5 text-left rounded-sm relative">
+                  <div className="flex items-center gap-2 mb-2 text-gold-bright font-cinzel text-xs font-bold uppercase tracking-wider">
+                    <Sparkles className="h-4 w-4 text-gold-primary shrink-0" />
+                    <span>Ein Wort unserer Küchenmeister & Schankwirte</span>
+                  </div>
+                  <p className="font-serif text-xs md:text-sm text-cream-parchment/90 leading-relaxed">
+                    In unserer Taverne wird jedes Festmahl mit frischen Zutaten und viel Herzblut zubereitet.
+                    Sollte Euer Bund verhindert sein oder sich Eure Pläne ändern, bitten wir Euch herzlich, uns dies so zeitig wie möglich mitzuteilen.
+                  </p>
+                  <div className="mt-3 pt-3 border-t border-gold-secondary/20 text-xs font-serif text-cream-parchment/80 space-y-1.5">
+                    <p>
+                      • <strong className="text-gold-bright">Online stornieren:</strong> Direkt hier unten über die rote Schaltfläche <span className="text-red-400 font-cinzel text-[11px] font-bold">„Stornieren“</span> oder später jederzeit im Reiter <span className="text-gold-primary font-cinzel text-[11px] font-bold">„Zunftbrief suchen“</span> mit Eurem Buchungscode <strong className="text-gold-bright">{lastCreated.id}</strong>.
+                    </p>
+                    <p>
+                      • <strong className="text-gold-bright">Persönlich Bescheid geben:</strong> Ruft uns gern direkt unter{' '}
+                      <a href="tel:035835495389" className="text-gold-bright hover:text-gold-primary underline font-bold">
+                        03583 5495389
+                      </a>{' '}
+                      an – besonders bei kurzfristigen Änderungen oder veränderter Gästeanzahl.
+                    </p>
+                  </div>
+                  <p className="mt-3 text-[11px] font-serif italic text-gold-secondary/80">
+                    So verderben keine köstlichen Speisen und andere hungrige Wanderer erhalten Einlass an die Tafel. Habt Dank für Eure Zunft-Ehre!
                   </p>
                 </div>
-                <p className="mt-3 text-[11px] font-serif italic text-gold-secondary/80">
-                  So verderben keine köstlichen Speisen und andere hungrige Wanderer erhalten Einlass an die Tafel. Habt Dank für Eure Zunft-Ehre!
-                </p>
-              </div>
+              )}
 
               <p className="font-serif text-xs text-cream-parchment/60 mb-6 max-w-md mx-auto">
                 Notiert Euch Euren Buchungscode <strong>{lastCreated.id}</strong> zum späteren Nachschlagen oder Verwalten.
@@ -733,14 +808,14 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   onClick={() => setLastCreated(null)}
                   className="bg-gold-primary px-6 py-3 font-cinzel text-xs font-bold tracking-widest uppercase text-void-black hover:bg-gold-bright transition-colors cursor-pointer"
                 >
-                  Weiteren Tisch reservieren
+                  {lastCreated.guests >= 11 ? 'Neue Reservierung / Anfrage' : 'Weiteren Tisch reservieren'}
                 </button>
                 <button
                   id="btn-cancel-this-booking"
                   onClick={() => handleDelete(lastCreated.id)}
                   className="border border-red-500/50 px-6 py-3 font-cinzel text-xs font-bold tracking-widest uppercase text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
                 >
-                  Stornieren
+                  {lastCreated.guests >= 11 ? 'Anfrage zurückziehen' : 'Stornieren'}
                 </button>
               </div>
             </div>
@@ -812,16 +887,32 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   </div>
 
                   <div className="flex flex-col space-y-2">
-                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center gap-1.5">
-                      <Phone className="h-3.5 w-3.5" /> Telefonnummer <span className="text-[10px] font-normal lowercase opacity-75">(optional)</span>
+                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Phone className="h-3.5 w-3.5" /> {isLargeGroup ? 'Handynummer *' : 'Telefonnummer'}
+                      </span>
+                      {isLargeGroup ? (
+                        <span className="text-[10px] font-normal lowercase text-gold-bright tracking-normal">
+                          (Pflichtfeld für Rückruf)
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-normal lowercase opacity-75 tracking-normal">
+                          (optional)
+                        </span>
+                      )}
                     </label>
                     <input
                       id="input-phone"
                       type="tel"
-                      placeholder="z.B. 0170 1234567"
+                      required={isLargeGroup}
+                      placeholder={isLargeGroup ? 'z.B. 0170 1234567 (für telefonischen Rückruf)' : 'z.B. 0170 1234567'}
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="border-0 border-b-2 border-gold-secondary/40 bg-transparent py-2 font-serif text-base text-cream-parchment placeholder:text-cream-parchment/30 outline-none focus:border-gold-primary focus:drop-shadow-[0_4px_6px_rgba(212,175,55,0.15)] transition-all"
+                      className={`border-0 border-b-2 bg-transparent py-2 font-serif text-base text-cream-parchment placeholder:text-cream-parchment/30 outline-none transition-all ${
+                        isLargeGroup
+                          ? 'border-gold-primary/80 focus:border-gold-bright focus:drop-shadow-[0_4px_6px_rgba(212,175,55,0.25)]'
+                          : 'border-gold-secondary/40 focus:border-gold-primary focus:drop-shadow-[0_4px_6px_rgba(212,175,55,0.15)]'
+                      }`}
                     />
                   </div>
                 </div>
@@ -830,8 +921,13 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-2">
                   {/* Guests Selector */}
                   <div className="flex flex-col space-y-2">
-                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase">
-                      Anzahl Gefährten *
+                    <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center justify-between">
+                      <span>Anzahl Gefährten *</span>
+                      {isLargeGroup && (
+                        <span className="text-[10px] text-gold-bright font-normal uppercase tracking-wider">
+                          [Anfrage]
+                        </span>
+                      )}
                     </label>
                     <select
                       id="select-guests"
@@ -841,21 +937,19 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     >
                       {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
                         <option key={num} value={num} className="bg-void-black text-cream-parchment py-2">
-                          {num} Krieger
+                          {num === 20 ? '20+ Krieger (Großgruppen-Anfrage)' : num >= 11 ? `${num} Krieger [Anfrage]` : `${num} Krieger`}
                         </option>
                       ))}
                     </select>
-                    <p className="text-[11px] font-serif italic text-cream-parchment/60 leading-tight pt-1">
-                      * Für mehr als 20 Gäste bedarf es einer{' '}
-                      {isTavernOpenNow ? (
-                        <a href="tel:035835495389" className="text-gold-bright underline hover:text-gold-primary">
-                          telefonischen Reservierung
-                        </a>
-                      ) : (
-                        'telefonischen Reservierung (zu den Öffnungszeiten)'
-                      )}{' '}
-                      & persönlichen Planung.
-                    </p>
+                    {isLargeGroup ? (
+                      <p className="text-[11px] font-serif italic text-gold-bright leading-tight pt-1">
+                        * Ab 11 Personen als Voranfrage: Bitte Handynummer angeben. Wir melden uns zeitnah persönlich zur Abstimmung.
+                      </p>
+                    ) : (
+                      <p className="text-[11px] font-serif italic text-cream-parchment/60 leading-tight pt-1">
+                        * Bis 10 Personen sofort online reservieren. Ab 11 Personen als Voranfrage mit persönlicher Absprache.
+                      </p>
+                    )}
                   </div>
 
                   {/* Date Input with Custom Visual Calendar */}
@@ -968,6 +1062,21 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   </div>
                 </div>
 
+                {/* Large group inquiry info banner */}
+                {isLargeGroup && (
+                  <div className="p-4 border border-gold-primary/50 bg-gold-primary/10 rounded flex items-start space-x-3 animate-in fade-in duration-200">
+                    <Sparkles className="h-5 w-5 text-gold-primary shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold font-cinzel text-xs text-gold-bright tracking-wide uppercase">
+                        Voranfrage für Großgruppen ({guests === 20 ? '20+' : guests} Gefährten)
+                      </p>
+                      <p className="mt-1 text-xs md:text-sm font-serif text-cream-parchment/90 leading-relaxed">
+                        Für größere Bünde bereiten wir die Hoftafel individuell vor. Daher ist die Angabe Eurer Handynummer erforderlich. Wir rufen Euch schnellstmöglich persönlich an, um Tischordnung, Speisenfolge und alle Wünsche abzustimmen.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Tuesday Ruhetag Warning Banner */}
                 {isTuesdaySelected && (
                   <div className="p-4 border border-red-500/50 bg-red-950/30 text-red-200 text-xs md:text-sm font-serif flex items-start space-x-3 rounded animate-in fade-in duration-200">
@@ -1043,10 +1152,16 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   disabled={isSubmitting || isTuesdaySelected}
                   className="w-full sm:w-auto bg-gold-primary border border-gold-primary px-10 py-4 font-cinzel text-sm font-black tracking-widest uppercase text-void-black hover:bg-gold-bright transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? 'Brieftaube fliegt...' : 'Tischvertragsbrief absenden'}
+                  {isSubmitting
+                    ? 'Brieftaube fliegt...'
+                    : isLargeGroup
+                    ? 'Großgruppen-Anfrage absenden'
+                    : 'Tischvertragsbrief absenden'}
                 </button>
                 <p className="text-[11px] font-serif italic text-cream-parchment/50 mt-3 max-w-md mx-auto">
-                  Mit Absenden haltet Ihr Eurem Bund die Plätze frei. Sollte sich Euer Plan ändern, bitten wir um baldigste Nachricht oder Stornierung.
+                  {isLargeGroup
+                    ? 'Bei Gruppen ab 11 Gefährten handelt es sich um eine Voranfrage. Unsere Wirtsleute prüfen den Termin und melden sich schnellstmöglich telefonisch bei Euch, um alles Weitere persönlich zu besprechen.'
+                    : 'Mit Absenden haltet Ihr Eurem Bund die Plätze frei. Sollte sich Euer Plan ändern, bitten wir um baldigste Nachricht oder Stornierung.'}
                 </p>
               </div>
             </form>
@@ -1096,11 +1211,31 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 <span className="font-cinzel text-gold-bright font-bold">{searchedReservation.id}</span>
                 <span className="text-xs text-gold-secondary">{searchedReservation.vault}</span>
               </div>
+              {searchedReservation.guests >= 11 || searchedReservation.status === 'inquiry' ? (
+                <div className="p-3 border border-gold-primary/40 bg-gold-primary/10 text-xs font-serif text-gold-bright rounded flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-gold-primary shrink-0" />
+                  <span>
+                    <strong>Status: Voranfrage eingegangen</strong> – Unsere Wirtsleute melden sich zeitnah telefonisch unter {searchedReservation.phone || 'Eurer Handynummer'} zur persönlichen Abstimmung.
+                  </span>
+                </div>
+              ) : (
+                <div className="p-2 border border-green-500/30 bg-green-950/20 text-xs font-serif text-green-300 rounded flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-400 shrink-0" />
+                  <span><strong>Status: Tischreservierung bestätigt</strong></span>
+                </div>
+              )}
               <div className="space-y-1">
                 <p><strong>Name:</strong> {searchedReservation.name}</p>
-                {searchedReservation.phone && <p><strong>Telefon:</strong> {searchedReservation.phone}</p>}
+                {searchedReservation.phone && <p><strong>Handy / Telefon:</strong> {searchedReservation.phone}</p>}
                 {searchedReservation.email && <p><strong>E-Mail:</strong> {searchedReservation.email}</p>}
-                <p><strong>Krieger:</strong> {searchedReservation.guests} Personen</p>
+                <p>
+                  <strong>Krieger:</strong>{' '}
+                  {searchedReservation.guests === 20
+                    ? '20+ Personen (Großgruppen-Anfrage)'
+                    : searchedReservation.guests >= 11
+                    ? `${searchedReservation.guests} Personen (Großgruppen-Anfrage)`
+                    : `${searchedReservation.guests} Personen`}
+                </p>
                 <p><strong>Zeitpunkt:</strong> {formatGermanDate(searchedReservation.date)} um {searchedReservation.time} Uhr</p>
                 {searchedReservation.notes && <p><strong>Wünsche:</strong> {searchedReservation.notes}</p>}
               </div>
@@ -1109,7 +1244,9 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   onClick={() => handleDelete(searchedReservation.id)}
                   className="text-xs text-red-400 hover:text-red-300 underline font-cinzel uppercase tracking-wider cursor-pointer"
                 >
-                  Reservierung Stornieren
+                  {searchedReservation.guests >= 11 || searchedReservation.status === 'inquiry'
+                    ? 'Anfrage zurückziehen'
+                    : 'Reservierung Stornieren'}
                 </button>
               </div>
             </div>

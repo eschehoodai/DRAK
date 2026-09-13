@@ -57,7 +57,7 @@ try {
         $stmt = $pdo->prepare("
             UPDATE reservations 
             SET status = 'cancelled' 
-            WHERE date = :date AND time = :time AND name = :name AND status = 'confirmed'
+            WHERE date = :date AND time = :time AND name = :name AND status IN ('confirmed', 'inquiry')
         ");
         $stmt->execute([':date' => $date, ':time' => $time, ':name' => $name]);
     }

@@ -52,16 +52,26 @@ if (empty($name) || empty($date) || empty($time)) {
     exit();
 }
 
+$isLargeGroup = ($guests >= 11);
+$status = $isLargeGroup ? 'inquiry' : 'confirmed';
+
+// Handynummer ist ab 11 Personen Pflicht
+if ($isLargeGroup && empty($phone)) {
+    http_response_code(400);
+    echo json_encode(["success" => false, "error" => "Für Gruppen ab 11 Personen ist die Handynummer zwingend erforderlich."]);
+    exit();
+}
+
 // Transaktionssichere Kapazitätsprüfung & Speicherung nach Plan B in SQLite
 try {
     $pdo = getDb();
     $pdo->beginTransaction();
 
-    // Aktuelle Buchungen für den Zeitslot abfragen
+    // Aktuelle Buchungen für den Zeitslot abfragen (sowohl bestätigte Buchungen als auch Voranfragen blockieren den Slot)
     $stmt = $pdo->prepare("
         SELECT guests
         FROM reservations
-        WHERE date = :date AND time = :time AND status = 'confirmed'
+        WHERE date = :date AND time = :time AND status IN ('confirmed', 'inquiry')
     ");
     $stmt->execute([':date' => $date, ':time' => $time]);
     $existingBookings = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -113,10 +123,10 @@ try {
         exit();
     }
 
-    // Reservierung in Datenbank anlegen
+    // Reservierung / Anfrage in Datenbank anlegen
     $insert = $pdo->prepare("
         INSERT INTO reservations (id, name, phone, email, guests, date, time, vault, notes, status)
-        VALUES (:id, :name, :phone, :email, :guests, :date, :time, :vault, :notes, 'confirmed')
+        VALUES (:id, :name, :phone, :email, :guests, :date, :time, :vault, :notes, :status)
     ");
     $insert->execute([
         ':id'     => $id,
@@ -127,7 +137,8 @@ try {
         ':date'   => $date,
         ':time'   => $time,
         ':vault'  => $vault,
-        ':notes'  => $notes
+        ':notes'  => $notes,
+        ':status' => $status
     ]);
 
     $pdo->commit();
@@ -136,14 +147,10 @@ try {
         $pdo->rollBack();
     }
     error_log("DB-Fehler bei Reservierung: " . $e->getMessage());
-    // Hinweis: Falls z.B. Schreibrechte lokal fehlen, bricht die Mail nicht zwingend ab
 }
 
 // Empfänger-Adressen (Kunde & Testadresse)
 $to = "drakzittau@dlr-gastro-event.de, eschehoodai@gmail.com";
-
-// Betreff
-$subject = "🐉 Neue Tischreservierung: $id - $name";
 
 // Datum schön formatieren falls möglich
 $formattedDate = $date;
@@ -151,23 +158,48 @@ if (strtotime($date)) {
     $formattedDate = date('d.m.Y', strtotime($date));
 }
 
-// E-Mail-Nachricht (Textfassung)
-$message = "Seid gegrüßt,\n\n";
-$message .= "Eine neue Hoftafel-Reservierung ist für die Drachen Taverne Zittau eingegangen:\n\n";
-$message .= "--------------------------------------------------------\n";
-$message .= "Buchungscode : " . $id . "\n";
-$message .= "Name des Gastes: " . $name . "\n";
-$message .= "Telefonnummer  : " . ($phone ? $phone : "Keine angegeben") . "\n";
-if (!empty($email)) {
-    $message .= "E-Mail Gast    : " . $email . "\n";
+// Betreff und E-Mail-Nachricht je nach Art (Buchung oder Großgruppen-Anfrage)
+if ($isLargeGroup) {
+    $subject = "📜 Neue Großgruppen-Anfrage (ab 11 Pers.): $id - $name ($guests Personen)";
+
+    $message = "Seid gegrüßt,\n\n";
+    $message .= "Eine neue GROSSGRUPPEN-ANFRAGE ist für die Drachen Taverne Zittau eingegangen:\n\n";
+    $message .= "ACHTUNG: Dies ist eine UNVERBINDLICHE VORANFRAGE (noch keine feste Buchung)!\n";
+    $message .= "Bitte schnellstmöglich den Gast telefonisch kontaktieren:\n";
+    $message .= "--------------------------------------------------------\n";
+    $message .= "Buchungscode   : " . $id . "\n";
+    $message .= "Name des Gastes: " . $name . "\n";
+    $message .= "Handy/Telefon  : " . ($phone ? $phone : "Keine angegeben") . " (RÜCKRUF ERFORDERLICH)\n";
+    if (!empty($email)) {
+        $message .= "E-Mail Gast    : " . $email . "\n";
+    }
+    $message .= "Anzahl Personen: " . $guests . " Person(en)\n";
+    $message .= "Wunsch-Datum   : " . $formattedDate . "\n";
+    $message .= "Wunsch-Uhrzeit : " . $time . " Uhr\n";
+    $message .= "Gewölbebereich : " . $vault . "\n";
+    $message .= "Anmerkungen    : " . ($notes ? $notes : "Keine") . "\n";
+    $message .= "--------------------------------------------------------\n\n";
+    $message .= "E-Mail wurde automatisch über das Reservierungsformular auf drakzittau.de versendet.\n";
+} else {
+    $subject = "🐉 Neue Tischreservierung: $id - $name";
+
+    $message = "Seid gegrüßt,\n\n";
+    $message .= "Eine neue Hoftafel-Reservierung ist für die Drachen Taverne Zittau eingegangen:\n\n";
+    $message .= "--------------------------------------------------------\n";
+    $message .= "Buchungscode : " . $id . "\n";
+    $message .= "Name des Gastes: " . $name . "\n";
+    $message .= "Telefonnummer  : " . ($phone ? $phone : "Keine angegeben") . "\n";
+    if (!empty($email)) {
+        $message .= "E-Mail Gast    : " . $email . "\n";
+    }
+    $message .= "Anzahl Personen: " . $guests . " Person(en)\n";
+    $message .= "Datum          : " . $formattedDate . "\n";
+    $message .= "Uhrzeit        : " . $time . " Uhr\n";
+    $message .= "Gewölbebereich : " . $vault . "\n";
+    $message .= "Anmerkungen    : " . ($notes ? $notes : "Keine") . "\n";
+    $message .= "--------------------------------------------------------\n\n";
+    $message .= "E-Mail wurde automatisch über das Reservierungsformular auf drakzittau.de versendet.\n";
 }
-$message .= "Anzahl Personen: " . $guests . " Person(en)\n";
-$message .= "Datum          : " . $formattedDate . "\n";
-$message .= "Uhrzeit        : " . $time . " Uhr\n";
-$message .= "Gewölbebereich : " . $vault . "\n";
-$message .= "Anmerkungen    : " . ($notes ? $notes : "Keine") . "\n";
-$message .= "--------------------------------------------------------\n\n";
-$message .= "E-Mail wurde automatisch über das Reservierungsformular auf drakzittau.de versendet.\n";
 
 // Header konfigurieren
 $replyToHeader = !empty($email) ? ($name . ' <' . $email . '>') : 'Drachen Taverne <noreply@drakzittau.de>';

@@ -42,6 +42,7 @@ export interface Reservation {
   vault: string;
   notes?: string;
   id: string;
+  status?: 'confirmed' | 'inquiry' | 'cancelled';
 }
 
 export type JobPosition = 'Servicekraft' | 'Koch/Köchin';

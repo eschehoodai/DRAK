@@ -71,7 +71,7 @@ function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
     $stmt = $pdo->prepare("
         SELECT time, guests
         FROM reservations
-        WHERE date = :date AND status = 'confirmed'
+        WHERE date = :date AND status IN ('confirmed', 'inquiry')
     ");
     $stmt->execute([':date' => $date]);
     
