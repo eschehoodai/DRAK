@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Screen, Reservation } from '../types';
 import { 
   Calendar, User, Mail, Phone, Hourglass, Shield, Search, Sparkles, Trash2,
-  ChevronLeft, ChevronRight, Clock, AlertTriangle, Check, X, Copy
+  ChevronLeft, ChevronRight, Clock, AlertTriangle, Check, X, Copy, ChevronDown
 } from 'lucide-react';
 
 interface ReservationViewProps {
@@ -670,7 +670,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                       <span>Eingangsbestätigung Eurer Voranfrage</span>
                     </div>
                     <p className="font-serif text-sm text-cream-parchment leading-relaxed">
-                      Seid gegrüßt, <strong>{lastCreated.name}</strong>! Eure Anfrage für <strong>{lastCreated.guests === 20 ? '20+' : lastCreated.guests} Gefährten</strong> am <strong>{formatGermanDate(lastCreated.date)} um {lastCreated.time} Uhr</strong> ist wohlbehalten in der Drachen Taverne eingegangen.
+                      Seid gegrüßt, <strong>{lastCreated.name}</strong>! Eure Anfrage für <strong>{lastCreated.guests >= 12 ? '12+' : lastCreated.guests} Gefährten</strong> am <strong>{formatGermanDate(lastCreated.date)} um {lastCreated.time} Uhr</strong> ist wohlbehalten in der Drachen Taverne eingegangen.
                     </p>
                     <div className="mt-3 p-3.5 bg-tavern-dark/90 border border-gold-primary/50 rounded font-serif text-xs md:text-sm text-gold-bright flex items-start sm:items-center gap-3">
                       <Phone className="h-5 w-5 text-gold-primary shrink-0 mt-0.5 sm:mt-0" />
@@ -729,13 +729,13 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     )}
                   </button>
                 </div>
-                <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Truppführer:</span> {lastCreated.name}</p>
+                <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Großmeister/in:</span> {lastCreated.name}</p>
                 {lastCreated.phone && (
                   <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Telefon / Handy:</span> {lastCreated.phone}</p>
                 )}
                 <p>
                   <span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gefährten:</span>
-                  {lastCreated.guests === 20 ? '20+ Krieger' : `${lastCreated.guests} Krieger`}
+                  {lastCreated.guests >= 12 ? '12+ Ritter / Ladies' : `${lastCreated.guests} Ritter / Ladies`}
                   {lastCreated.guests >= 11 && (
                     <span className="ml-2 text-[10px] uppercase font-cinzel text-gold-bright border border-gold-primary/40 px-1.5 py-0.5 rounded bg-gold-primary/10">
                       Großgruppen-Anfrage
@@ -873,7 +873,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col space-y-2">
                     <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center gap-1.5">
-                      <User className="h-3.5 w-3.5" /> Name der Truppe *
+                      <User className="h-3.5 w-3.5" /> Großmeister/in *
                     </label>
                     <input
                       id="input-name"
@@ -929,18 +929,25 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                         </span>
                       )}
                     </label>
-                    <select
-                      id="select-guests"
-                      value={guests}
-                      onChange={(e) => setGuests(parseInt(e.target.value))}
-                      className="border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer"
-                    >
-                      {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
-                        <option key={num} value={num} className="bg-void-black text-cream-parchment py-2">
-                          {num === 20 ? '20+ Krieger (Großgruppen-Anfrage)' : num >= 11 ? `${num} Krieger [Anfrage]` : `${num} Krieger`}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        id="select-guests"
+                        value={guests}
+                        onChange={(e) => setGuests(parseInt(e.target.value))}
+                        className="w-full appearance-none border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark py-3 pr-10 pl-2 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer"
+                      >
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
+                          <option key={num} value={num} className="bg-void-black text-cream-parchment py-2">
+                            {num === 12
+                              ? '12+ Ritter / Ladies (Großgruppen-Anfrage)'
+                              : num === 11
+                              ? '11 Ritter / Ladies [Anfrage]'
+                              : `${num} Ritter / Ladies`}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gold-secondary" />
+                    </div>
                     {isLargeGroup ? (
                       <p className="text-[11px] font-serif italic text-gold-bright leading-tight pt-1">
                         * Ab 11 Personen als Voranfrage: Bitte Handynummer angeben. Wir melden uns zeitnah persönlich zur Abstimmung.
@@ -994,60 +1001,63 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                       )}
                     </label>
 
-                    <select
-                      id="select-time"
-                      disabled={isTuesdaySelected || availableSlots.length === 0}
-                      value={time}
-                      onChange={(e) => {
-                        setTime(e.target.value);
-                        setSlotNotice('');
-                      }}
-                      className="border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      {isTuesdaySelected ? (
-                        <option value="" className="bg-void-black text-red-400">
-                          Geschlossen (Ruhetag)
-                        </option>
-                      ) : availableSlots.length > 0 ? (
-                        availableSlots.map((hr) => {
-                          const { remaining, isCompletelyFull, hasEnoughRoom } = getSlotDetails(hr, guests);
+                    <div className="relative">
+                      <select
+                        id="select-time"
+                        disabled={isTuesdaySelected || availableSlots.length === 0}
+                        value={time}
+                        onChange={(e) => {
+                          setTime(e.target.value);
+                          setSlotNotice('');
+                        }}
+                        className="w-full appearance-none border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark py-3 pr-10 pl-2 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        {isTuesdaySelected ? (
+                          <option value="" className="bg-void-black text-red-400">
+                            Geschlossen (Ruhetag)
+                          </option>
+                        ) : availableSlots.length > 0 ? (
+                          availableSlots.map((hr) => {
+                            const { remaining, isCompletelyFull, hasEnoughRoom } = getSlotDetails(hr, guests);
 
-                          let label = `${hr} Uhr`;
-                          if (isCompletelyFull) {
-                            label = `${hr} Uhr — Ausgebucht`;
-                          } else if (!hasEnoughRoom) {
-                            if (guests > 10) {
-                              label = `${hr} Uhr — Für Großgruppen belegt`;
-                            } else if (remaining > 0) {
-                              label = `${hr} Uhr — Nur noch ${remaining} ${remaining === 1 ? 'Platz' : 'Plätze'} frei`;
-                            } else {
+                            let label = `${hr} Uhr`;
+                            if (isCompletelyFull) {
                               label = `${hr} Uhr — Ausgebucht`;
-                            }
-                          } else if (guests <= 10 && remaining < 10) {
-                            label = `${hr} Uhr (${remaining} Plätze frei)`;
-                          }
-
-                          return (
-                            <option
-                              key={hr}
-                              value={hr}
-                              disabled={!hasEnoughRoom}
-                              className={
-                                !hasEnoughRoom
-                                  ? 'bg-void-black text-cream-parchment/35 italic'
-                                  : 'bg-void-black text-cream-parchment'
+                            } else if (!hasEnoughRoom) {
+                              if (guests > 10) {
+                                label = `${hr} Uhr — Für Großgruppen belegt`;
+                              } else if (remaining > 0) {
+                                label = `${hr} Uhr — Nur noch ${remaining} ${remaining === 1 ? 'Platz' : 'Plätze'} frei`;
+                              } else {
+                                label = `${hr} Uhr — Ausgebucht`;
                               }
-                            >
-                              {label}
-                            </option>
-                          );
-                        })
-                      ) : (
-                        <option value="" className="bg-void-black text-cream-parchment">
-                          Keine Zeiten verfügbar
-                        </option>
-                      )}
-                    </select>
+                            } else if (guests <= 10 && remaining < 10) {
+                              label = `${hr} Uhr (${remaining} Plätze frei)`;
+                            }
+
+                            return (
+                              <option
+                                key={hr}
+                                value={hr}
+                                disabled={!hasEnoughRoom}
+                                className={
+                                  !hasEnoughRoom
+                                    ? 'bg-void-black text-cream-parchment/35 italic'
+                                    : 'bg-void-black text-cream-parchment'
+                                }
+                              >
+                                {label}
+                              </option>
+                            );
+                          })
+                        ) : (
+                          <option value="" className="bg-void-black text-cream-parchment">
+                            Keine Zeiten verfügbar
+                          </option>
+                        )}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gold-secondary" />
+                    </div>
                     {slotNotice && !isTuesdaySelected && (
                       <div className="mt-2 p-2.5 border border-gold-primary/30 bg-gold-primary/10 rounded flex items-center gap-2 text-xs font-serif text-gold-bright animate-in fade-in duration-200">
                         <Sparkles className="h-3.5 w-3.5 text-gold-primary shrink-0" />
@@ -1068,7 +1078,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     <Sparkles className="h-5 w-5 text-gold-primary shrink-0 mt-0.5" />
                     <div>
                       <p className="font-bold font-cinzel text-xs text-gold-bright tracking-wide uppercase">
-                        Voranfrage für Großgruppen ({guests === 20 ? '20+' : guests} Gefährten)
+                        Voranfrage für Großgruppen ({guests >= 12 ? '12+' : guests} Gefährten)
                       </p>
                       <p className="mt-1 text-xs md:text-sm font-serif text-cream-parchment/90 leading-relaxed">
                         Für größere Bünde bereiten wir die Hoftafel individuell vor. Daher ist die Angabe Eurer Handynummer erforderlich. Wir rufen Euch schnellstmöglich persönlich an, um Tischordnung, Speisenfolge und alle Wünsche abzustimmen.
@@ -1225,13 +1235,13 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 </div>
               )}
               <div className="space-y-1">
-                <p><strong>Name:</strong> {searchedReservation.name}</p>
+                <p><strong>Großmeister/in:</strong> {searchedReservation.name}</p>
                 {searchedReservation.phone && <p><strong>Handy / Telefon:</strong> {searchedReservation.phone}</p>}
                 {searchedReservation.email && <p><strong>E-Mail:</strong> {searchedReservation.email}</p>}
                 <p>
-                  <strong>Krieger:</strong>{' '}
-                  {searchedReservation.guests === 20
-                    ? '20+ Personen (Großgruppen-Anfrage)'
+                  <strong>Ritter / Ladies:</strong>{' '}
+                  {searchedReservation.guests >= 12
+                    ? '12+ Personen (Großgruppen-Anfrage)'
                     : searchedReservation.guests >= 11
                     ? `${searchedReservation.guests} Personen (Großgruppen-Anfrage)`
                     : `${searchedReservation.guests} Personen`}
