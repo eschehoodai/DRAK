@@ -735,7 +735,11 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 )}
                 <p>
                   <span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gefährten:</span>
-                  {lastCreated.guests >= 12 ? '12+ Ritter / Ladies' : `${lastCreated.guests} Ritter / Ladies`}
+                  {lastCreated.guests >= 12
+                    ? '12+ Ritter / Ladies'
+                    : lastCreated.guests === 1
+                    ? '1 Ritter / Ladie'
+                    : `${lastCreated.guests} Ritter / Ladies`}
                   {lastCreated.guests >= 11 && (
                     <span className="ml-2 text-[10px] uppercase font-cinzel text-gold-bright border border-gold-primary/40 px-1.5 py-0.5 rounded bg-gold-primary/10">
                       Großgruppen-Anfrage
@@ -942,6 +946,8 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                               ? '12+ Ritter / Ladies (Großgruppen-Anfrage)'
                               : num === 11
                               ? '11 Ritter / Ladies [Anfrage]'
+                              : num === 1
+                              ? '1 Ritter / Ladie'
                               : `${num} Ritter / Ladies`}
                           </option>
                         ))}
@@ -1239,11 +1245,13 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 {searchedReservation.phone && <p><strong>Handy / Telefon:</strong> {searchedReservation.phone}</p>}
                 {searchedReservation.email && <p><strong>E-Mail:</strong> {searchedReservation.email}</p>}
                 <p>
-                  <strong>Ritter / Ladies:</strong>{' '}
+                  <strong>{searchedReservation.guests === 1 ? 'Ritter / Ladie:' : 'Ritter / Ladies:'}</strong>{' '}
                   {searchedReservation.guests >= 12
                     ? '12+ Personen (Großgruppen-Anfrage)'
                     : searchedReservation.guests >= 11
                     ? `${searchedReservation.guests} Personen (Großgruppen-Anfrage)`
+                    : searchedReservation.guests === 1
+                    ? '1 Person'
                     : `${searchedReservation.guests} Personen`}
                 </p>
                 <p><strong>Zeitpunkt:</strong> {formatGermanDate(searchedReservation.date)} um {searchedReservation.time} Uhr</p>
