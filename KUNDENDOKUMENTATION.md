@@ -51,6 +51,13 @@ Ihre neue Website wurde als hochmoderne **Single-Page-Application (SPA)** konzip
 - **Passwortschutz:** Der Zugang ist mit dem Passwort `Zittau2026!` geschützt.
 - **Automatischer Deployment-Schutz:** Sowohl `angebote.json` als auch `speisekarte.json` sind im automatischen Deployment-Filter exkludiert, sodass Ihre im Admin-Bereich gepflegten Daten bei zukünftigen Website-Updates auf dem Server **vollständig erhalten bleiben**.
 
+### 📱 Digitaler Tischplan & Slot-Manager fürs iPad (`/tischplan.php`)
+- **Eigenständige Theken-App:** Unter `https://drakzittau.de/tischplan.php` (Passwort: `Zittau2026!`) kann der Wirt direkt auf seinem Apple iPad (9. Gen) telefonische Reservierungen oder Vor-Ort-Gäste erfassen.
+- **Echtzeit-Synchronisierung:** Bucht der Wirt manuell Plätze ein (z. B. 2 Personen um 18:00 Uhr), sind für Online-Gäste auf der Website sofort nur noch 8 Plätze in diesem Slot verfügbar. Es wird dabei bewusst keine E-Mail versendet.
+- **1-Klick-Slot-Sperre:** Ganze Zeitslots können mit einem einzigen Tipp auf „🔒 Sperren“ komplett geschlossen werden (z. B. für geschlossene Gesellschaften oder Schichtende).
+- **Löschen & Freigabe:** Mit dem Papierkorb-Symbol (`🗑️`) können Buchungen oder Sperren mit einem Klick gelöscht werden – die Plätze stehen online sofort wieder zur Verfügung.
+- **Apple Home-Screen:** Kann im Safari auf dem iPad über „Teilen ➔ Zum Home-Bildschirm“ als Vollbild-App wie eine native App ohne störende Browserleisten abgelegt werden.
+
 
 ---
 

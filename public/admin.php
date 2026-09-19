@@ -680,7 +680,10 @@ $categoriesDef = [
             <!-- Bearbeitungs-Oberfläche -->
             <div class="top-bar">
                 <span style="color: var(--gold-primary); font-family: 'Cinzel', serif;">Eingeloggt als Wirt</span>
-                <a href="admin.php?action=logout" class="btn btn-danger">Abmelden</a>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <a href="tischplan.php" class="btn" style="background: var(--gold-dim); border-color: var(--gold-bright); color: #fff;">📅 Zum Tischplan (iPad)</a>
+                    <a href="admin.php?action=logout" class="btn btn-danger">Abmelden</a>
+                </div>
             </div>
 
             <!-- Tab Navigation -->

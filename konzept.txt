@@ -1,0 +1,140 @@
+================================================================================
+STRATEGISCHES GOOGLE ADS KONZEPT – DRACHEN TAVERNE ZITTAU
+Budget: 100 € (Test- & Neukunden-Budget)
+Fokus: Maximale lokale Tischreservierungen & Anrufe ohne Streuverluste
+Basis: Reale Daten der Google Search Console (Juli – Sept 2026)
+================================================================================
+
+1. ANALYSE-ERKENNTNISSE AUS DEINER SEARCH CONSOLE
+--------------------------------------------------------------------------------
+- Gerätenutzung:      83,8 % Mobile (775 Klicks), nur 13,5 % Desktop.
+                      ➔ Mobiler Fokus, große Buttons, 1-Klick-Anrufe!
+- Wochentage:         Starker Peak von Fr bis So (bis zu 28 Klicks/Tag).
+                      ➔ Budget primär Do–So einsetzen.
+- Top-Geografie:      98 % Deutschland.
+                      ➔ Keine Ausspielung nach Tschechien/Polen bei 100 € Budget.
+- Wichtig:            Als Anzeigen-Ziel zwingend HTTPS nutzen: https://drakzittau.de/
+
+
+2. BUDGET-FOKUS: 100% NEUKUNDEN (KEINE EIGENMARKE BIETEN!)
+--------------------------------------------------------------------------------
+- Suchbegriffe wie "drak zittau" oder "drachen taverne" NICHT bewerben.
+  (Hier seid ihr organisch bereits Platz 1 – spart euch das Geld!)
+- Das 100-€-Budget fließt zu 100 % in allgemeine Restaurant-Suchende, die euch
+  noch NICHT kennen oder nach Erlebnisgastronomie suchen.
+
+
+3. ANZEIGENGRUPPE 1: "HUNGRIGE GÄSTE IN ZITTAU" (Hauptumsatz)
+--------------------------------------------------------------------------------
+Ziel: Die 640+ Suchenden abfangen, die einfach gut in Zittau essen wollen.
+
+Keywords:
+   [restaurant zittau]
+   "restaurant zittau"
+   [essen gehen zittau]
+   "essen zittau"
+   [gastronomie zittau]
+   [gut essen zittau]
+
+Anzeigentitel (Headlines, max. 30 Zeichen):
+   1. Restaurant in Zittau gesucht?
+   2. Drachen Taverne Zittau
+   3. Deftige Küche & Uriges Flair
+   4. Jetzt Tisch online buchen
+   5. Essen gehen in Zittau
+
+Beschreibungen (max. 90 Zeichen):
+   1. Lust auf etwas Besonderes in Zittau? Entdecke urige Gemütlichkeit & deftiges Essen.
+   2. Zentral in der Inneren Weberstraße. Ideal für Abende mit Freunden & Familie. Jetzt buchen!
+
+
+4. ANZEIGENGRUPPE 2: "ERLEBNIS & MITTELALTER" (Hohe Abschlussrate)
+--------------------------------------------------------------------------------
+Ziel: Gäste abholen, die das Besondere & Mittelalter-Flair suchen.
+
+Keywords:
+   [mittelalter restaurant zittau]
+   "mittelalter restaurant"
+   [taverne zittau]
+   [ritteressen zittau]
+   [erlebnisgastronomie zittau]
+
+Anzeigentitel (Headlines, max. 30 Zeichen):
+   1. Mittelalter Restaurant Zittau
+   2. Drachen Taverne – Urig Speisen
+   3. Erlebnisgastronomie Zittau
+   4. Met, Braten & Tavernenküche
+   5. Zunftbriefe & Tavernenflair
+
+Beschreibungen (max. 90 Zeichen):
+   1. Tauche ein in die Welt der Ritter & Mythen. Deftige Tavernenküche & beste Stimmung.
+   2. Einzigartiges Ambiente mitten in Zittau. Jetzt online deinen Tisch sichern!
+
+
+5. SCHALTZEITEN & AUSRICHTUNG (KAMPAGNENEINSTELLUNGEN)
+--------------------------------------------------------------------------------
+- Kampagnentyp:       Nur Suchnetzwerk (Search Only)
+- Displaynetzwerk:    DEAKTIVIEREN (ganz wichtig, sonst verbrennt Geld!)
+- Partnernetzwerk:    Deaktivieren
+- Radius:             Max. 15–20 km um Zittau
+                      (Einstellung: "Nutzer, die sich an diesem Ort befinden")
+- Wochentage:         Donnerstag bis Sonntag (11:30 – 20:30 Uhr)
+- Tagesbudget:        ca. 4,50 € – 5,00 € pro Schalttag (reicht für 5–6 Wochen)
+- Gebotsstrategie:    "Klicks maximieren" mit max. CPC-Gebot: 0,65 €
+                      (Bringt ca. 150 Neukunden-Klicks für 100 € – Details siehe Punkt 8)
+- Mobil-Boost:        +15 % Gebot auf Smartphones (da 84 % eurer Besucher mobil sind)
+
+
+6. AUSSCHLUSS-KEYWORDS (NEGATIVE KEYWORDS – PFLICHT!)
+--------------------------------------------------------------------------------
+Verhindert Geldverschwendung für Klicks, die keinen Tisch reservieren:
+   - kostenlos, umsonst, gratis
+   - rezept, rezepte, kochen, selber machen
+   - jobs, stellenangebote, praktikum, karriere, gehalt, bewerbung
+   - lieferdienst, lieferservice, takeaway, bestellen (falls ihr nicht liefert)
+   - drak wiki, drak stream, dragon ball, minecraft (Gamer/Popkultur)
+   - museum, parkplatz, wetter
+
+
+7. WICHTIGE ASSETS & ERWEITERUNGEN (KOSTENLOS IN GOOGLE ADS)
+--------------------------------------------------------------------------------
+- Anruferweiterung:    Telefonnummer hinterlegen (für 1-Klick-Anrufe vom Smartphone)
+- Standorterweiterung: Verknüpfung mit Google Maps / Google Unternehmensprofil
+- Sitelinks:
+  1. "Tisch reservieren" ➔ https://drakzittau.de/#reservierung
+  2. "Speisekarte & Trank" ➔ https://drakzittau.de/#speisekarte
+  3. "Galerie & Ambiente" ➔ https://drakzittau.de/#galerie
+================================================================================
+
+
+8. GEBOTSSTRATEGIE & CONVERSION-FAHRPLAN (WARUM ERST "KLICKS MAXIMIEREN"?)
+--------------------------------------------------------------------------------
+Häufige Frage: Warum optimieren wir nicht direkt rein auf Buchungen / Conversions?
+
+GRÜNDE FÜR DIE STARTSTRATEGIE ("Klicks maximieren" mit CPC-Deckel):
+1. Fehlende historische Daten (Lernphase für den Algorithmus):
+   Google Smart Bidding ("Conversions maximieren" / "Ziel-CPA") benötigt zwingend
+   mindestens 15–30 echte Buchungen/Anrufe in den letzten 30 Tagen, um statistische
+   Muster zu erkennen. Ohne diese Daten experimentiert Google teuer und treibt die
+   Klickpreise unkontrolliert in die Höhe (z. B. 2,00–3,50 € pro Klick).
+
+2. Volle Kostenkontrolle beim Testbudget (100 €):
+   Bei einem Tagesbudget von ~4,50–5,00 € sichert ein max. CPC von 0,65 € verlässlich
+   ca. 150 echte Besucher aus Zittau und Umgebung. Kein Einzelklick frisst das Budget auf.
+
+3. Fehlender direkter Warenkorbwert (typisch Gastronomie):
+   Eine Online-Tischreservierung erzeugt zunächst 0 € direkten Webshop-Umsatz
+   (der Verzehr wird erst vor Ort an der Kasse bezahlt). Man optimiert daher später
+   auf die Anzahl der Reservierungen / Anrufe (Ziel-CPA) statt auf Umsatz (ROAS).
+
+DER 2-PHASEN-FAHRPLAN:
+- Phase 1 (Aktuell / Start):
+  ➔ Gebotsstrategie: "Klicks maximieren" mit max. CPC-Grenze (0,65 €).
+  ➔ Parallel: Conversion-Tracking für Reservierungs-Absendungen & Telefon-Klicks einrichten.
+  ➔ Ziel: Günstigen Neukunden-Traffic aufbauen & die ersten 20–30 Conversions sammeln.
+
+- Phase 2 (Sobald 20–30 Buchungen/Anrufe im Konto registriert wurden):
+  ➔ Umstellung auf "Conversions maximieren" (optional mit Ziel-CPA, z. B. 4,00–6,00 € pro Tisch).
+  ➔ Google steuert die Anzeigen dann vollautomatisch bevorzugt an Nutzer aus, die mit
+     höchster Wahrscheinlichkeit tatsächlich einen Tisch buchen.
+================================================================================

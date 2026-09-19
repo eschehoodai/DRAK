@@ -39,18 +39,21 @@ try {
         $booked = $info['total_guests'];
         $count = $info['booking_count'];
         $hasLarge = $info['has_large_group'];
+        $isBlocked = !empty($info['is_blocked']);
 
-        // Plan B:
+        // Plan B + Wirt-Sperre:
+        // - Wenn durch Wirt gesperrt ($isBlocked): sofort 0 Plätze frei
         // - Hat eine Großgruppe (> 10 Gäste) gebucht, ist der Slot sofort voll (0 Plätze frei).
         // - Bei normalen Gruppen schließt der Slot bei STANDARD_SLOT_CAPACITY (10 Personen).
-        $isFull = $hasLarge || ($count > 0 && $booked >= STANDARD_SLOT_CAPACITY);
+        $isFull = $isBlocked || $hasLarge || ($count > 0 && $booked >= STANDARD_SLOT_CAPACITY);
         $remaining = $isFull ? 0 : max(0, STANDARD_SLOT_CAPACITY - $booked);
-        $maxSingleGroup = ($count === 0) ? MAX_EXCLUSIVE_GROUP_CAPACITY : $remaining;
+        $maxSingleGroup = ($count === 0 && !$isBlocked) ? MAX_EXCLUSIVE_GROUP_CAPACITY : $remaining;
 
         $slotsData[$slotTime] = [
             "booked"         => $booked,
             "bookingCount"   => $count,
             "hasLargeGroup"  => $hasLarge,
+            "isBlocked"      => $isBlocked,
             "remaining"      => $remaining,
             "maxSingleGroup" => $maxSingleGroup,
             "isFull"         => $isFull

@@ -67,31 +67,40 @@ try {
     $pdo = getDb();
     $pdo->beginTransaction();
 
-    // Aktuelle Buchungen für den Zeitslot abfragen (sowohl bestätigte Buchungen als auch Voranfragen blockieren den Slot)
+    // Aktuelle Buchungen für den Zeitslot abfragen (bestätigte Buchungen, Voranfragen und Wirt-Sperren blockieren den Slot)
     $stmt = $pdo->prepare("
-        SELECT guests
+        SELECT guests, status
         FROM reservations
-        WHERE date = :date AND time = :time AND status IN ('confirmed', 'inquiry')
+        WHERE date = :date AND time = :time AND status IN ('confirmed', 'inquiry', 'blocked')
     ");
     $stmt->execute([':date' => $date, ':time' => $time]);
-    $existingBookings = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    $existingRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $bookingCount = count($existingBookings);
+    $bookingCount = 0;
     $currentBooked = 0;
     $hasLargeGroup = false;
+    $isBlocked = false;
 
-    foreach ($existingBookings as $g) {
-        $gInt = (int)$g;
-        $currentBooked += $gInt;
-        if ($gInt > STANDARD_SLOT_CAPACITY) {
-            $hasLargeGroup = true;
+    foreach ($existingRows as $row) {
+        if ($row['status'] === 'blocked') {
+            $isBlocked = true;
+        } else {
+            $gInt = (int)$row['guests'];
+            $currentBooked += $gInt;
+            $bookingCount++;
+            if ($gInt > STANDARD_SLOT_CAPACITY) {
+                $hasLargeGroup = true;
+            }
         }
     }
 
     $isAllowed = false;
     $errorMessage = '';
 
-    if ($hasLargeGroup || ($bookingCount > 0 && $currentBooked >= STANDARD_SLOT_CAPACITY)) {
+    if ($isBlocked) {
+        $isAllowed = false;
+        $errorMessage = "Dieser Termin (" . htmlspecialchars($time) . " Uhr) ist durch die Wirtsleute gesperrt.";
+    } else if ($hasLargeGroup || ($bookingCount > 0 && $currentBooked >= STANDARD_SLOT_CAPACITY)) {
         $isAllowed = false;
         $errorMessage = "Dieser Termin (" . htmlspecialchars($time) . " Uhr) ist leider bereits vollständig ausgebucht.";
     } else if ($bookingCount === 0) {

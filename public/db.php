@@ -61,17 +61,17 @@ function getDb(): PDO {
 
 /**
  * Gibt detaillierte Belegungsdaten je Zeitslot für ein bestimmtes Datum zurück.
- * Erfasst Gesamtzahl der Gäste, Anzahl der Buchungen und ob eine Großgruppe (>10) gebucht hat.
+ * Erfasst Gesamtzahl der realen Gäste, Buchungsanzahl, Großgruppen und Wirt-Sperren.
  *
  * @param PDO $pdo
  * @param string $date (Format: YYYY-MM-DD)
- * @return array<string, array{total_guests: int, booking_count: int, has_large_group: bool}>
+ * @return array<string, array{total_guests: int, booking_count: int, has_large_group: bool, is_blocked: bool}>
  */
 function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
     $stmt = $pdo->prepare("
-        SELECT time, guests
+        SELECT time, guests, status
         FROM reservations
-        WHERE date = :date AND status IN ('confirmed', 'inquiry')
+        WHERE date = :date AND status IN ('confirmed', 'inquiry', 'blocked')
     ");
     $stmt->execute([':date' => $date]);
     
@@ -79,18 +79,160 @@ function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
     while ($row = $stmt->fetch()) {
         $timeSlot = trim($row['time']);
         $guests = (int)$row['guests'];
+        $status = trim($row['status']);
+
         if (!isset($occupancy[$timeSlot])) {
             $occupancy[$timeSlot] = [
                 'total_guests'    => 0,
                 'booking_count'   => 0,
-                'has_large_group' => false
+                'has_large_group' => false,
+                'is_blocked'      => false,
             ];
         }
-        $occupancy[$timeSlot]['total_guests'] += $guests;
-        $occupancy[$timeSlot]['booking_count']++;
-        if ($guests > STANDARD_SLOT_CAPACITY) {
-            $occupancy[$timeSlot]['has_large_group'] = true;
+
+        if ($status === 'blocked') {
+            $occupancy[$timeSlot]['is_blocked'] = true;
+        } else {
+            $occupancy[$timeSlot]['total_guests'] += $guests;
+            $occupancy[$timeSlot]['booking_count']++;
+            if ($guests > STANDARD_SLOT_CAPACITY) {
+                $occupancy[$timeSlot]['has_large_group'] = true;
+            }
         }
     }
     return $occupancy;
 }
+
+/**
+ * Gibt alle aktiven Reservierungen und Sperren für ein bestimmtes Datum geordnet nach Uhrzeit zurück.
+ *
+ * @param PDO $pdo
+ * @param string $date (Format: YYYY-MM-DD)
+ * @return array<array{id: string, name: string, phone: string, email: string, guests: int, date: string, time: string, vault: string, notes: string, status: string, created_at: string}>
+ */
+function getReservationsListForDate(PDO $pdo, string $date): array {
+    $stmt = $pdo->prepare("
+        SELECT id, name, phone, email, guests, date, time, vault, notes, status, created_at
+        FROM reservations
+        WHERE date = :date AND status IN ('confirmed', 'inquiry', 'blocked')
+        ORDER BY time ASC, created_at ASC
+    ");
+    $stmt->execute([':date' => $date]);
+    return $stmt->fetchAll();
+}
+
+/**
+ * Gibt eine monatsweite Zusammenfassung der Belegung für das 3-Farben-Ampel-Modell zurück.
+ * Ampelsystem:
+ * - 'gray': Ruhetag (Dienstag)
+ * - 'green': Frei / Viel Platz (< 30% Auslastung)
+ * - 'yellow': Teilbelegt (30% - 75% Auslastung)
+ * - 'red': Ausgebucht / Stark belegt (> 75% Auslastung oder mehrere Slots voll/gesperrt)
+ *
+ * @param PDO $pdo
+ * @param string $yearMonth Format YYYY-MM (z. B. "2026-09")
+ * @param array $openingHoursConfig
+ * @return array<string, array{total_guests: int, booking_count: int, blocked_count: int, full_count: int, total_slots: int, status: string}>
+ */
+function getMonthOccupancySummary(PDO $pdo, string $yearMonth, array $openingHoursConfig): array {
+    $startDate = $yearMonth . '-01';
+    $daysInMonth = (int)date('t', strtotime($startDate));
+    $endDate = $yearMonth . '-' . sprintf('%02d', $daysInMonth);
+
+    $stmt = $pdo->prepare("
+        SELECT date, time, guests, status
+        FROM reservations
+        WHERE date >= :start AND date <= :end AND status IN ('confirmed', 'inquiry', 'blocked')
+    ");
+    $stmt->execute([':start' => $startDate, ':end' => $endDate]);
+    $allRows = $stmt->fetchAll();
+
+    // Nach Datum und Slot gruppieren
+    $daySlotMap = [];
+    foreach ($allRows as $r) {
+        $d = $r['date'];
+        $t = trim($r['time']);
+        if (!isset($daySlotMap[$d])) $daySlotMap[$d] = [];
+        if (!isset($daySlotMap[$d][$t])) {
+            $daySlotMap[$d][$t] = ['guests' => 0, 'count' => 0, 'has_large' => false, 'is_blocked' => false];
+        }
+        if ($r['status'] === 'blocked') {
+            $daySlotMap[$d][$t]['is_blocked'] = true;
+        } else {
+            $g = (int)$r['guests'];
+            $daySlotMap[$d][$t]['guests'] += $g;
+            $daySlotMap[$d][$t]['count']++;
+            if ($g > STANDARD_SLOT_CAPACITY) {
+                $daySlotMap[$d][$t]['has_large'] = true;
+            }
+        }
+    }
+
+    $summary = [];
+    for ($day = 1; $day <= $daysInMonth; $day++) {
+        $curDate = $yearMonth . '-' . sprintf('%02d', $day);
+        $dayOfWeek = (int)date('w', strtotime($curDate));
+        $config = $openingHoursConfig[$dayOfWeek] ?? null;
+
+        // Ruhetag (z. B. Dienstag)
+        if (!$config || !$config['isOpen']) {
+            $summary[$curDate] = [
+                'total_guests'  => 0,
+                'booking_count' => 0,
+                'blocked_count' => 0,
+                'full_count'    => 0,
+                'total_slots'   => 0,
+                'status'        => 'gray'
+            ];
+            continue;
+        }
+
+        // Maximale Slots des Tages ermitteln
+        list($openH, $openM) = explode(':', $config['open']);
+        list($lastH, $lastM) = explode(':', $config['lastSlot']);
+        $slotMinutes = ((int)$lastH * 60 + (int)$lastM) - ((int)$openH * 60 + (int)$openM);
+        $totalSlots = max(1, floor($slotMinutes / 30) + 1);
+        $maxCapacity = $totalSlots * STANDARD_SLOT_CAPACITY; // Standard 10 pro Slot
+
+        $daySlotsData = $daySlotMap[$curDate] ?? [];
+        $totalGuests = 0;
+        $bookingCount = 0;
+        $blockedCount = 0;
+        $fullCount = 0;
+
+        foreach ($daySlotsData as $slotTime => $info) {
+            $totalGuests += $info['guests'];
+            $bookingCount += $info['count'];
+            if ($info['is_blocked']) {
+                $blockedCount++;
+                $fullCount++;
+            } elseif ($info['has_large'] || ($info['count'] > 0 && $info['guests'] >= STANDARD_SLOT_CAPACITY)) {
+                $fullCount++;
+            }
+        }
+
+        // 3-Farben-Ampel bestimmen
+        $occupancyRatio = $maxCapacity > 0 ? ($totalGuests / $maxCapacity) : 0;
+
+        if ($fullCount >= ($totalSlots * 0.7) || $occupancyRatio >= 0.75) {
+            $color = 'red';
+        } elseif ($occupancyRatio >= 0.3 || $fullCount >= 2 || $totalGuests >= 15) {
+            $color = 'yellow';
+        } else {
+            $color = 'green';
+        }
+
+        $summary[$curDate] = [
+            'total_guests'  => $totalGuests,
+            'booking_count' => $bookingCount,
+            'blocked_count' => $blockedCount,
+            'full_count'    => $fullCount,
+            'total_slots'   => $totalSlots,
+            'status'        => $color
+        ];
+    }
+
+    return $summary;
+}
+
+
