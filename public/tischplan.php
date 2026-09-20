@@ -1068,7 +1068,9 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
             z-index: 999;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+            overflow-y: auto;
+            overscroll-behavior: contain;
         }
         .modal-backdrop.active {
             display: flex;
@@ -1076,25 +1078,32 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
         .modal-card {
             background: #1a1714;
             border: 2px solid var(--gold-primary);
-            border-radius: 6px;
+            border-radius: 8px;
             width: 100%;
             max-width: 520px;
-            padding: 22px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+            max-height: calc(100vh - 32px);
+            max-height: calc(100dvh - 32px);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 35px rgba(0, 0, 0, 0.95);
             position: relative;
+            overflow: hidden;
+            margin: auto;
         }
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            padding: 14px 18px;
             border-bottom: 1px solid var(--card-border);
-            padding-bottom: 10px;
+            background: #1f1b17;
+            flex-shrink: 0;
         }
         .modal-header h3 {
             font-family: 'Cinzel', serif;
             color: var(--gold-bright);
-            font-size: 1.25rem;
+            font-size: 1.2rem;
+            margin: 0;
         }
         .btn-close-modal {
             background: none;
@@ -1104,6 +1113,39 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
             cursor: pointer;
             padding: 4px 8px;
             line-height: 1;
+            border-radius: 4px;
+            transition: color 0.15s, background 0.15s;
+        }
+        .btn-close-modal:hover, .btn-close-modal:active {
+            color: var(--gold-bright);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .modal-body-scroll {
+            padding: 16px 20px 22px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            flex: 1 1 auto;
+        }
+        /* Elegante, schlanke Scrollbar für das Modal */
+        .modal-body-scroll::-webkit-scrollbar {
+            width: 7px;
+        }
+        .modal-body-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        .modal-body-scroll::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.4);
+            border-radius: 4px;
+        }
+        .modal-body-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--gold-bright);
+        }
+        @media (max-width: 480px) {
+            .modal-grid-2col {
+                grid-template-columns: 1fr !important;
+            }
         }
 
         .form-group {
@@ -1575,10 +1617,10 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
             <button type="button" class="btn-close-modal" onclick="closeBookingModal()">✕</button>
         </div>
 
-        <form method="POST" action="tischplan.php" id="modalBookingForm">
+        <form method="POST" action="tischplan.php" id="modalBookingForm" class="modal-body-scroll">
             <input type="hidden" name="action" value="add_reservation">
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+            <div class="modal-grid-2col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="modalDate">Datum</label>
                     <input type="date" id="modalDate" name="date" required class="form-control">
@@ -1698,6 +1740,9 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
         highlightGuestBtn(2);
 
         document.getElementById('bookingModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        const form = document.getElementById('modalBookingForm');
+        if (form) form.scrollTop = 0;
         setTimeout(() => {
             document.getElementById('modalName').focus();
         }, 150);
@@ -1705,6 +1750,7 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
 
     function closeBookingModal() {
         document.getElementById('bookingModal').classList.remove('active');
+        document.body.style.overflow = '';
     }
 
     // Gästebutton Schnellauswahl
