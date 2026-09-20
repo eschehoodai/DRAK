@@ -7,6 +7,7 @@ import React from 'react';
 import { Screen } from '../types';
 import { ShieldAlert, Calendar, Phone } from 'lucide-react';
 import { useIsTavernOpen } from '../utils/openingHours';
+import { trackPhoneCallClick } from '../utils/gtag';
 
 interface HeaderProps {
   currentScreen: Screen;
@@ -113,6 +114,7 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
             <a
               id="hdr-cta-phone"
               href="tel:035835495389"
+              onClick={trackPhoneCallClick}
               className="hidden sm:flex items-center space-x-1.5 border border-gold-secondary/40 bg-gold-primary/10 px-3 py-2 font-cinzel text-xs font-bold text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all duration-300 cursor-pointer"
               title="Direkt in der Taverne anrufen"
             >

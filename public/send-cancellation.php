@@ -39,7 +39,7 @@ $email    = isset($data['email']) ? filter_var(trim($data['email']), FILTER_SANI
 $guests   = isset($data['guests']) ? intval($data['guests']) : 1;
 $date     = isset($data['date']) ? trim(strip_tags($data['date'])) : '';
 $time     = isset($data['time']) ? trim(strip_tags($data['time'])) : '';
-$vault    = isset($data['vault']) ? trim(strip_tags($data['vault'])) : 'Gewölbe';
+$vault    = isset($data['vault']) ? trim(strip_tags($data['vault'])) : 'Die Grosse Kathedrale';
 
 require_once __DIR__ . '/db.php';
 

@@ -38,15 +38,16 @@ export default function DatenschutzView() {
             ['sec-reservierung', '5. Reservierungsformular'],
             ['sec-bewerbung', '6. Bewerbungsformular'],
             ['sec-fonts', '7. Google Fonts'],
-            ['sec-empfaenger', '8. Empfänger der Daten'],
-            ['sec-drittland', '9. Drittlandtransfer'],
-            ['sec-rechte', '10. Ihre Rechte als betroffene Person'],
-            ['sec-widerruf', '11. Widerrufsrecht bei Einwilligung'],
-            ['sec-beschwerde', '12. Beschwerderecht bei einer Aufsichtsbehörde'],
-            ['sec-bereitstellung', '13. Pflicht zur Bereitstellung von Daten'],
-            ['sec-loeschung', '14. Routinemäßige Löschung und Sperrung von personenbezogenen Daten'],
-            ['sec-profiling', '15. Automatisierte Entscheidungsfindung'],
-            ['sec-stand', '16. Aktualität und Änderung dieser Datenschutzerklärung'],
+            ['sec-google-ads', '8. Google Ads & Conversion Tracking'],
+            ['sec-empfaenger', '9. Empfänger der Daten'],
+            ['sec-drittland', '10. Drittlandtransfer'],
+            ['sec-rechte', '11. Ihre Rechte als betroffene Person'],
+            ['sec-widerruf', '12. Widerrufsrecht bei Einwilligung'],
+            ['sec-beschwerde', '13. Beschwerderecht bei einer Aufsichtsbehörde'],
+            ['sec-bereitstellung', '14. Pflicht zur Bereitstellung von Daten'],
+            ['sec-loeschung', '15. Routinemäßige Löschung und Sperrung von personenbezogenen Daten'],
+            ['sec-profiling', '16. Automatisierte Entscheidungsfindung'],
+            ['sec-stand', '17. Aktualität und Änderung dieser Datenschutzerklärung'],
           ].map(([id, label]) => (
             <li key={id}>
               <button
@@ -273,10 +274,45 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 8. Empfänger der Daten */}
+        {/* 8. Google Ads & Conversion Tracking */}
+        <section id="sec-google-ads">
+          <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
+            8. Google Ads & Conversion Tracking
+          </h2>
+          <p>
+            Diese Website nutzt das Online-Werbeprogramm „Google Ads“ und im Rahmen dessen das Google Tag
+            (gtag.js) sowie das Conversion-Tracking von Google Ireland Limited, Gordon House, Barrow Street,
+            Dublin 4, Irland („Google“).
+          </p>
+          <p className="mt-2">
+            Wenn Sie über eine von Google geschaltete Anzeige auf unsere Website gelangen, wird von Google
+            ein Cookie oder ein Identifier für das Conversion-Tracking auf Ihrem Endgerät abgelegt, sofern
+            Sie dem in unserem Cookie-Banner zugestimmt haben. Mit Hilfe dieser Cookies und Messpunkte können
+            wir nachvollziehen, ob ein Klick auf eine Anzeige zu einer erfolgreichen Tischreservierung oder
+            einem Klick auf unsere Telefonnummer geführt hat.
+          </p>
+          <div className="mt-3 space-y-1">
+            <p><span className="text-gold-secondary font-bold">Zweck:</span> Statistische Erfolgsmessung unserer Werbemaßnahmen zur Tischreservierung und Ausspielung relevanter Angebote.</p>
+            <p><span className="text-gold-secondary font-bold">Rechtsgrundlage:</span> Art. 6 Abs. 1 lit. a DSGVO sowie § 25 Abs. 1 TDDDG (Einwilligung über den Cookie-Banner).</p>
+            <p><span className="text-gold-secondary font-bold">Google Consent Mode:</span> Wir setzen den Google Consent Mode v2 ein. Standardmäßig werden alle Werbe- und Analyse-Cookies blockiert, bis Sie im Cookie-Banner ausdrücklich zustimmen.</p>
+            <p><span className="text-gold-secondary font-bold">Drittlandtransfer:</span> Daten können an Server der Google LLC in die USA übermittelt werden. Google ist nach dem EU-U.S. Data Privacy Framework (DPF) zertifiziert.</p>
+          </div>
+          <p className="mt-2">
+            Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen, indem Sie die{' '}
+            <button
+              onClick={openSettings}
+              className="text-gold-bright hover:underline underline-offset-2 cursor-pointer"
+            >
+              Cookie-Einstellungen
+            </button>{' '}
+            aufrufen und dort die Analyse- & Marketing-Kategorie deaktivieren.
+          </p>
+        </section>
+
+        {/* 9. Empfänger der Daten */}
         <section id="sec-empfaenger">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            8. Empfänger der Daten
+            9. Empfänger der Daten
           </h2>
           <p>Eine Weitergabe Ihrer personenbezogenen Daten an Dritte erfolgt nur, wenn:</p>
           <ul className="list-disc list-inside mt-2 space-y-1 pl-2">
@@ -290,13 +326,13 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 9. Drittlandtransfer */}
+        {/* 10. Drittlandtransfer */}
         <section id="sec-drittland">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            9. Drittlandtransfer
+            10. Drittlandtransfer
           </h2>
           <p>
-            Durch die Einbindung von Google Fonts kann eine Datenübermittlung in die USA
+            Durch die Einbindung von Google Fonts und Google Ads / Conversion Tracking kann eine Datenübermittlung in die USA
             stattfinden. Die USA verfügen mit dem EU-U.S. Data Privacy Framework (DPF) über
             einen Angemessenheitsbeschluss der Europäischen Kommission. Google LLC ist unter dem
             DPF zertifiziert, sodass ein angemessenes Datenschutzniveau gewährleistet ist.
@@ -306,10 +342,10 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 10. Ihre Rechte als betroffene Person */}
+        {/* 11. Ihre Rechte als betroffene Person */}
         <section id="sec-rechte">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            10. Ihre Rechte als betroffene Person
+            11. Ihre Rechte als betroffene Person
           </h2>
           <p>Sie haben nach der DSGVO folgende Rechte:</p>
           <ul className="list-disc list-inside mt-2 space-y-2 pl-2">
@@ -350,10 +386,10 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 11. Widerrufsrecht bei Einwilligung */}
+        {/* 12. Widerrufsrecht bei Einwilligung */}
         <section id="sec-widerruf">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            11. Widerrufsrecht bei Einwilligung
+            12. Widerrufsrecht bei Einwilligung
           </h2>
           <p>
             Soweit die Verarbeitung Ihrer personenbezogenen Daten auf einer Einwilligung beruht,
@@ -373,10 +409,10 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 12. Beschwerderecht bei einer Aufsichtsbehörde */}
+        {/* 13. Beschwerderecht bei einer Aufsichtsbehörde */}
         <section id="sec-beschwerde">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            12. Beschwerderecht bei einer Aufsichtsbehörde
+            13. Beschwerderecht bei einer Aufsichtsbehörde
           </h2>
           <p>
             Unbeschadet eines anderweitigen verwaltungsrechtlichen oder gerichtlichen Rechtsbehelfs
@@ -392,10 +428,10 @@ export default function DatenschutzView() {
           </address>
         </section>
 
-        {/* 13. Pflicht zur Bereitstellung von Daten */}
+        {/* 14. Pflicht zur Bereitstellung von Daten */}
         <section id="sec-bereitstellung">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            13. Pflicht zur Bereitstellung von Daten
+            14. Pflicht zur Bereitstellung von Daten
           </h2>
           <p>
             Wir klären Sie darüber auf, dass die Bereitstellung personenbezogener Daten zum Teil
@@ -406,10 +442,10 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 14. Routinemäßige Löschung und Sperrung von personenbezogenen Daten */}
+        {/* 15. Routinemäßige Löschung und Sperrung von personenbezogenen Daten */}
         <section id="sec-loeschung">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            14. Routinemäßige Löschung und Sperrung von personenbezogenen Daten
+            15. Routinemäßige Löschung und Sperrung von personenbezogenen Daten
           </h2>
           <p>
             Das Kriterium für die Dauer der Speicherung von personenbezogenen Daten ist die jeweilige
@@ -420,10 +456,10 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 15. Automatisierte Entscheidungsfindung */}
+        {/* 16. Automatisierte Entscheidungsfindung */}
         <section id="sec-profiling">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            15. Automatisierte Entscheidungsfindung
+            16. Automatisierte Entscheidungsfindung
           </h2>
           <p>
             Es findet keine automatisierte Entscheidungsfindung einschließlich Profiling gemäß
@@ -431,10 +467,10 @@ export default function DatenschutzView() {
           </p>
         </section>
 
-        {/* 16. Aktualität und Änderung dieser Datenschutzerklärung */}
+        {/* 17. Aktualität und Änderung dieser Datenschutzerklärung */}
         <section id="sec-stand">
           <h2 className="font-cinzel text-lg font-bold tracking-wider text-gold-primary uppercase mb-3">
-            16. Aktualität und Änderung dieser Datenschutzerklärung
+            17. Aktualität und Änderung dieser Datenschutzerklärung
           </h2>
           <p>
             Wir behalten uns vor, diese Datenschutzerklärung anzupassen, um sie an geänderte

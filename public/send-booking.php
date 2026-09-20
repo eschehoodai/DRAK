@@ -40,7 +40,7 @@ $email    = isset($data['email']) ? filter_var(trim($data['email']), FILTER_SANI
 $guests   = isset($data['guests']) ? intval($data['guests']) : 1;
 $date     = isset($data['date']) ? trim(strip_tags($data['date'])) : '';
 $time     = isset($data['time']) ? trim(strip_tags($data['time'])) : '';
-$vault    = isset($data['vault']) ? trim(strip_tags($data['vault'])) : 'Gewölbe';
+$vault    = isset($data['vault']) ? trim(strip_tags($data['vault'])) : 'Die Grosse Kathedrale';
 $notes    = isset($data['notes']) ? trim(strip_tags($data['notes'])) : 'Keine Sonderwünsche';
 
 require_once __DIR__ . '/db.php';
@@ -167,12 +167,33 @@ if (strtotime($date)) {
     $formattedDate = date('d.m.Y', strtotime($date));
 }
 
-// Betreff und E-Mail-Nachricht je nach Art (Buchung oder Großgruppen-Anfrage)
-if ($isLargeGroup) {
-    $subject = "📜 Neue Großgruppen-Anfrage (ab 11 Pers.): $id - $name ($guests Personen)";
+// Betreff und E-Mail-Nachricht je nach Art (Buchung, Voranfrage oder Großgruppen-Anfrage)
+if ($guests >= 20) {
+    $subject = "📜 Neue Großgruppen-Anfrage (ab 20 Pers.): $id - $name (20+ Personen)";
 
     $message = "Seid gegrüßt,\n\n";
-    $message .= "Eine neue GROSSGRUPPEN-ANFRAGE ist für die Drachen Taverne Zittau eingegangen:\n\n";
+    $message .= "Eine neue GROSSGRUPPEN-ANFRAGE (20+ Personen) ist für die Drachen Taverne Zittau eingegangen:\n\n";
+    $message .= "ACHTUNG: Dies ist eine UNVERBINDLICHE VORANFRAGE (noch keine feste Buchung)!\n";
+    $message .= "Bitte schnellstmöglich den Gast telefonisch kontaktieren:\n";
+    $message .= "--------------------------------------------------------\n";
+    $message .= "Buchungscode   : " . $id . "\n";
+    $message .= "Name des Gastes: " . $name . "\n";
+    $message .= "Handy/Telefon  : " . ($phone ? $phone : "Keine angegeben") . " (RÜCKRUF ERFORDERLICH)\n";
+    if (!empty($email)) {
+        $message .= "E-Mail Gast    : " . $email . "\n";
+    }
+    $message .= "Anzahl Personen: 20+ Personen (Großgruppe)\n";
+    $message .= "Wunsch-Datum   : " . $formattedDate . "\n";
+    $message .= "Wunsch-Uhrzeit : " . $time . " Uhr\n";
+    $message .= "Gewölbebereich : " . $vault . "\n";
+    $message .= "Anmerkungen    : " . ($notes ? $notes : "Keine") . "\n";
+    $message .= "--------------------------------------------------------\n\n";
+    $message .= "E-Mail wurde automatisch über das Reservierungsformular auf drakzittau.de versendet.\n";
+} else if ($isLargeGroup) {
+    $subject = "📜 Neue Voranfrage (11-19 Pers.): $id - $name ($guests Personen)";
+
+    $message = "Seid gegrüßt,\n\n";
+    $message .= "Eine neue TISCH-VORANFRAGE ($guests Personen) ist für die Drachen Taverne Zittau eingegangen:\n\n";
     $message .= "ACHTUNG: Dies ist eine UNVERBINDLICHE VORANFRAGE (noch keine feste Buchung)!\n";
     $message .= "Bitte schnellstmöglich den Gast telefonisch kontaktieren:\n";
     $message .= "--------------------------------------------------------\n";

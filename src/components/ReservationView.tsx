@@ -16,6 +16,7 @@ interface ReservationViewProps {
 }
 
 import { OPENING_HOURS, useIsTavernOpen } from '../utils/openingHours';
+import { trackReservationSuccess, trackPhoneCallClick } from '../utils/gtag';
 
 
 /**
@@ -44,21 +45,23 @@ const getDayOfWeek = (dateStr: string): number => {
 const getTimeSlotsForDate = (dateStr: string): string[] => {
   const dayOfWeek = getDayOfWeek(dateStr);
   const config = OPENING_HOURS[dayOfWeek];
-  if (!config || !config.isOpen) return [];
+  if (!config || !config.isOpen || !config.shifts) return [];
 
   const slots: string[] = [];
-  const [openHour, openMin] = config.open.split(':').map(Number);
-  const [lastHour, lastMin] = config.lastSlot.split(':').map(Number);
+  for (const shift of config.shifts) {
+    const [openHour, openMin] = shift.open.split(':').map(Number);
+    const [lastHour, lastMin] = shift.lastSlot.split(':').map(Number);
 
-  let currentMin = openHour * 60 + openMin;
-  const endMin = lastHour * 60 + lastMin;
+    let currentMin = openHour * 60 + openMin;
+    const endMin = lastHour * 60 + lastMin;
 
-  while (currentMin <= endMin) {
-    const h = Math.floor(currentMin / 60);
-    const m = currentMin % 60;
-    const formatted = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-    slots.push(formatted);
-    currentMin += 30;
+    while (currentMin <= endMin) {
+      const h = Math.floor(currentMin / 60);
+      const m = currentMin % 60;
+      const formatted = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+      slots.push(formatted);
+      currentMin += 30;
+    }
   }
   return slots;
 };
@@ -246,7 +249,8 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [guests, setGuests] = useState(2);
-  const isLargeGroup = guests >= 11;
+  const isInquiry = guests >= 11;
+  const isLargeGroup = guests >= 20;
   
   // Initialize default date to next open day
   const [date, setDate] = useState(() => getNextOpenDate(new Date()));
@@ -436,7 +440,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
       return;
     }
 
-    if (isLargeGroup && (!phone || phone.trim().length < 5)) {
+    if (isInquiry && (!phone || phone.trim().length < 5)) {
       alert('Für Gruppen ab 11 Gefährten benötigen wir zwingend Eure Handynummer, damit unsere Wirtsleute Euch schnellstmöglich zurückrufen und alles Weitere persönlich besprechen können.');
       return;
     }
@@ -489,6 +493,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     const updated = [newRes, ...reservations];
     saveBookings(updated);
     setLastCreated(newRes);
+    trackReservationSuccess(newRes.id, newRes.guests);
     
     // Clear form
     setName('');
@@ -661,7 +666,9 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     ANFRAGE ERFOLGREICH EINGEGANGEN
                   </h2>
                   <p className="font-serif text-sm italic text-gold-secondary/80 mb-6">
-                    ~ Eure Großgruppen-Anfrage wird geprüft ~
+                    {lastCreated.guests >= 20
+                      ? '~ Eure Großgruppen-Anfrage wird geprüft ~'
+                      : '~ Eure Voranfrage wird geprüft ~'}
                   </p>
 
                   <div className="my-6 p-5 border-2 border-gold-primary bg-gold-primary/10 text-left rounded-sm relative shadow-lg">
@@ -670,7 +677,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                       <span>Eingangsbestätigung Eurer Voranfrage</span>
                     </div>
                     <p className="font-serif text-sm text-cream-parchment leading-relaxed">
-                      Seid gegrüßt, <strong>{lastCreated.name}</strong>! Eure Anfrage für <strong>{lastCreated.guests >= 12 ? '12+' : lastCreated.guests} Gefährten</strong> am <strong>{formatGermanDate(lastCreated.date)} um {lastCreated.time} Uhr</strong> ist wohlbehalten in der Drachen Taverne eingegangen.
+                      Seid gegrüßt, <strong>{lastCreated.name}</strong>! Eure Anfrage für <strong>{lastCreated.guests >= 20 ? '20+' : lastCreated.guests} Gefährten</strong> am <strong>{formatGermanDate(lastCreated.date)} um {lastCreated.time} Uhr</strong> ist wohlbehalten in der Drachen Taverne eingegangen.
                     </p>
                     <div className="mt-3 p-3.5 bg-tavern-dark/90 border border-gold-primary/50 rounded font-serif text-xs md:text-sm text-gold-bright flex items-start sm:items-center gap-3">
                       <Phone className="h-5 w-5 text-gold-primary shrink-0 mt-0.5 sm:mt-0" />
@@ -735,16 +742,20 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 )}
                 <p>
                   <span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gefährten:</span>
-                  {lastCreated.guests >= 12
-                    ? '12+ Ritter / Ladies'
+                  {lastCreated.guests >= 20
+                    ? '20+ Ritter / Ladies'
                     : lastCreated.guests === 1
                     ? '1 Ritter / Ladie'
                     : `${lastCreated.guests} Ritter / Ladies`}
-                  {lastCreated.guests >= 11 && (
+                  {lastCreated.guests >= 20 ? (
                     <span className="ml-2 text-[10px] uppercase font-cinzel text-gold-bright border border-gold-primary/40 px-1.5 py-0.5 rounded bg-gold-primary/10">
                       Großgruppen-Anfrage
                     </span>
-                  )}
+                  ) : lastCreated.guests >= 11 ? (
+                    <span className="ml-2 text-[10px] uppercase font-cinzel text-gold-bright border border-gold-primary/40 px-1.5 py-0.5 rounded bg-gold-primary/10">
+                      Voranfrage
+                    </span>
+                  ) : null}
                 </p>
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Festmahl-Zeit:</span> {formatGermanDate(lastCreated.date)} um {lastCreated.time} Uhr</p>
                 <p><span className="text-gold-primary uppercase font-cinzel text-xs font-bold mr-2">Gewölbe:</span> {lastCreated.vault}</p>
@@ -767,7 +778,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     <Phone className="h-3.5 w-3.5 text-gold-primary shrink-0" />
                     <span>
                       Tavernen-Telefon:{' '}
-                      <a href="tel:035835495389" className="text-gold-bright hover:text-gold-primary underline font-bold">
+                      <a href="tel:035835495389" onClick={trackPhoneCallClick} className="text-gold-bright hover:text-gold-primary underline font-bold">
                         03583 5495389
                       </a>
                     </span>
@@ -790,7 +801,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     </p>
                     <p>
                       • <strong className="text-gold-bright">Persönlich Bescheid geben:</strong> Ruft uns gern direkt unter{' '}
-                      <a href="tel:035835495389" className="text-gold-bright hover:text-gold-primary underline font-bold">
+                      <a href="tel:035835495389" onClick={trackPhoneCallClick} className="text-gold-bright hover:text-gold-primary underline font-bold">
                         03583 5495389
                       </a>{' '}
                       an – besonders bei kurzfristigen Änderungen oder veränderter Gästeanzahl.
@@ -854,6 +865,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     Ruft unsere Wirtsleute direkt in der Taverne an:{' '}
                     <a 
                       href="tel:035835495389" 
+                      onClick={trackPhoneCallClick}
                       className="font-bold text-gold-bright hover:text-gold-primary underline tracking-wider inline-flex items-center gap-1"
                     >
                       03583 5495389
@@ -893,9 +905,9 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   <div className="flex flex-col space-y-2">
                     <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
-                        <Phone className="h-3.5 w-3.5" /> {isLargeGroup ? 'Handynummer *' : 'Telefonnummer'}
+                        <Phone className="h-3.5 w-3.5" /> {isInquiry ? 'Handynummer *' : 'Telefonnummer'}
                       </span>
-                      {isLargeGroup ? (
+                      {isInquiry ? (
                         <span className="text-[10px] font-normal lowercase text-gold-bright tracking-normal">
                           (Pflichtfeld für Rückruf)
                         </span>
@@ -908,12 +920,12 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     <input
                       id="input-phone"
                       type="tel"
-                      required={isLargeGroup}
-                      placeholder={isLargeGroup ? 'z.B. 0170 1234567 (für telefonischen Rückruf)' : 'z.B. 0170 1234567'}
+                      required={isInquiry}
+                      placeholder={isInquiry ? 'z.B. 0170 1234567 (für telefonischen Rückruf)' : 'z.B. 0170 1234567'}
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       className={`border-0 border-b-2 bg-transparent py-2 font-serif text-base text-cream-parchment placeholder:text-cream-parchment/30 outline-none transition-all ${
-                        isLargeGroup
+                        isInquiry
                           ? 'border-gold-primary/80 focus:border-gold-bright focus:drop-shadow-[0_4px_6px_rgba(212,175,55,0.25)]'
                           : 'border-gold-secondary/40 focus:border-gold-primary focus:drop-shadow-[0_4px_6px_rgba(212,175,55,0.15)]'
                       }`}
@@ -927,9 +939,9 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   <div className="flex flex-col space-y-2">
                     <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase flex items-center justify-between">
                       <span>Anzahl Gefährten *</span>
-                      {isLargeGroup && (
+                      {isInquiry && (
                         <span className="text-[10px] text-gold-bright font-normal uppercase tracking-wider">
-                          [Anfrage]
+                          {isLargeGroup ? '[Großgruppe]' : '[Anfrage]'}
                         </span>
                       )}
                     </label>
@@ -940,12 +952,12 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                         onChange={(e) => setGuests(parseInt(e.target.value))}
                         className="w-full appearance-none border-0 border-b-2 border-gold-secondary/40 bg-tavern-dark py-3 pr-10 pl-2 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary transition-all cursor-pointer"
                       >
-                        {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
+                        {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
                           <option key={num} value={num} className="bg-void-black text-cream-parchment py-2">
-                            {num === 12
-                              ? '12+ Ritter / Ladies (Großgruppen-Anfrage)'
-                              : num === 11
-                              ? '11 Ritter / Ladies [Anfrage]'
+                            {num === 20
+                              ? '20+ (Großgruppen-Anfrage)'
+                              : num >= 11
+                              ? `${num} Ritter / Ladies [Anfrage]`
                               : num === 1
                               ? '1 Ritter / Ladie'
                               : `${num} Ritter / Ladies`}
@@ -955,6 +967,10 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                       <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gold-secondary" />
                     </div>
                     {isLargeGroup ? (
+                      <p className="text-[11px] font-serif italic text-gold-bright leading-tight pt-1">
+                        * Ab 20 Personen als Großgruppen-Anfrage: Bitte Handynummer angeben. Wir melden uns zeitnah persönlich zur Abstimmung.
+                      </p>
+                    ) : isInquiry ? (
                       <p className="text-[11px] font-serif italic text-gold-bright leading-tight pt-1">
                         * Ab 11 Personen als Voranfrage: Bitte Handynummer angeben. Wir melden uns zeitnah persönlich zur Abstimmung.
                       </p>
@@ -1072,22 +1088,24 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     )}
                     {date && !isTuesdaySelected && selectedDayConfig?.isOpen && (
                       <p className="text-[11px] font-serif italic text-cream-parchment/60 leading-tight pt-1">
-                        * Küchenschluss um {selectedDayConfig.kitchenClose} Uhr (1 Std. vor Schließung um {selectedDayConfig.close} Uhr).
+                        * Küchenschluss abends 1 Stunde vor Schließung{selectedDayOfWeek === 0 ? ' (20:00 Uhr)' : ' (21:00 Uhr)'}.
                       </p>
                     )}
                   </div>
                 </div>
 
                 {/* Large group inquiry info banner */}
-                {isLargeGroup && (
+                {isInquiry && (
                   <div className="p-4 border border-gold-primary/50 bg-gold-primary/10 rounded flex items-start space-x-3 animate-in fade-in duration-200">
                     <Sparkles className="h-5 w-5 text-gold-primary shrink-0 mt-0.5" />
                     <div>
                       <p className="font-bold font-cinzel text-xs text-gold-bright tracking-wide uppercase">
-                        Voranfrage für Großgruppen ({guests >= 12 ? '12+' : guests} Gefährten)
+                        {isLargeGroup ? 'Großgruppen-Anfrage (20+ Gefährten)' : `Voranfrage (${guests} Gefährten)`}
                       </p>
                       <p className="mt-1 text-xs md:text-sm font-serif text-cream-parchment/90 leading-relaxed">
-                        Für größere Bünde bereiten wir die Hoftafel individuell vor. Daher ist die Angabe Eurer Handynummer erforderlich. Wir rufen Euch schnellstmöglich persönlich an, um Tischordnung, Speisenfolge und alle Wünsche abzustimmen.
+                        {isLargeGroup
+                          ? 'Für Gesellschaften ab 20 Personen bereiten wir die Hoftafel individuell vor. Daher ist die Angabe Eurer Handynummer erforderlich. Wir rufen Euch schnellstmöglich persönlich an, um Tischordnung, Speisenfolge und alle Wünsche abzustimmen.'
+                          : 'Für Gruppen ab 11 Personen bereiten wir die Hoftafel individuell vor. Daher ist die Angabe Eurer Handynummer erforderlich. Wir rufen Euch schnellstmöglich persönlich an, um Tischordnung, Speisenfolge und alle Wünsche abzustimmen.'}
                       </p>
                     </div>
                   </div>
@@ -1172,10 +1190,14 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     ? 'Brieftaube fliegt...'
                     : isLargeGroup
                     ? 'Großgruppen-Anfrage absenden'
+                    : isInquiry
+                    ? 'Voranfrage absenden'
                     : 'Tischvertragsbrief absenden'}
                 </button>
                 <p className="text-[11px] font-serif italic text-cream-parchment/50 mt-3 max-w-md mx-auto">
                   {isLargeGroup
+                    ? 'Bei Gesellschaften ab 20 Gefährten handelt es sich um eine Großgruppen-Anfrage. Unsere Wirtsleute prüfen den Termin und melden sich schnellstmöglich telefonisch bei Euch, um alles Weitere persönlich zu besprechen.'
+                    : isInquiry
                     ? 'Bei Gruppen ab 11 Gefährten handelt es sich um eine Voranfrage. Unsere Wirtsleute prüfen den Termin und melden sich schnellstmöglich telefonisch bei Euch, um alles Weitere persönlich zu besprechen.'
                     : 'Mit Absenden haltet Ihr Eurem Bund die Plätze frei. Sollte sich Euer Plan ändern, bitten wir um baldigste Nachricht oder Stornierung.'}
                 </p>
@@ -1246,10 +1268,10 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 {searchedReservation.email && <p><strong>E-Mail:</strong> {searchedReservation.email}</p>}
                 <p>
                   <strong>{searchedReservation.guests === 1 ? 'Ritter / Ladie:' : 'Ritter / Ladies:'}</strong>{' '}
-                  {searchedReservation.guests >= 12
-                    ? '12+ Personen (Großgruppen-Anfrage)'
+                  {searchedReservation.guests >= 20
+                    ? '20+ Personen (Großgruppen-Anfrage)'
                     : searchedReservation.guests >= 11
-                    ? `${searchedReservation.guests} Personen (Großgruppen-Anfrage)`
+                    ? `${searchedReservation.guests} Personen (Voranfrage)`
                     : searchedReservation.guests === 1
                     ? '1 Person'
                     : `${searchedReservation.guests} Personen`}

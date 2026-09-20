@@ -187,11 +187,25 @@ function getMonthOccupancySummary(PDO $pdo, string $yearMonth, array $openingHou
             continue;
         }
 
-        // Maximale Slots des Tages ermitteln
-        list($openH, $openM) = explode(':', $config['open']);
-        list($lastH, $lastM) = explode(':', $config['lastSlot']);
-        $slotMinutes = ((int)$lastH * 60 + (int)$lastM) - ((int)$openH * 60 + (int)$openM);
-        $totalSlots = max(1, floor($slotMinutes / 30) + 1);
+        // Maximale Slots des Tages ermitteln (unter Berücksichtigung von geteilten Schichten)
+        $totalSlots = 0;
+        if (!empty($config['shifts']) && is_array($config['shifts'])) {
+            foreach ($config['shifts'] as $shift) {
+                if (!empty($shift['open']) && !empty($shift['lastSlot'])) {
+                    list($openH, $openM) = explode(':', $shift['open']);
+                    list($lastH, $lastM) = explode(':', $shift['lastSlot']);
+                    $slotMinutes = ((int)$lastH * 60 + (int)$lastM) - ((int)$openH * 60 + (int)$openM);
+                    $totalSlots += max(1, floor($slotMinutes / 30) + 1);
+                }
+            }
+        } elseif (!empty($config['open']) && !empty($config['lastSlot'])) {
+            list($openH, $openM) = explode(':', $config['open']);
+            list($lastH, $lastM) = explode(':', $config['lastSlot']);
+            $slotMinutes = ((int)$lastH * 60 + (int)$lastM) - ((int)$openH * 60 + (int)$openM);
+            $totalSlots = max(1, floor($slotMinutes / 30) + 1);
+        } else {
+            $totalSlots = 1;
+        }
         $maxCapacity = $totalSlots * STANDARD_SLOT_CAPACITY; // Standard 10 pro Slot
 
         $daySlotsData = $daySlotMap[$curDate] ?? [];

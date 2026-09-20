@@ -16,13 +16,55 @@ require_once __DIR__ . '/db.php';
 // Öffnungszeiten-Definition (Analog zu frontend openingHours.ts)
 // 0 = Sonntag, 1 = Montag, ..., 6 = Samstag
 $OPENING_HOURS = [
-    0 => ['isOpen' => true,  'open' => '11:00', 'close' => '21:00', 'lastSlot' => '20:00', 'label' => 'So: 11:00–21:00 Uhr'],
-    1 => ['isOpen' => true,  'open' => '17:00', 'close' => '22:00', 'lastSlot' => '21:00', 'label' => 'Mo: 17:00–22:00 Uhr'],
-    2 => ['isOpen' => false, 'open' => '',      'close' => '',      'lastSlot' => '',      'label' => 'Di: Ruhetag (Geschlossen)'],
-    3 => ['isOpen' => true,  'open' => '17:00', 'close' => '22:00', 'lastSlot' => '21:00', 'label' => 'Mi: 17:00–22:00 Uhr'],
-    4 => ['isOpen' => true,  'open' => '17:00', 'close' => '22:00', 'lastSlot' => '21:00', 'label' => 'Do: 17:00–22:00 Uhr'],
-    5 => ['isOpen' => true,  'open' => '17:00', 'close' => '22:00', 'lastSlot' => '21:00', 'label' => 'Fr: 17:00–22:00 Uhr'],
-    6 => ['isOpen' => true,  'open' => '11:00', 'close' => '22:00', 'lastSlot' => '21:00', 'label' => 'Sa: 11:00–22:00 Uhr'],
+    0 => [
+        'isOpen' => true,
+        'shifts' => [
+            ['open' => '11:00', 'close' => '14:00', 'lastSlot' => '13:30', 'name' => 'Mittag'],
+            ['open' => '17:00', 'close' => '21:00', 'kitchenClose' => '20:00', 'lastSlot' => '20:00', 'name' => 'Abend'],
+        ],
+        'label'  => 'So: 11:00–14:00 & 17:00–21:00 Uhr'
+    ],
+    1 => [
+        'isOpen' => true,
+        'shifts' => [
+            ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+        ],
+        'label'  => 'Mo: 17:00–22:00 Uhr'
+    ],
+    2 => [
+        'isOpen' => false,
+        'shifts' => [],
+        'label'  => 'Di: Ruhetag (Geschlossen)'
+    ],
+    3 => [
+        'isOpen' => true,
+        'shifts' => [
+            ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+        ],
+        'label'  => 'Mi: 17:00–22:00 Uhr'
+    ],
+    4 => [
+        'isOpen' => true,
+        'shifts' => [
+            ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+        ],
+        'label'  => 'Do: 17:00–22:00 Uhr'
+    ],
+    5 => [
+        'isOpen' => true,
+        'shifts' => [
+            ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+        ],
+        'label'  => 'Fr: 17:00–22:00 Uhr'
+    ],
+    6 => [
+        'isOpen' => true,
+        'shifts' => [
+            ['open' => '11:00', 'close' => '14:00', 'lastSlot' => '13:30', 'name' => 'Mittag'],
+            ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+        ],
+        'label'  => 'Sa: 11:00–14:00 & 17:00–22:00 Uhr'
+    ],
 ];
 
 $message = null;
@@ -63,17 +105,32 @@ function getSlotsForDate(string $dateStr, array $openingHoursConfig): array {
     if (!$config || !$config['isOpen']) return [];
 
     $slots = [];
-    list($openH, $openM) = explode(':', $config['open']);
-    list($lastH, $lastM) = explode(':', $config['lastSlot']);
-
-    $currentMin = (int)$openH * 60 + (int)$openM;
-    $endMin = (int)$lastH * 60 + (int)$lastM;
-
-    while ($currentMin <= $endMin) {
-        $h = floor($currentMin / 60);
-        $m = $currentMin % 60;
-        $slots[] = sprintf('%02d:%02d', $h, $m);
-        $currentMin += 30;
+    if (!empty($config['shifts']) && is_array($config['shifts'])) {
+        foreach ($config['shifts'] as $shift) {
+            if (!empty($shift['open']) && !empty($shift['lastSlot'])) {
+                list($openH, $openM) = explode(':', $shift['open']);
+                list($lastH, $lastM) = explode(':', $shift['lastSlot']);
+                $currentMin = (int)$openH * 60 + (int)$openM;
+                $endMin = (int)$lastH * 60 + (int)$lastM;
+                while ($currentMin <= $endMin) {
+                    $h = floor($currentMin / 60);
+                    $m = $currentMin % 60;
+                    $slots[] = sprintf('%02d:%02d', $h, $m);
+                    $currentMin += 30;
+                }
+            }
+        }
+    } elseif (!empty($config['open']) && !empty($config['lastSlot'])) {
+        list($openH, $openM) = explode(':', $config['open']);
+        list($lastH, $lastM) = explode(':', $config['lastSlot']);
+        $currentMin = (int)$openH * 60 + (int)$openM;
+        $endMin = (int)$lastH * 60 + (int)$lastM;
+        while ($currentMin <= $endMin) {
+            $h = floor($currentMin / 60);
+            $m = $currentMin % 60;
+            $slots[] = sprintf('%02d:%02d', $h, $m);
+            $currentMin += 30;
+        }
     }
     return $slots;
 }
@@ -99,7 +156,7 @@ if ($isLoggedIn) {
         $rGuests = max(1, intval($_POST['guests'] ?? 1));
         $rName   = trim(strip_tags($_POST['name'] ?? 'Telefon-Buchung'));
         $rPhone  = trim(strip_tags($_POST['phone'] ?? ''));
-        $rVault  = trim(strip_tags($_POST['vault'] ?? 'Gewölbe'));
+        $rVault  = trim(strip_tags($_POST['vault'] ?? 'Die Grosse Kathedrale'));
         $rNotes  = trim(strip_tags($_POST['notes'] ?? 'Manuell im Tischplan eingetragen'));
 
         if (empty($rDate) || empty($rTime) || empty($rName)) {
@@ -133,32 +190,47 @@ if ($isLoggedIn) {
         }
     }
 
-    // 4. 1-Klick Komplettsperre für einen Zeitslot (0 Gäste, status = 'blocked')
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'block_slot') {
+    // 4. 1-Klick / Checkbox Sofortsperre für 30-Minuten-Slots
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array($_POST['action'], ['toggle_slot_block', 'block_slot'], true)) {
         $rDate = trim($_POST['date'] ?? $selectedDate);
         $rTime = trim($_POST['time'] ?? '');
+        $targetState = isset($_POST['blocked']) ? (int)$_POST['blocked'] : -1;
 
         if (empty($rDate) || empty($rTime)) {
-            $message = 'Datum und Uhrzeit für die Sperre erforderlich.';
+            $message = 'Datum und Uhrzeit für die Slot-Sperre erforderlich.';
             $messageType = 'error';
         } else {
             try {
-                $newId = 'DRAK-LOCK-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 6));
-                $stmt = $pdo->prepare("
-                    INSERT INTO reservations (id, name, phone, email, guests, date, time, vault, notes, status)
-                    VALUES (:id, '🔒 Slot gesperrt (Wirt)', '', '', 0, :date, :time, 'Komplett', 'Slot-Sperre durch Wirt', 'blocked')
-                ");
-                $stmt->execute([
-                    ':id'   => $newId,
-                    ':date' => $rDate,
-                    ':time' => $rTime,
-                ]);
-                $message = "Der Zeitslot um {$rTime} Uhr wurde für Online-Buchungen gesperrt (0 Gäste gebucht).";
-                $messageType = 'success';
+                // Prüfen ob bereits gesperrt
+                $checkStmt = $pdo->prepare("SELECT id FROM reservations WHERE date = :date AND time = :time AND status = 'blocked'");
+                $checkStmt->execute([':date' => $rDate, ':time' => $rTime]);
+                $existingLock = $checkStmt->fetch();
+
+                if ($existingLock && ($targetState === 0 || ($targetState === -1 && $_POST['action'] === 'toggle_slot_block'))) {
+                    // Sperre aufheben
+                    $delStmt = $pdo->prepare("DELETE FROM reservations WHERE id = :id");
+                    $delStmt->execute([':id' => $existingLock['id']]);
+                    $message = "Der Zeitslot um {$rTime} Uhr wurde freigegeben (Sperre aufgehoben).";
+                    $messageType = 'success';
+                } elseif (!$existingLock && ($targetState === 1 || $targetState === -1)) {
+                    // Sperre neu setzen
+                    $newId = 'DRAK-LOCK-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 6));
+                    $stmt = $pdo->prepare("
+                        INSERT INTO reservations (id, name, phone, email, guests, date, time, vault, notes, status)
+                        VALUES (:id, '🔒 Slot gesperrt (Wirt)', '', '', 0, :date, :time, 'Komplett', 'Slot-Sperre durch Wirt', 'blocked')
+                    ");
+                    $stmt->execute([
+                        ':id'   => $newId,
+                        ':date' => $rDate,
+                        ':time' => $rTime,
+                    ]);
+                    $message = "Der Zeitslot um {$rTime} Uhr wurde gesperrt.";
+                    $messageType = 'success';
+                }
                 $selectedDate = $rDate;
                 $selectedMonth = substr($rDate, 0, 7);
             } catch (Exception $e) {
-                $message = 'Fehler beim Sperren des Slots: ' . $e->getMessage();
+                $message = 'Fehler beim Bearbeiten der Slot-Sperre: ' . $e->getMessage();
                 $messageType = 'error';
             }
         }
@@ -215,6 +287,72 @@ if ($isLoggedIn) {
             $totalBookingsDay++;
         }
     }
+}
+
+/**
+ * Hilfsfunktion zum Rendern einer einzelnen Reservierungszeile
+ */
+function renderReservationRow(array $res, string $selectedDate): void {
+    $isLock = ($res['status'] === 'blocked') || str_starts_with($res['id'], 'DRAK-LOCK');
+    $isPhone = str_contains($res['notes'], 'Telefon') || str_starts_with($res['id'], 'DRAK-MAN');
+    $timeStr = htmlspecialchars($res['time']);
+    $nameStr = htmlspecialchars($res['name']);
+    $guests = (int)$res['guests'];
+    ?>
+    <div class="res-item-row <?= $isLock ? 'row-lock' : '' ?>">
+        <div class="res-item-main">
+            <div class="res-time-pill">
+                <span>⏰</span>
+                <span><?= $timeStr ?> Uhr</span>
+            </div>
+
+            <?php if ($isLock): ?>
+                <span class="res-guests-pill pill-lock">🔒 Sperre</span>
+            <?php else: ?>
+                <span class="res-guests-pill"><?= $guests ?> <?= $guests === 1 ? 'Person' : 'Personen' ?></span>
+            <?php endif; ?>
+
+            <div class="res-guest-details">
+                <div class="res-guest-name-line">
+                    <?php if ($isLock): ?>
+                        <span class="res-guest-name" style="color: #fca5a5;">Tisch / Slot gesperrt durch Wirt</span>
+                        <span class="res-tag tag-lock">🔒 Sperre</span>
+                    <?php else: ?>
+                        <span class="res-guest-name"><?= $nameStr ?></span>
+                        <?php if ($isPhone): ?>
+                            <span class="res-tag tag-phone">📞 Manuell</span>
+                        <?php else: ?>
+                            <span class="res-tag tag-online">🌐 Online</span>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+
+                <div class="res-sub-meta">
+                    <?php if (!empty($res['phone'])): ?>
+                        <span>📞 <a href="tel:<?= htmlspecialchars($res['phone']) ?>"><?= htmlspecialchars($res['phone']) ?></a></span>
+                    <?php endif; ?>
+                    <?php if (!empty($res['vault']) && $res['vault'] !== 'Komplett'): ?>
+                        <span>📍 <?= htmlspecialchars($res['vault']) ?></span>
+                    <?php endif; ?>
+                    <?php if (!empty($res['notes']) && $res['notes'] !== 'Keine Sonderwünsche' && !$isLock): ?>
+                        <span>📝 <?= htmlspecialchars($res['notes']) ?></span>
+                    <?php endif; ?>
+                    <span style="font-size: 0.78rem; opacity: 0.6;">(ID: <?= htmlspecialchars($res['id']) ?>)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lösch-Button -->
+        <form method="POST" action="tischplan.php" onsubmit="return confirm('<?= $isLock ? "Möchtest du diese Slot-Sperre aufheben? Die Plätze werden online sofort wieder freigegeben." : "Möchtest du die Reservierung für {$nameStr} ({$guests} Pers. um {$timeStr} Uhr) wirklich löschen?" ?>');">
+            <input type="hidden" name="action" value="delete_reservation">
+            <input type="hidden" name="id" value="<?= htmlspecialchars($res['id']) ?>">
+            <input type="hidden" name="date" value="<?= htmlspecialchars($selectedDate) ?>">
+            <button type="submit" class="btn btn-danger btn-sm" title="<?= $isLock ? 'Sperre aufheben' : 'Buchung löschen' ?>">
+                🗑️
+            </button>
+        </form>
+    </div>
+    <?php
 }
 
 // Datum-Hilfswerte für Vor/Zurück Navigation
@@ -640,206 +778,284 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
             color: var(--gold-bright);
         }
 
-        /* ================= SLOTS GRID ================= */
-        .slots-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 14px;
-        }
-        @media (min-width: 900px) {
-            .slots-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        /* Slot Card */
-        .slot-card {
+        /* ================= 30-MINUTEN SLOTS SCHNELLSPERRE (CHECKBOXEN) ================= */
+        .slot-lock-bar-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 6px;
-            padding: 14px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+        }
+        .slot-lock-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .slot-lock-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.05rem;
+            color: var(--gold-bright);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .slot-lock-hint {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+        .slot-checkbox-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .slot-checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 4px;
+            background: #1a1714;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            color: var(--text-cream);
+            cursor: pointer;
+            user-select: none;
+            min-height: 44px;
+            touch-action: manipulation;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s;
+        }
+        .slot-checkbox-label:active {
+            transform: scale(0.97);
+        }
+        .slot-checkbox-label:hover {
+            border-color: var(--gold-bright);
+            background: #221e1a;
+        }
+        .slot-checkbox-label.is-blocked {
+            background: rgba(239, 68, 68, 0.18);
+            border-color: rgba(239, 68, 68, 0.6);
+            color: #fca5a5;
+        }
+        .slot-checkbox-label.is-blocked:hover {
+            background: rgba(239, 68, 68, 0.28);
+            border-color: var(--danger);
+        }
+        .slot-checkbox-input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--danger);
+        }
+        .slot-time-text {
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        /* ================= RESERVIERUNGSLISTE (TAGESÜBERSICHT) ================= */
+        .res-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .res-list-topbar {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .res-list-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.15rem;
+            color: var(--gold-bright);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .res-shift-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
-            position: relative;
-        }
-        .slot-card.status-full {
-            border-color: rgba(239, 68, 68, 0.5);
-            background: #191211;
-        }
-        .slot-card.status-blocked {
-            border-color: rgba(239, 68, 68, 0.7);
-            background: #201111;
-        }
-        .slot-card.status-partial {
-            border-color: rgba(234, 179, 8, 0.5);
-            background: #171511;
-        }
-        .slot-card.status-free {
-            border-color: rgba(16, 185, 129, 0.35);
         }
 
-        .slot-header {
+        .res-shift-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 8px;
         }
-        .slot-time {
+
+        .res-shift-title {
             font-family: 'Cinzel', serif;
-            font-size: 1.35rem;
-            font-weight: 900;
-            color: var(--text-cream);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .slot-time .clock-icon {
+            font-size: 1.05rem;
             color: var(--gold-bright);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .slot-status-pill {
+        .res-shift-badge {
+            font-size: 0.8rem;
+            color: var(--text-muted);
             font-family: 'Cinzel', serif;
-            font-size: 0.78rem;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .pill-free {
-            background: var(--success-bg);
-            border: 1px solid var(--success);
-            color: #6ee7b7;
-        }
-        .pill-partial {
-            background: var(--warning-bg);
-            border: 1px solid var(--warning);
-            color: #fde047;
-        }
-        .pill-full {
-            background: var(--danger-bg);
-            border: 1px solid var(--danger);
-            color: #fca5a5;
         }
 
-        /* Capacity Progress Bar */
-        .capacity-bar-wrap {
-            width: 100%;
-            height: 8px;
-            background: #25221d;
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-        }
-        .capacity-bar-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
-        .fill-free { background: var(--success); }
-        .fill-partial { background: var(--warning); }
-        .fill-full { background: var(--danger); }
-
-        /* Bookings List inside Slot */
-        .slot-bookings-list {
+        .res-items-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            background: rgba(0, 0, 0, 0.35);
-            border-radius: 4px;
-            padding: 8px;
-            min-height: 52px;
-        }
-        .no-bookings-txt {
-            color: var(--text-muted);
-            font-style: italic;
-            font-size: 0.9rem;
-            text-align: center;
-            margin: auto 0;
-            padding: 6px;
+            gap: 10px;
         }
 
-        .booking-row {
+        .res-item-row {
+            background: #181512;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 5px;
+            padding: 12px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
-            background: #1c1916;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 8px 10px;
-            border-radius: 4px;
+            gap: 12px;
+            transition: border-color 0.15s, background 0.15s;
         }
-        .booking-row.row-lock {
+        .res-item-row:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            background: #1e1a16;
+        }
+        .res-item-row.row-lock {
             border-color: rgba(239, 68, 68, 0.4);
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(239, 68, 68, 0.08);
         }
 
-        .booking-info {
+        .res-item-main {
             display: flex;
-            flex-direction: column;
-            gap: 2px;
+            align-items: center;
+            gap: 14px;
             flex: 1;
             min-width: 0;
+            flex-wrap: wrap;
         }
-        .booking-main-line {
+
+        .res-time-pill {
+            font-family: 'Cinzel', serif;
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--gold-bright);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--card-border);
+            padding: 6px 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .res-guests-pill {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 0.88rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            background: var(--gold-dim);
+            color: #fff;
+            border: 1px solid var(--gold-bright);
+        }
+        .res-guests-pill.pill-lock {
+            background: var(--danger);
+            border-color: #f87171;
+        }
+
+        .res-guest-details {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .res-guest-name-line {
             display: flex;
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
         }
-        .booking-guests-badge {
-            background: var(--gold-dim);
-            color: #fff;
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            font-size: 0.8rem;
-            padding: 2px 7px;
-            border-radius: 3px;
-        }
-        .badge-lock {
-            background: var(--danger);
-            color: #fff;
-        }
-        .booking-name {
+
+        .res-guest-name {
+            font-size: 1.05rem;
             font-weight: 600;
             color: var(--text-cream);
-            font-size: 0.95rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
-        .booking-type-tag {
+
+        .res-tag {
             font-size: 0.72rem;
-            padding: 1px 6px;
+            padding: 2px 7px;
             border-radius: 3px;
             font-family: 'Cinzel', serif;
+            font-weight: 700;
         }
-        .tag-phone { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #93c5fd; }
         .tag-online { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: #6ee7b7; }
-        .tag-lock { background: rgba(239, 68, 68, 0.25); border: 1px solid var(--danger); color: #fca5a5; font-weight: 700; }
+        .tag-phone { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #93c5fd; }
+        .tag-lock { background: rgba(239, 68, 68, 0.25); border: 1px solid var(--danger); color: #fca5a5; }
 
-        .booking-sub-line {
+        .res-sub-meta {
             display: flex;
-            gap: 10px;
-            font-size: 0.82rem;
-            color: var(--text-muted);
             align-items: center;
+            gap: 12px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
         }
-        .booking-sub-line a {
+        .res-sub-meta a {
             color: var(--gold-bright);
             text-decoration: none;
         }
-
-        /* Slot Action Buttons */
-        .slot-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: auto;
+        .res-sub-meta a:hover {
+            text-decoration: underline;
         }
-        .slot-actions .btn {
-            flex: 1;
-            min-height: 42px;
-            font-size: 0.82rem;
+
+        .res-empty-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 36px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+        .res-empty-icon {
+            font-size: 2.2rem;
+            opacity: 0.8;
+        }
+        .res-empty-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--gold-bright);
+        }
+        .res-empty-sub {
+            color: var(--text-muted);
+            max-width: 480px;
+            font-size: 0.95rem;
         }
 
         /* Modal Popup (for new booking) */
@@ -1181,162 +1397,171 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
             </div>
         </div>
 
-        <!-- ZEITSLOT ÜBERSICHT -->
-        <?php if (empty($daySlots)): ?>
-            <div style="background: var(--card-bg); border: 1px solid var(--card-border); padding: 30px; text-align: center; border-radius: 6px;">
-                <p style="font-size: 1.1rem; color: var(--gold-bright); margin-bottom: 12px;">
-                    Für diesen Tag sind laut regulärem Öffnungsplan keine Standard-Zeitslots eingerichtet.
-                </p>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">
-                    Möchtest du trotzdem eine Sonderbuchung oder Sperre eintragen?
-                </p>
+        <!-- 30-MINUTEN SLOTS SCHNELLSPERRE (CHECKBOXEN) -->
+        <?php if (!empty($daySlots)): ?>
+            <div class="slot-lock-bar-card">
+                <div class="slot-lock-header">
+                    <span class="slot-lock-title">
+                        <span>🔒</span>
+                        <span>30-Minuten Slots sperren / freigeben:</span>
+                    </span>
+                    <span class="slot-lock-hint">
+                        💡 Checkbox anklicken: Angehakt = Slot gesperrt | Nicht angehakt = Slot frei
+                    </span>
+                </div>
+
+                <form method="POST" action="tischplan.php" id="slotToggleForm" style="display:none;">
+                    <input type="hidden" name="action" value="toggle_slot_block">
+                    <input type="hidden" name="date" value="<?= htmlspecialchars($selectedDate) ?>">
+                    <input type="hidden" name="time" id="toggleTimeInput" value="">
+                    <input type="hidden" name="blocked" id="toggleBlockedInput" value="">
+                </form>
+
+                <div class="slot-checkbox-grid">
+                    <?php foreach ($daySlots as $slotTime): ?>
+                        <?php
+                        $isBlocked = !empty($occupancy[$slotTime]['is_blocked']);
+                        $bookedGuests = !empty($occupancy[$slotTime]['total_guests']) ? (int)$occupancy[$slotTime]['total_guests'] : 0;
+                        ?>
+                        <label class="slot-checkbox-label <?= $isBlocked ? 'is-blocked' : '' ?>" title="<?= $isBlocked ? 'Slot ist gesperrt (Klicken zum Freigeben)' : 'Slot ist frei (Klicken zum Sperren)' ?>">
+                            <input type="checkbox" 
+                                   class="slot-checkbox-input" 
+                                   <?= $isBlocked ? 'checked' : '' ?> 
+                                   onchange="toggleSlot('<?= htmlspecialchars($slotTime) ?>', this.checked ? 1 : 0)">
+                            <span class="slot-time-text">
+                                <?php if ($isBlocked): ?>
+                                    🔒 <?= htmlspecialchars($slotTime) ?> <small style="font-size: 0.72rem; opacity: 0.9;">(Gesperrt)</small>
+                                <?php else: ?>
+                                    <?= htmlspecialchars($slotTime) ?>
+                                    <?php if ($bookedGuests > 0): ?>
+                                        <small style="font-size: 0.72rem; opacity: 0.75; color: var(--gold-bright);">(<?= $bookedGuests ?>G)</small>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- TAGES-RESERVIERUNGSLISTE (KEINE STARREN SLOTS MEHR) -->
+        <div class="res-list-container">
+            <div class="res-list-topbar">
+                <div class="res-list-title">
+                    <span>📋</span>
+                    <span>Reservierungen (<?= count($reservationsList) ?> Buchungen · <?= $totalGuestsDay ?> Gäste)</span>
+                </div>
                 <button type="button" class="btn btn-gold" onclick="openBookingModal('<?= htmlspecialchars($selectedDate) ?>', '18:00')">
-                    ➕ Sonderbuchung eintragen
+                    ➕ Neue Reservierung eintragen
                 </button>
             </div>
-        <?php else: ?>
-            <div class="slots-grid">
-                <?php foreach ($daySlots as $slotTime): ?>
-                    <?php
-                    $slotInfo = $occupancy[$slotTime] ?? [
-                        'total_guests' => 0, 
-                        'booking_count' => 0, 
-                        'has_large_group' => false,
-                        'is_blocked' => false
-                    ];
-                    $booked = (int)$slotInfo['total_guests'];
-                    $count = (int)$slotInfo['booking_count'];
-                    $hasLarge = (bool)$slotInfo['has_large_group'];
-                    $isBlocked = !empty($slotInfo['is_blocked']);
 
-                    // Slot ist voll/gesperrt, wenn durch Wirt gesperrt, Großgruppe oder 10 Gäste erreicht
-                    $isFull = $isBlocked || $hasLarge || ($count > 0 && $booked >= STANDARD_SLOT_CAPACITY);
-                    $remaining = $isFull ? 0 : max(0, STANDARD_SLOT_CAPACITY - $booked);
+            <?php if (empty($reservationsList)): ?>
+                <div class="res-empty-box">
+                    <div class="res-empty-icon">📜</div>
+                    <div class="res-empty-title">Für diesen Tag liegen noch keine Reservierungen vor.</div>
+                    <div class="res-empty-sub">
+                        Tippe auf den Button, um telefonische Reservierungen, Vor-Ort-Gäste oder eine Tisch-Sperre für diesen Tag einzutragen.
+                    </div>
+                    <button type="button" class="btn btn-gold" onclick="openBookingModal('<?= htmlspecialchars($selectedDate) ?>', '18:00')">
+                        ➕ Reservierung eintragen
+                    </button>
+                </div>
+            <?php else: ?>
+                <?php
+                // Prüfen ob geteilte Schichten vorliegen (z.B. Sa & So)
+                $hasShifts = !empty($dayConfig['shifts']) && count($dayConfig['shifts']) > 1;
 
-                    $bookings = $reservationsBySlot[$slotTime] ?? [];
-
-                    // Status-Klasse bestimmen (3-Farben-Modell)
-                    if ($isBlocked) {
-                        $cardClass = 'status-blocked';
-                        $pillClass = 'pill-full';
-                        $pillText = '🔒 Gesperrt durch Wirt';
-                        $fillClass = 'fill-full';
-                        $fillPercent = 100;
-                    } elseif ($isFull) {
-                        $cardClass = 'status-full';
-                        $pillClass = 'pill-full';
-                        $pillText = $hasLarge ? 'Großgruppe (Voll)' : 'Ausgebucht (0 frei)';
-                        $fillClass = 'fill-full';
-                        $fillPercent = 100;
-                    } elseif ($booked > 0) {
-                        $cardClass = 'status-partial';
-                        $pillClass = 'pill-partial';
-                        $pillText = "{$booked}/10 belegt ({$remaining} frei)";
-                        $fillClass = 'fill-partial';
-                        $fillPercent = min(100, ($booked / STANDARD_SLOT_CAPACITY) * 100);
-                    } else {
-                        $cardClass = 'status-free';
-                        $pillClass = 'pill-free';
-                        $pillText = 'Frei (10 Plätze)';
-                        $fillClass = 'fill-free';
-                        $fillPercent = 0;
+                if ($hasShifts):
+                    $lunchReservations = [];
+                    $dinnerReservations = [];
+                    foreach ($reservationsList as $res) {
+                        $t = trim($res['time']);
+                        if ($t < '16:00') {
+                            $lunchReservations[] = $res;
+                        } else {
+                            $dinnerReservations[] = $res;
+                        }
                     }
-                    ?>
-                    <div class="slot-card <?= $cardClass ?>">
-                        <!-- Header -->
-                        <div class="slot-header">
-                            <div class="slot-time">
-                                <span class="clock-icon">⏰</span>
-                                <span><?= htmlspecialchars($slotTime) ?> Uhr</span>
+                ?>
+                    <!-- ☀️ MITTAGSSCHICHT -->
+                    <div class="res-shift-card">
+                        <div class="res-shift-header">
+                            <div class="res-shift-title">
+                                <span>☀️</span>
+                                <span>Mittagsschicht (11:00 – 14:00 Uhr)</span>
                             </div>
-                            <span class="slot-status-pill <?= $pillClass ?>">
-                                <?= htmlspecialchars($pillText) ?>
+                            <span class="res-shift-badge">
+                                <?= count($lunchReservations) ?> Buchungen
                             </span>
                         </div>
 
-                        <!-- Kapazitätsbalken -->
-                        <div class="capacity-bar-wrap">
-                            <div class="capacity-bar-fill <?= $fillClass ?>" style="width: <?= $fillPercent ?>%;"></div>
-                        </div>
-
-                        <!-- Buchungsliste in diesem Slot -->
-                        <div class="slot-bookings-list">
-                            <?php if (empty($bookings)): ?>
-                                <div class="no-bookings-txt">Noch keine Buchungen in diesem Slot</div>
-                            <?php else: ?>
-                                <?php foreach ($bookings as $res): ?>
-                                    <?php
-                                    $isLock = ($res['status'] === 'blocked') || str_starts_with($res['id'], 'DRAK-LOCK');
-                                    $isPhone = str_contains($res['notes'], 'Telefon') || str_starts_with($res['id'], 'DRAK-MAN');
-                                    ?>
-                                    <div class="booking-row <?= $isLock ? 'row-lock' : '' ?>">
-                                        <div class="booking-info">
-                                            <div class="booking-main-line">
-                                                <?php if ($isLock): ?>
-                                                    <span class="booking-guests-badge badge-lock">🔒 Sperre</span>
-                                                    <span class="booking-name" style="color: #fca5a5;">Slot gesperrt durch Wirt</span>
-                                                    <span class="booking-type-tag tag-lock">Keine Online-Buchung</span>
-                                                <?php else: ?>
-                                                    <span class="booking-guests-badge"><?= (int)$res['guests'] ?> Pers.</span>
-                                                    <span class="booking-name" title="<?= htmlspecialchars($res['name']) ?>">
-                                                        <?= htmlspecialchars($res['name']) ?>
-                                                    </span>
-                                                    <?php if ($isPhone): ?>
-                                                        <span class="booking-type-tag tag-phone">📞 Manuell</span>
-                                                    <?php else: ?>
-                                                        <span class="booking-type-tag tag-online">🌐 Online</span>
-                                                    <?php endif; ?>
-                                                <?php endif; ?>
-                                            </div>
-
-                                            <div class="booking-sub-line">
-                                                <?php if (!empty($res['phone'])): ?>
-                                                    <span>📞 <a href="tel:<?= htmlspecialchars($res['phone']) ?>"><?= htmlspecialchars($res['phone']) ?></a></span>
-                                                <?php endif; ?>
-                                                <?php if (!empty($res['vault']) && $res['vault'] !== 'Gewölbe' && $res['vault'] !== 'Komplett'): ?>
-                                                    <span>📍 <?= htmlspecialchars($res['vault']) ?></span>
-                                                <?php endif; ?>
-                                                <?php if (!empty($res['notes']) && $res['notes'] !== 'Keine Sonderwünsche' && !$isLock): ?>
-                                                    <span>📝 <?= htmlspecialchars($res['notes']) ?></span>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-
-                                        <!-- Lösch-Button -->
-                                        <form method="POST" action="tischplan.php" onsubmit="return confirm('<?= $isLock ? "Möchtest du diese Slot-Sperre aufheben? Der Slot wird online sofort wieder freigegeben." : "Möchtest du diese Buchung für " . htmlspecialchars($res['name']) . " wirklich löschen? Die Plätze werden online sofort wieder frei." ?>');">
-                                            <input type="hidden" name="action" value="delete_reservation">
-                                            <input type="hidden" name="id" value="<?= htmlspecialchars($res['id']) ?>">
-                                            <input type="hidden" name="date" value="<?= htmlspecialchars($selectedDate) ?>">
-                                            <button type="submit" class="btn btn-danger btn-sm" title="<?= $isLock ? 'Sperre aufheben' : 'Buchung löschen' ?>">
-                                                🗑️
-                                            </button>
-                                        </form>
-                                    </div>
+                        <?php if (empty($lunchReservations)): ?>
+                            <div style="color: var(--text-muted); font-style: italic; padding: 12px 0; text-align: center;">
+                                Keine Reservierungen für die Mittagsschicht.
+                            </div>
+                        <?php else: ?>
+                            <div class="res-items-list">
+                                <?php foreach ($lunchReservations as $res): ?>
+                                    <?php renderReservationRow($res, $selectedDate); ?>
                                 <?php endforeach; ?>
-                            <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- 🌙 ABENDSSCHICHT -->
+                    <div class="res-shift-card">
+                        <div class="res-shift-header">
+                            <div class="res-shift-title">
+                                <span>🌙</span>
+                                <span>Abendschicht (<?= $dayOfWeekSelected === 0 ? '17:00 – 21:00' : '17:00 – 22:00' ?> Uhr)</span>
+                            </div>
+                            <span class="res-shift-badge">
+                                <?= count($dinnerReservations) ?> Buchungen
+                            </span>
                         </div>
 
-                        <!-- Aktionen je Slot -->
-                        <div class="slot-actions">
-                            <button type="button" class="btn btn-gold" onclick="openBookingModal('<?= htmlspecialchars($selectedDate) ?>', '<?= htmlspecialchars($slotTime) ?>')">
-                                ➕ Belegen
-                            </button>
+                        <?php if (empty($dinnerReservations)): ?>
+                            <div style="color: var(--text-muted); font-style: italic; padding: 12px 0; text-align: center;">
+                                Keine Reservierungen für die Abendschicht.
+                            </div>
+                        <?php else: ?>
+                            <div class="res-items-list">
+                                <?php foreach ($dinnerReservations as $res): ?>
+                                    <?php renderReservationRow($res, $selectedDate); ?>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
-                            <?php if (!$isBlocked): ?>
-                                <form method="POST" action="tischplan.php" style="flex: 1; display: flex;" onsubmit="return confirm('Möchtest du den Zeitslot um <?= htmlspecialchars($slotTime) ?> Uhr komplett sperren? (Es werden 0 Gäste eingetragen, der Slot wird online sofort geschlossen).');">
-                                    <input type="hidden" name="action" value="block_slot">
-                                    <input type="hidden" name="date" value="<?= htmlspecialchars($selectedDate) ?>">
-                                    <input type="hidden" name="time" value="<?= htmlspecialchars($slotTime) ?>">
-                                    <button type="submit" class="btn btn-danger" style="width: 100%;">
-                                        🔒 Sperren
-                                    </button>
-                                </form>
-                            <?php endif; ?>
+                <?php else: ?>
+                    <!-- EINZELNE SCHICHT (Z.B. MO/MI-FR) -->
+                    <div class="res-shift-card">
+                        <div class="res-shift-header">
+                            <div class="res-shift-title">
+                                <span>🌙</span>
+                                <span>Abendschicht (17:00 – 22:00 Uhr)</span>
+                            </div>
+                            <span class="res-shift-badge">
+                                <?= count($reservationsList) ?> Buchungen · <?= $totalGuestsDay ?> Gäste
+                            </span>
+                        </div>
+
+                        <div class="res-items-list">
+                            <?php foreach ($reservationsList as $res): ?>
+                                <?php renderReservationRow($res, $selectedDate); ?>
+                            <?php endforeach; ?>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+                <?php endif; ?>
+
+                <div style="text-align: center; margin-top: 10px;">
+                    <button type="button" class="btn btn-gold" onclick="openBookingModal('<?= htmlspecialchars($selectedDate) ?>', '18:00')">
+                        ➕ Weitere Reservierung eintragen
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
 
     <?php endif; ?>
 
@@ -1359,8 +1584,21 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
                     <input type="date" id="modalDate" name="date" required class="form-control">
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label for="modalTime">Uhrzeit / Slot</label>
+                    <label for="modalTime">Uhrzeit / Termin *</label>
                     <input type="text" id="modalTime" name="time" required class="form-control" placeholder="z.B. 18:00">
+                    <div class="time-presets" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;">
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('11:30')">11:30</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('12:00')">12:00</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('12:30')">12:30</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('13:00')">13:00</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('17:00')">17:00</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('17:30')">17:30</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('18:00')">18:00</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('18:30')">18:30</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('19:00')">19:00</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('19:30')">19:30</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('20:00')">20:00</button>
+                    </div>
                 </div>
             </div>
 
@@ -1386,6 +1624,7 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
                     <button type="button" class="name-preset-btn" onclick="setNamePreset('Vor Ort / Spontan')">+ Vor Ort</button>
                     <button type="button" class="name-preset-btn" onclick="setNamePreset('Stammtisch')">+ Stammtisch</button>
                     <button type="button" class="name-preset-btn" onclick="setNamePreset('Tisch reserviert')">+ Reserviert</button>
+                    <button type="button" class="name-preset-btn" style="border-color: rgba(239,68,68,0.5); color: #fca5a5;" onclick="setLockPreset()">🔒 Tisch-Sperre</button>
                 </div>
             </div>
 
@@ -1399,10 +1638,8 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
             <div class="form-group">
                 <label for="modalVault">Bereich</label>
                 <select id="modalVault" name="vault" class="form-control">
-                    <option value="Gewölbe">Gewölbe (Standard)</option>
-                    <option value="Hauptsaal">Hauptsaal (Große Kathedrale)</option>
-                    <option value="Biergarten">Biergarten</option>
-                    <option value="Nische / Ruhig">Ruhige Nische</option>
+                    <option value="Die Grosse Kathedrale">Die Grosse Kathedrale</option>
+                    <option value="Unter den alten Linden">Unter den alten Linden</option>
                 </select>
             </div>
 
@@ -1457,6 +1694,7 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
         document.getElementById('modalName').value = '';
         document.getElementById('modalPhone').value = '';
         document.getElementById('modalNotes').value = '';
+        document.getElementById('modalVault').value = 'Die Grosse Kathedrale';
         highlightGuestBtn(2);
 
         document.getElementById('bookingModal').classList.add('active');
@@ -1499,6 +1737,15 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
         input.focus();
     }
 
+    function setTimePreset(time) {
+        document.getElementById('modalTime').value = time;
+    }
+
+    function setLockPreset() {
+        document.getElementById('modalName').value = '🔒 Tisch gesperrt (Wirt)';
+        document.getElementById('modalNotes').value = 'Sperre durch Wirt';
+    }
+
     // Modal schließen mit Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
@@ -1512,6 +1759,13 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
             closeBookingModal();
         }
     });
+
+    // 30-Minuten Slot Checkbox Umschaltung
+    function toggleSlot(slotTime, targetState) {
+        document.getElementById('toggleTimeInput').value = slotTime;
+        document.getElementById('toggleBlockedInput').value = targetState;
+        document.getElementById('slotToggleForm').submit();
+    }
 
     // Automatischer dezenter Refresh alle 60 Sekunden (damit neue Online-Buchungen erscheinen)
     let idleTimer = setTimeout(() => {

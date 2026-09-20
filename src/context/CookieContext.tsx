@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { updateGtagConsent } from '../utils/gtag';
 
 export interface CookieConsent {
   necessary: boolean;
@@ -47,6 +48,12 @@ function saveConsent(consent: CookieConsent): void {
 export function CookieProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState(loadConsent);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  useEffect(() => {
+    if (state.hasConsented) {
+      updateGtagConsent(state.consent.analytics);
+    }
+  }, [state.hasConsented, state.consent.analytics]);
 
   const acceptAll = useCallback(() => {
     const consent: CookieConsent = { necessary: true, functional: true, analytics: true };
