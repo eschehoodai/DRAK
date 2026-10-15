@@ -14,7 +14,7 @@ import ReservationView from './components/ReservationView';
 import JobsView from './components/JobsView';
 import DatenschutzView from './components/DatenschutzView';
 import NotFoundView from './components/NotFoundView';
-import { CookieBanner } from './components/CookieBanner';
+import { CookieBanner } from './components/ConsentNotice';
 import BackgroundMusic from './components/BackgroundMusic';
 import { CookieProvider } from './context/CookieContext';
 import { Screen } from './types';

@@ -90,3 +90,86 @@ body {
   right: -1px;
   border-width: 0 2px 2px 0;
 }
+
+/* ================= WINTER & FROST ANIMATIONS ================= */
+@keyframes snowfall {
+  0% {
+    transform: translateY(-24px) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.75;
+  }
+  85% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateY(420px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-snowfall {
+  animation-name: snowfall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes frost-shimmer {
+  0% {
+    transform: translateX(-160%) skewX(-25deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  30% {
+    transform: translateX(260%) skewX(-25deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(260%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+.animate-frost-shimmer {
+  animation: frost-shimmer 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes frost-pulse {
+  0%, 100% {
+    opacity: 0.18;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.38;
+    transform: scale(1.12);
+  }
+}
+
+.animate-frost-pulse {
+  animation: frost-pulse 6s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 18s linear infinite;
+}
+
+.gilded-corner-frost {
+  border-color: #94a3b8 !important;
+  box-shadow: 0 0 6px rgba(148, 163, 184, 0.4);
+}
+

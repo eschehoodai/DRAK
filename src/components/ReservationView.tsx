@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Screen, Reservation } from '../types';
 import { 
   Calendar, User, Mail, Phone, Hourglass, Shield, Search, Sparkles, Trash2,
-  ChevronLeft, ChevronRight, Clock, AlertTriangle, Check, X, Copy, ChevronDown
+  ChevronLeft, ChevronRight, Clock, AlertTriangle, Check, X, Copy, ChevronDown, Snowflake
 } from 'lucide-react';
 
 interface ReservationViewProps {
@@ -1136,28 +1136,53 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                       {
                         name: 'Die Grosse Kathedrale',
                         desc: 'Massive, kreuzförmige Deckenbögen und schwere Eichentische für große Bünde, getaucht in warmes, flackerndes Kerzenlicht. Ideal für königliche Gelage.',
+                        isWinterPaused: false,
                       },
                       {
                         name: 'Unter den alten Linden',
-                        desc: 'Ein lauschiger Biergarten im Schatten uralter Linden, mit rustikalen Holzbänken. Kühles Bier und deftige Brotzeiten unter freiem Himmel.',
+                        desc: 'Ein lauschiger Biergarten im Schatten uralter Linden. Ruht im Winterschlaf – zur kalten Jahreszeit geschlossen. Wiedereröffnung im Frühjahr.',
+                        isWinterPaused: true,
                       },
                     ].map((v) => (
                       <div
                         key={v.name}
                         id={`vault-option-${v.name.replace(/\s+/g, '-').toLowerCase()}`}
-                        onClick={() => setVault(v.name)}
-                        className={`border-2 p-4 transition-all duration-300 cursor-pointer text-left flex flex-col ${
-                          vault === v.name
-                            ? 'border-gold-primary bg-gold-primary/10'
-                            : 'border-gold-secondary/20 bg-void-black/20 hover:border-gold-secondary/50'
+                        onClick={() => {
+                          if (!v.isWinterPaused) {
+                            setVault(v.name);
+                          }
+                        }}
+                        className={`border-2 p-4 transition-all duration-300 text-left flex flex-col relative ${
+                          v.isWinterPaused
+                            ? 'border-zinc-700/50 bg-zinc-950/60 opacity-60 cursor-not-allowed select-none'
+                            : vault === v.name
+                            ? 'border-gold-primary bg-gold-primary/10 cursor-pointer'
+                            : 'border-gold-secondary/20 bg-void-black/20 hover:border-gold-secondary/50 cursor-pointer'
                         }`}
                       >
-                        <span className="font-cinzel text-xs font-black tracking-wider text-gold-bright block mb-2">
-                          {v.name}
-                        </span>
-                        <p className="font-serif text-[11px] leading-relaxed text-cream-parchment/60">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <span className={`font-cinzel text-xs font-black tracking-wider block ${
+                            v.isWinterPaused ? 'text-zinc-400' : 'text-gold-bright'
+                          }`}>
+                            {v.name}
+                          </span>
+                          {v.isWinterPaused && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-cinzel font-bold text-sky-200 bg-sky-950/70 border border-sky-400/30">
+                              <Snowflake className="w-2.5 h-2.5 text-sky-300 animate-spin-slow" />
+                              Winterschlaf
+                            </span>
+                          )}
+                        </div>
+                        <p className={`font-serif text-[11px] leading-relaxed ${
+                          v.isWinterPaused ? 'text-zinc-400/80' : 'text-cream-parchment/60'
+                        }`}>
                           {v.desc}
                         </p>
+                        {v.isWinterPaused && (
+                          <p className="mt-2 font-cinzel text-[10px] text-sky-300/80 uppercase tracking-wide">
+                            ❄ Erst im Frühjahr wieder reservierbar
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>

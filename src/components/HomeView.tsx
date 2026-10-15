@@ -1,6 +1,6 @@
 import React from 'react';
 import { Screen } from '../types';
-import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin, Phone } from 'lucide-react';
+import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin, Phone, Snowflake } from 'lucide-react';
 import { useIsTavernOpen } from '../utils/openingHours';
 import { trackPhoneCallClick } from '../utils/gtag';
 import candlelitGobletImage from '../assets/images/Speise2.webp';
@@ -9,6 +9,18 @@ import logoDrak from '../assets/images/logo-drak.webp';
 import headerVideo from '../assets/images/headervideo.webm';
 import gewoelbeVideo from '../assets/images/gewölbe.mp4';
 import tafelVideo from '../assets/images/tafel.webm';
+
+const WINTER_SNOWFLAKES = [
+  { id: 1, left: '8%', size: 14, duration: '7.5s', delay: '0s', opacity: 0.75 },
+  { id: 2, left: '22%', size: 10, duration: '10.5s', delay: '2.8s', opacity: 0.5 },
+  { id: 3, left: '38%', size: 16, duration: '8.2s', delay: '1.1s', opacity: 0.8 },
+  { id: 4, left: '54%', size: 9, duration: '12s', delay: '4.5s', opacity: 0.45 },
+  { id: 5, left: '68%', size: 15, duration: '9.2s', delay: '0.6s', opacity: 0.7 },
+  { id: 6, left: '82%', size: 11, duration: '11.2s', delay: '3.4s', opacity: 0.55 },
+  { id: 7, left: '92%', size: 13, duration: '8.8s', delay: '5.2s', opacity: 0.6 },
+  { id: 8, left: '30%', size: 8, duration: '13s', delay: '6.5s', opacity: 0.4 },
+  { id: 9, left: '74%', size: 12, duration: '9.8s', delay: '2.1s', opacity: 0.65 },
+];
 
 interface HomeViewProps {
   onNavigate: (screen: Screen) => void;
@@ -234,31 +246,105 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
               </button>
             </div>
 
-            {/* Chamber 2 - Biergarten */}
-            <div id="chamber-card-biergarten" className="relative border border-gold-secondary/30 bg-void-black p-8 md:p-10 flex flex-col justify-between min-h-[22rem] group hover:border-gold-primary transition-all duration-300">
-              <div className="gilded-corner gilded-corner-tl" />
-              <div className="gilded-corner gilded-corner-tr" />
-              <div className="gilded-corner gilded-corner-bl" />
-              <div className="gilded-corner gilded-corner-br" />
+            {/* Chamber 2 - Biergarten (Winterschlaf / Eingegraut mit Frost-Animationen) */}
+            <div
+              id="chamber-card-biergarten"
+              className="relative border border-zinc-700/60 bg-gradient-to-b from-zinc-900/90 via-zinc-950/95 to-void-black/95 p-8 md:p-10 flex flex-col justify-between min-h-[22rem] group hover:border-sky-400/50 transition-all duration-500 overflow-hidden shadow-[inset_0_0_40px_rgba(180,210,240,0.03),0_8px_30px_rgba(0,0,0,0.5)]"
+            >
+              {/* Frosted Corners */}
+              <div className="gilded-corner gilded-corner-frost gilded-corner-tl" />
+              <div className="gilded-corner gilded-corner-frost gilded-corner-tr" />
+              <div className="gilded-corner gilded-corner-frost gilded-corner-bl" />
+              <div className="gilded-corner gilded-corner-frost gilded-corner-br" />
 
-              <div className="space-y-5">
-                <span className="font-cinzel text-xs font-black tracking-widest text-gold-primary uppercase block">
-                  II. Der Biergarten
-                </span>
-                <h3 className="font-cinzel text-2xl md:text-3xl font-bold text-cream-parchment group-hover:text-gold-bright transition-colors">
-                  Unter den alten Linden
-                </h3>
-                <p className="font-serif text-base leading-relaxed text-cream-parchment/70">
-                  Ein lauschiger Biergarten im Schatten uralter Linden, mit rustikalen Holzbänken. Hier genießt Ihr kühles Bier, deftige Brotzeiten und Oberlausitzer Spezialitäten unter freiem Himmel.
-                </p>
+              {/* Frost Ambient Radial Glow */}
+              <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-sky-500/10 blur-2xl pointer-events-none animate-frost-pulse" />
+              <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-slate-400/5 blur-2xl pointer-events-none" />
+
+              {/* Shimmering Ice Sheen Light Beam */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="w-[120px] h-[300%] bg-gradient-to-r from-transparent via-sky-200/10 to-transparent animate-frost-shimmer -top-1/2" />
               </div>
-              <button
-                id="btn-chamber-biergarten"
-                onClick={() => onNavigate(Screen.RESERVE)}
-                className="mt-6 text-left font-cinzel text-xs tracking-widest font-bold text-gold-secondary hover:text-gold-bright transition-colors uppercase cursor-pointer"
-              >
-                Im Biergarten anstoßen →
-              </button>
+
+              {/* Falling Snowflakes Layer */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+                {WINTER_SNOWFLAKES.map((flake) => (
+                  <div
+                    key={flake.id}
+                    className="absolute -top-6 text-sky-200/90 animate-snowfall"
+                    style={{
+                      left: flake.left,
+                      animationDuration: flake.duration,
+                      animationDelay: flake.delay,
+                      opacity: flake.opacity,
+                    }}
+                  >
+                    <Snowflake
+                      style={{ width: `${flake.size}px`, height: `${flake.size}px` }}
+                      className="drop-shadow-[0_0_6px_rgba(186,230,253,0.7)]"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Content Header & Body */}
+              <div className="relative z-10 space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-cinzel text-xs font-black tracking-widest text-zinc-400 uppercase block">
+                    II. Der Biergarten
+                  </span>
+
+                  {/* Frosted Seasonal Badge */}
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-cinzel font-bold tracking-wider uppercase bg-sky-950/70 text-sky-200 border border-sky-400/40 backdrop-blur-md shadow-[0_0_15px_rgba(56,189,248,0.25)]">
+                    <Snowflake className="w-3.5 h-3.5 text-sky-300 animate-spin-slow shrink-0" />
+                    <span>Winterschlaf</span>
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="font-cinzel text-2xl md:text-3xl font-bold text-zinc-300 group-hover:text-zinc-100 transition-colors">
+                    Unter den alten Linden
+                  </h3>
+                  <p className="font-cinzel text-[11px] font-semibold tracking-wider text-sky-300/80 uppercase">
+                    Ruht zur kalten Jahreszeit · Wiedereröffnung im Frühjahr
+                  </p>
+                </div>
+
+                <p className="font-serif text-base leading-relaxed text-zinc-400">
+                  Ein lauschiger Biergarten im Schatten uralter Linden, mit rustikalen Holzbänken. Wenn Frost und Schnee über die Zittauer Gassen ziehen, hält unser Freisitz winterliche Rast.
+                </p>
+
+                {/* Seasonal Notice Callout */}
+                <div className="border border-sky-900/40 bg-zinc-900/70 rounded p-3.5 backdrop-blur-sm shadow-inner flex items-start gap-3">
+                  <div className="p-2 rounded bg-sky-950/80 border border-sky-500/30 text-sky-300 shrink-0 mt-0.5">
+                    <Snowflake className="w-4 h-4 animate-spin-slow" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-cinzel text-xs font-bold tracking-wider text-sky-200 uppercase">
+                      Im Frühjahr wieder für Euch da
+                    </p>
+                    <p className="font-serif text-xs text-zinc-300/85 leading-relaxed">
+                      Sobald die Frühlingssonne den Lindengarten erwärmt, öffnen wir die Pforten erneut für kühles Fassbier & deftige Brotzeiten unter freiem Himmel.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer / Smart Transition Action */}
+              <div className="relative z-10 mt-6 pt-4 border-t border-zinc-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <span className="font-serif text-xs text-zinc-400 flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-sky-400/80 shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
+                  Freisitz pausiert
+                </span>
+                <button
+                  id="btn-chamber-biergarten"
+                  onClick={() => onNavigate(Screen.RESERVE)}
+                  className="text-left font-cinzel text-xs tracking-widest font-bold text-zinc-300 hover:text-gold-bright transition-colors uppercase cursor-pointer flex items-center gap-1.5 group/btn"
+                >
+                  <span>Im warmen Saal Platz nehmen</span>
+                  <span className="transition-transform duration-300 group-hover/btn:translate-x-1">→</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

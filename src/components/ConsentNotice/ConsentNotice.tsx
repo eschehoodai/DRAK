@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useCookieConsent } from '../../context/CookieContext';
 import type { CookieConsent } from '../../context/CookieContext';
-import styles from './CookieBanner.module.css';
+import styles from './ConsentNotice.module.css';
 
 interface CookieBannerProps {
   onNavigateDatenschutz: () => void;
 }
 
-export default function CookieBanner({ onNavigateDatenschutz }: CookieBannerProps) {
+export default function ConsentNotice({ onNavigateDatenschutz }: CookieBannerProps) {
   const {
     consent,
     hasConsented,
