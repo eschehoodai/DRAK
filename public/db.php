@@ -60,6 +60,147 @@ function getDb(): PDO {
 }
 
 /**
+ * Pfad zur Notfall-Fallback-Queue für den Fall kurzzeitiger DB-Sperren.
+ */
+function getFallbackQueueFile(): string {
+    $dataDir = __DIR__ . '/data';
+    if (!is_dir($dataDir)) {
+        @mkdir($dataDir, 0755, true);
+    }
+    return $dataDir . '/fallback_queue.json';
+}
+
+/**
+ * Speichert eine Reservierung sicher in der Notfall-Fallback-Datei mit Dateisperre.
+ */
+function saveFallbackReservation(array $res): bool {
+    $file = getFallbackQueueFile();
+    $fp = @fopen($file, 'c+');
+    if (!$fp) {
+        return false;
+    }
+    if (flock($fp, LOCK_EX)) {
+        $size = filesize($file);
+        $content = $size > 0 ? fread($fp, $size) : '';
+        $queue = !empty($content) ? json_decode($content, true) : [];
+        if (!is_array($queue)) {
+            $queue = [];
+        }
+        $queue[] = $res;
+        ftruncate($fp, 0);
+        rewind($fp);
+        fwrite($fp, json_encode($queue, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        fflush($fp);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        return true;
+    }
+    fclose($fp);
+    return false;
+}
+
+/**
+ * Holt alle Einträge aus der Notfall-Fallback-Queue.
+ */
+function getFallbackReservations(): array {
+    $file = getFallbackQueueFile();
+    if (!file_exists($file)) {
+        return [];
+    }
+    $content = @file_get_contents($file);
+    if (!$content) {
+        return [];
+    }
+    $queue = json_decode($content, true);
+    return is_array($queue) ? $queue : [];
+}
+
+/**
+ * Entfernt eine Reservierung aus der Notfall-Fallback-Queue (z. B. bei Stornierung / Löschung).
+ */
+function removeFallbackReservation(string $id): void {
+    $file = getFallbackQueueFile();
+    if (!file_exists($file)) {
+        return;
+    }
+    $fp = @fopen($file, 'c+');
+    if (!$fp) {
+        return;
+    }
+    if (flock($fp, LOCK_EX)) {
+        $size = filesize($file);
+        $content = $size > 0 ? fread($fp, $size) : '';
+        $queue = !empty($content) ? json_decode($content, true) : [];
+        if (!empty($queue) && is_array($queue)) {
+            $filtered = array_values(array_filter($queue, function($item) use ($id) {
+                return ($item['id'] ?? '') !== $id;
+            }));
+            ftruncate($fp, 0);
+            rewind($fp);
+            fwrite($fp, json_encode($filtered, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            fflush($fp);
+        }
+        flock($fp, LOCK_UN);
+    }
+    fclose($fp);
+}
+
+/**
+ * Überträgt gespeicherte Notfall-Buchungen automatisch in die SQLite-Datenbank (Auto-Drain).
+ */
+function drainFallbackQueue(PDO $pdo): void {
+    $file = getFallbackQueueFile();
+    if (!file_exists($file)) {
+        return;
+    }
+    $fp = @fopen($file, 'c+');
+    if (!$fp) {
+        return;
+    }
+    if (flock($fp, LOCK_EX)) {
+        $size = filesize($file);
+        $content = $size > 0 ? fread($fp, $size) : '';
+        $queue = !empty($content) ? json_decode($content, true) : [];
+        if (!empty($queue) && is_array($queue)) {
+            $remaining = [];
+            $insert = $pdo->prepare("
+                INSERT OR IGNORE INTO reservations (id, name, phone, email, guests, date, time, vault, notes, status, created_at)
+                VALUES (:id, :name, :phone, :email, :guests, :date, :time, :vault, :notes, :status, :created_at)
+            ");
+            foreach ($queue as $res) {
+                try {
+                    $insert->execute([
+                        ':id'         => $res['id'],
+                        ':name'       => $res['name'] ?? '',
+                        ':phone'      => $res['phone'] ?? '',
+                        ':email'      => $res['email'] ?? '',
+                        ':guests'     => (int)($res['guests'] ?? 1),
+                        ':date'       => $res['date'] ?? '',
+                        ':time'       => $res['time'] ?? '',
+                        ':vault'      => $res['vault'] ?? 'Die Grosse Kathedrale',
+                        ':notes'      => $res['notes'] ?? '',
+                        ':status'     => $res['status'] ?? 'confirmed',
+                        ':created_at' => $res['created_at'] ?? date('Y-m-d H:i:s'),
+                    ]);
+                } catch (Exception $e) {
+                    $remaining[] = $res;
+                }
+            }
+            ftruncate($fp, 0);
+            rewind($fp);
+            if (!empty($remaining)) {
+                fwrite($fp, json_encode($remaining, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            } else {
+                fwrite($fp, json_encode([], JSON_PRETTY_PRINT));
+            }
+            fflush($fp);
+        }
+        flock($fp, LOCK_UN);
+    }
+    fclose($fp);
+}
+
+/**
  * Gibt detaillierte Belegungsdaten je Zeitslot für ein bestimmtes Datum zurück.
  * Erfasst Gesamtzahl der realen Gäste, Buchungsanzahl, Großgruppen und Wirt-Sperren.
  *
@@ -68,6 +209,8 @@ function getDb(): PDO {
  * @return array<string, array{total_guests: int, booking_count: int, has_large_group: bool, is_blocked: bool}>
  */
 function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
+    drainFallbackQueue($pdo);
+
     $stmt = $pdo->prepare("
         SELECT time, guests, status
         FROM reservations
@@ -100,6 +243,28 @@ function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
             }
         }
     }
+
+    // Falls noch Elemente in fallback_queue für $date verbleiben:
+    $fallbacks = getFallbackReservations();
+    foreach ($fallbacks as $fb) {
+        if (($fb['date'] ?? '') !== $date) continue;
+        $t = trim($fb['time'] ?? '');
+        $g = (int)($fb['guests'] ?? 1);
+        $s = $fb['status'] ?? 'confirmed';
+        if (!isset($occupancy[$t])) {
+            $occupancy[$t] = ['total_guests' => 0, 'booking_count' => 0, 'has_large_group' => false, 'is_blocked' => false];
+        }
+        if ($s === 'blocked') {
+            $occupancy[$t]['is_blocked'] = true;
+        } else {
+            $occupancy[$t]['total_guests'] += $g;
+            $occupancy[$t]['booking_count']++;
+            if ($g > STANDARD_SLOT_CAPACITY) {
+                $occupancy[$t]['has_large_group'] = true;
+            }
+        }
+    }
+
     return $occupancy;
 }
 
@@ -111,6 +276,8 @@ function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
  * @return array<array{id: string, name: string, phone: string, email: string, guests: int, date: string, time: string, vault: string, notes: string, status: string, created_at: string}>
  */
 function getReservationsListForDate(PDO $pdo, string $date): array {
+    drainFallbackQueue($pdo);
+
     $stmt = $pdo->prepare("
         SELECT id, name, phone, email, guests, date, time, vault, notes, status, created_at
         FROM reservations
@@ -118,7 +285,35 @@ function getReservationsListForDate(PDO $pdo, string $date): array {
         ORDER BY time ASC, created_at ASC
     ");
     $stmt->execute([':date' => $date]);
-    return $stmt->fetchAll();
+    $list = $stmt->fetchAll();
+
+    // Eventuelle noch in der Notfall-Queue verbleibende Buchungen einmischen
+    $existingIds = array_column($list, 'id');
+    $fallbacks = getFallbackReservations();
+    foreach ($fallbacks as $fb) {
+        if (($fb['date'] ?? '') === $date && !in_array($fb['id'] ?? '', $existingIds)) {
+            $list[] = [
+                'id'         => $fb['id'],
+                'name'       => $fb['name'] ?? '',
+                'phone'      => $fb['phone'] ?? '',
+                'email'      => $fb['email'] ?? '',
+                'guests'     => (int)($fb['guests'] ?? 1),
+                'date'       => $fb['date'] ?? $date,
+                'time'       => $fb['time'] ?? '',
+                'vault'      => $fb['vault'] ?? 'Die Grosse Kathedrale',
+                'notes'      => $fb['notes'] ?? '',
+                'status'     => $fb['status'] ?? 'confirmed',
+                'created_at' => $fb['created_at'] ?? date('Y-m-d H:i:s')
+            ];
+        }
+    }
+
+    usort($list, function($a, $b) {
+        $c = strcmp($a['time'], $b['time']);
+        return $c !== 0 ? $c : strcmp($a['created_at'], $b['created_at']);
+    });
+
+    return $list;
 }
 
 /**

@@ -7,3 +7,6 @@ coverage/
 *.sqlite
 .env*
 !.env.example
+.serena/
+.github/context-mode/
+tattoo-bilder-galerie/

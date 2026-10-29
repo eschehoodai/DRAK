@@ -65,6 +65,25 @@ if ($isLargeGroup && empty($phone)) {
 // Transaktionssichere Kapazitätsprüfung & Speicherung nach Plan B in SQLite
 try {
     $pdo = getDb();
+
+    // Eventuell vorherige Notfall-Buchungen bei Gelegenheit in SQLite übertragen
+    try {
+        drainFallbackQueue($pdo);
+    } catch (Exception $e) {
+        // Leise ignorieren
+    }
+
+    // Eindeutigkeit der ID sicherstellen (Ursache B Kollisionsschutz)
+    try {
+        $checkIdStmt = $pdo->prepare("SELECT 1 FROM reservations WHERE id = :id");
+        $checkIdStmt->execute([':id' => $id]);
+        if ($checkIdStmt->fetchColumn()) {
+            $id = $id . '-' . mt_rand(10, 99);
+        }
+    } catch (Exception $e) {
+        $id = $id . '-' . mt_rand(10, 99);
+    }
+
     $pdo->beginTransaction();
 
     // Aktuelle Buchungen für den Zeitslot abfragen (bestätigte Buchungen, Voranfragen und Wirt-Sperren blockieren den Slot)
@@ -132,30 +151,60 @@ try {
         exit();
     }
 
-    // Reservierung / Anfrage in Datenbank anlegen
-    $insert = $pdo->prepare("
-        INSERT INTO reservations (id, name, phone, email, guests, date, time, vault, notes, status)
-        VALUES (:id, :name, :phone, :email, :guests, :date, :time, :vault, :notes, :status)
-    ");
-    $insert->execute([
-        ':id'     => $id,
-        ':name'   => $name,
-        ':phone'  => $phone,
-        ':email'  => $email,
-        ':guests' => $guests,
-        ':date'   => $date,
-        ':time'   => $time,
-        ':vault'  => $vault,
-        ':notes'  => $notes,
-        ':status' => $status
-    ]);
-
-    $pdo->commit();
+    // Reservierung mit bis zu 3 Versuchen in Datenbank anlegen (Ursache A Auto-Retry)
+    $inserted = false;
+    $maxAttempts = 3;
+    for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+        try {
+            $insert = $pdo->prepare("
+                INSERT INTO reservations (id, name, phone, email, guests, date, time, vault, notes, status)
+                VALUES (:id, :name, :phone, :email, :guests, :date, :time, :vault, :notes, :status)
+            ");
+            $insert->execute([
+                ':id'     => $id,
+                ':name'   => $name,
+                ':phone'  => $phone,
+                ':email'  => $email,
+                ':guests' => $guests,
+                ':date'   => $date,
+                ':time'   => $time,
+                ':vault'  => $vault,
+                ':notes'  => $notes,
+                ':status' => $status
+            ]);
+            $pdo->commit();
+            $inserted = true;
+            break;
+        } catch (Exception $attemptEx) {
+            if ($attempt < $maxAttempts) {
+                usleep(100000); // 100ms warten
+            } else {
+                throw $attemptEx;
+            }
+        }
+    }
 } catch (Exception $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
     error_log("DB-Fehler bei Reservierung: " . $e->getMessage());
+
+    // NOTFALL-PUFFER (Ursache A Fallback):
+    // Buchung sofort in fallback_queue.json sichern, damit sie nicht verloren geht
+    // und sofort im Tischplan erscheint!
+    saveFallbackReservation([
+        'id'         => $id,
+        'name'       => $name,
+        'phone'      => $phone,
+        'email'      => $email,
+        'guests'     => $guests,
+        'date'       => $date,
+        'time'       => $time,
+        'vault'      => $vault,
+        'notes'      => $notes,
+        'status'     => $status,
+        'created_at' => date('Y-m-d H:i:s')
+    ]);
 }
 
 // Empfänger-Adressen (Kunde & Testadresse)
@@ -251,6 +300,7 @@ if ($mailSent) {
     http_response_code(200);
     echo json_encode([
         "success" => true,
+        "id"      => $id,
         "message" => "E-Mail-Benachrichtigung für Reservierung $id erfolgreich versendet."
     ]);
 } else {
@@ -259,6 +309,7 @@ if ($mailSent) {
     http_response_code(200);
     echo json_encode([
         "success" => true,
+        "id"      => $id,
         "warning" => "Reservierung lokal gespeichert. Auf dem Netcup-Server wird mail() aktiv ausgeführt.",
         "message" => "Reservierung empfangen."
     ]);

@@ -452,7 +452,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
 
     setIsSubmitting(true);
 
-    const randomCode = Math.floor(1000 + Math.random() * 9000);
+    const randomCode = Math.floor(100000 + Math.random() * 900000);
     const id = `DRAK-${randomCode}`;
 
     const newRes: Reservation = {
@@ -469,23 +469,37 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
 
     // Send email notification to server via PHP mail()
     try {
-      const response = await fetch('/send-booking.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newRes),
-      });
+      const sendRequest = async () => {
+        return await fetch('/send-booking.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newRes),
+        });
+      };
 
-      const result = await response.json().catch(() => null);
+      let response = await sendRequest().catch(() => null);
+      // Kurzer automatischer Wiederholungsversuch im Hintergrund bei kurzem Netzwerkwackler
+      if (!response || (!response.ok && response.status !== 400 && response.status !== 409)) {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        response = await sendRequest().catch(() => null);
+      }
 
-      if (response.status === 409 || (result && result.success === false)) {
+      const result = response ? await response.json().catch(() => null) : null;
+
+      if (response && (response.status === 409 || (result && result.success === false))) {
         alert(result?.error || 'Dieser Termin ist leider nicht mehr für die gewünschte Personenanzahl verfügbar.');
         if (date) fetchAvailability(date);
         return;
       }
+
+      // Falls das Backend die ID geräuschlos verfeinert hat (z. B. Suffix bei Kollision)
+      if (result && result.id) {
+        newRes.id = result.id;
+      }
     } catch (err) {
-      console.warn('E-Mail-Versand fehlgeschlagen (evtl. lokale Entwicklungsumgebung):', err);
+      console.warn('Hintergrund-Synchronisation fehlgeschlagen:', err);
     } finally {
       setIsSubmitting(false);
     }

@@ -245,6 +245,7 @@ if ($isLoggedIn) {
             try {
                 $stmt = $pdo->prepare("DELETE FROM reservations WHERE id = :id");
                 $stmt->execute([':id' => $delId]);
+                removeFallbackReservation($delId);
                 $message = "Die Buchung / Sperre wurde entfernt. Die Plätze stehen online sofort wieder zur Verfügung!";
                 $messageType = 'success';
                 $selectedDate = $rDate;

@@ -53,6 +53,7 @@ try {
             WHERE id = :id
         ");
         $stmt->execute([':id' => $id]);
+        removeFallbackReservation($id);
     } else if (!empty($date) && !empty($time) && !empty($name)) {
         $stmt = $pdo->prepare("
             UPDATE reservations 
