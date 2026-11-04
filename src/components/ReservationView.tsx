@@ -284,6 +284,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     booked: number;
     bookingCount: number;
     hasLargeGroup: boolean;
+    isBlocked?: boolean;
     remaining: number;
     maxSingleGroup: number;
     isFull: boolean;
@@ -320,33 +321,45 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   }, [date]);
 
   // Prüft die Verfügbarkeit eines Zeitslots nach Plan B:
+  // - Sperre durch Wirt (isBlocked): Sofort dicht
   // - Wenn Slot noch ungebucht: Einzelgruppe bis zu 20 Personen erlaubt
   // - Sobald eine Großgruppe (>10) bucht: Slot komplett dicht
   // - Wenn normale Buchungen drin sind: nur noch kleine Gruppen bis max. 10 Personen gesamt
   const getSlotDetails = (slotTime: string, partySize: number) => {
     const slotInfo = availability[slotTime];
 
-    // Wenn für diesen Slot noch gar keine Buchungen existieren -> komplett leer
-    if (!slotInfo || slotInfo.bookingCount === 0) {
+    // Wenn für diesen Slot noch gar kein Eintrag existiert -> komplett leer
+    if (!slotInfo) {
       const hasEnoughRoom = partySize <= 20;
-      return { booked: 0, remaining: 10, isCompletelyFull: false, hasEnoughRoom };
+      return { booked: 0, remaining: 10, isCompletelyFull: false, hasEnoughRoom, isBlocked: false };
     }
 
-    const { booked, hasLargeGroup, remaining, isFull } = slotInfo;
+    const { booked, hasLargeGroup, remaining, isFull, isBlocked } = slotInfo;
 
-    // Slot ist durch Großgruppe (>10) oder durch 10 Gäste bereits voll
+    // 1. Sperre durch Wirt hat oberste Priorität
+    if (isBlocked) {
+      return { booked, remaining: 0, isCompletelyFull: true, hasEnoughRoom: false, isBlocked: true };
+    }
+
+    // 2. Slot ist durch Großgruppe (>10) oder durch 10 Gäste bereits voll
     if (isFull || hasLargeGroup) {
-      return { booked, remaining: 0, isCompletelyFull: true, hasEnoughRoom: false };
+      return { booked, remaining: 0, isCompletelyFull: true, hasEnoughRoom: false, isBlocked: false };
     }
 
-    // Wenn bereits kleine Tische gebucht haben, darf keine Großgruppe (>10) mehr hinzukommen
+    // 3. Wenn noch keine Buchungen vorliegen (und nicht gesperrt):
+    if (slotInfo.bookingCount === 0) {
+      const hasEnoughRoom = partySize <= 20;
+      return { booked: 0, remaining: 10, isCompletelyFull: false, hasEnoughRoom, isBlocked: false };
+    }
+
+    // 4. Wenn bereits kleine Tische gebucht haben, darf keine Großgruppe (>10) mehr hinzukommen
     if (partySize > 10) {
-      return { booked, remaining, isCompletelyFull: false, hasEnoughRoom: false };
+      return { booked, remaining, isCompletelyFull: false, hasEnoughRoom: false, isBlocked: false };
     }
 
-    // Für normale Gruppen (<= 10): Prüfen ob Restplätze ausreichen
+    // 5. Für normale Gruppen (<= 10): Prüfen ob Restplätze ausreichen
     const hasEnoughRoom = remaining >= partySize;
-    return { booked, remaining, isCompletelyFull: remaining <= 0, hasEnoughRoom };
+    return { booked, remaining, isCompletelyFull: remaining <= 0, hasEnoughRoom, isBlocked: false };
   };
 
   // Zeitslot-Auswahl synchronisieren: Falls Slot belegt ist, automatisch nächsten freien Termin wählen
@@ -1054,10 +1067,12 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                           </option>
                         ) : availableSlots.length > 0 ? (
                           availableSlots.map((hr) => {
-                            const { remaining, isCompletelyFull, hasEnoughRoom } = getSlotDetails(hr, guests);
+                            const { remaining, isCompletelyFull, hasEnoughRoom, isBlocked } = getSlotDetails(hr, guests);
 
                             let label = `${hr} Uhr`;
-                            if (isCompletelyFull) {
+                            if (isBlocked) {
+                              label = `${hr} Uhr — Gesperrt`;
+                            } else if (isCompletelyFull) {
                               label = `${hr} Uhr — Ausgebucht`;
                             } else if (!hasEnoughRoom) {
                               if (guests > 10) {
@@ -1222,7 +1237,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 <button
                   id="btn-submit-booking"
                   type="submit"
-                  disabled={isSubmitting || isTuesdaySelected}
+                  disabled={isSubmitting || isTuesdaySelected || !time}
                   className="w-full sm:w-auto bg-gold-primary border border-gold-primary px-10 py-4 font-cinzel text-sm font-black tracking-widest uppercase text-void-black hover:bg-gold-bright transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting
