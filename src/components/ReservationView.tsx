@@ -111,12 +111,38 @@ function CustomCalendarModal({ isOpen, onClose, selectedDate, onSelectDate }: Cu
   const initialParts = selectedDate ? selectedDate.split('-').map(Number) : [];
   const initialMonthDate = initialParts.length === 3 ? new Date(initialParts[0], initialParts[1] - 1, 1) : new Date();
   const [viewDate, setViewDate] = useState<Date>(initialMonthDate);
+  const [blockedDates, setBlockedDates] = useState<string[]>([]);
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
 
   const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
   const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
+
+  // Monats-Sperren vom Server laden (nur komplett geschlossene Tage, teilbelegte Tage bleiben anklickbar)
+  useEffect(() => {
+    const monthStr = `${year}-${(month + 1).toString().padStart(2, '0')}`;
+    let isCancelled = false;
+
+    const fetchMonthBlocked = async () => {
+      try {
+        const res = await fetch(`/get-availability.php?month=${encodeURIComponent(monthStr)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.blockedDates) && !isCancelled) {
+            setBlockedDates(data.blockedDates);
+          }
+        }
+      } catch (e) {
+        console.warn('Monats-Sperren konnten nicht geladen werden:', e);
+      }
+    };
+
+    fetchMonthBlocked();
+    return () => {
+      isCancelled = true;
+    };
+  }, [year, month]);
 
   const monthNames = [
     'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 
@@ -190,11 +216,12 @@ function CustomCalendarModal({ isOpen, onClose, selectedDate, onSelectDate }: Cu
             const currentDayDate = new Date(year, month, day);
             currentDayDate.setHours(0, 0, 0, 0);
 
+            const dayStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             const isPast = currentDayDate < today;
             const isTuesday = currentDayDate.getDay() === 2;
-            const isDisabled = isPast || isTuesday;
+            const isDayBlocked = blockedDates.includes(dayStr);
+            const isDisabled = isPast || isTuesday || isDayBlocked;
 
-            const dayStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             const isSelected = dayStr === selectedDate;
             const isToday = currentDayDate.getTime() === today.getTime();
 
@@ -216,9 +243,11 @@ function CustomCalendarModal({ isOpen, onClose, selectedDate, onSelectDate }: Cu
                 } ${isToday && !isSelected ? 'border border-gold-primary/60 text-gold-primary font-bold' : ''}`}
               >
                 <span>{day}</span>
-                {isTuesday && (
+                {isTuesday ? (
                   <span className="text-[8px] leading-none text-red-400 font-cinzel tracking-tighter uppercase">Ruhe</span>
-                )}
+                ) : isDayBlocked ? (
+                  <span className="text-[8px] leading-none text-red-400 font-cinzel tracking-tighter uppercase">Gesperrt</span>
+                ) : null}
               </button>
             );
           })}
@@ -228,7 +257,7 @@ function CustomCalendarModal({ isOpen, onClose, selectedDate, onSelectDate }: Cu
         <div className="mt-6 pt-4 border-t border-gold-secondary/20 flex items-center justify-between text-xs text-cream-parchment/60 font-serif">
           <div className="flex items-center space-x-2">
             <span className="h-2.5 w-2.5 rounded-full bg-red-500/80 inline-block" />
-            <span>Dienstag: Ruhetag</span>
+            <span>Dienstag (Ruhe) · 🔴 Gesperrt</span>
           </div>
           <button
             type="button"
@@ -293,6 +322,8 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   const [availability, setAvailability] = useState<{ [slotTime: string]: SlotInfo }>({});
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
   const [slotNotice, setSlotNotice] = useState<string>('');
+  const [isDayFullyBlocked, setIsDayFullyBlocked] = useState(false);
+  const [dayBlockedReason, setDayBlockedReason] = useState<string | null>(null);
 
   // Verfügbarkeit für das gewählte Datum vom Server abrufen
   const fetchAvailability = async (targetDate: string) => {
@@ -304,6 +335,8 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
         const data = await res.json();
         if (data.success) {
           setAvailability(data.slots || {});
+          setIsDayFullyBlocked(Boolean(data.isDayBlocked));
+          setDayBlockedReason(data.dayBlockReason || null);
         }
       }
     } catch (err) {
@@ -367,6 +400,16 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     if (!date) {
       setTime('');
       setSlotNotice('');
+      return;
+    }
+
+    if (isDayFullyBlocked) {
+      setTime('');
+      setSlotNotice(
+        dayBlockedReason
+          ? `Die Taverne ist an diesem Tag für Reservierungen geschlossen (${dayBlockedReason}). Bitte wählt über das Kalendersymbol einen anderen Tag für Euer Festmahl.`
+          : `An diesem Tag können leider keine Online-Reservierungen angenommen werden. Bitte wählt über das Kalendersymbol einen anderen Tag für Euer Festmahl.`
+      );
       return;
     }
 
@@ -1053,7 +1096,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                     <div className="relative">
                       <select
                         id="select-time"
-                        disabled={isTuesdaySelected || availableSlots.length === 0}
+                        disabled={isTuesdaySelected || isDayFullyBlocked || availableSlots.length === 0}
                         value={time}
                         onChange={(e) => {
                           setTime(e.target.value);
@@ -1064,6 +1107,10 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                         {isTuesdaySelected ? (
                           <option value="" className="bg-void-black text-red-400">
                             Geschlossen (Ruhetag)
+                          </option>
+                        ) : isDayFullyBlocked ? (
+                          <option value="" className="bg-void-black text-red-400">
+                            Geschlossen {dayBlockedReason ? `(${dayBlockedReason})` : '(Gesperrt)'}
                           </option>
                         ) : availableSlots.length > 0 ? (
                           availableSlots.map((hr) => {
@@ -1155,6 +1202,21 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                   </div>
                 )}
 
+                {/* Ganztags-Sperre Warning Banner */}
+                {isDayFullyBlocked && !isTuesdaySelected && (
+                  <div className="p-4 border border-red-500/50 bg-red-950/30 text-red-200 text-xs md:text-sm font-serif flex items-start space-x-3 rounded animate-in fade-in duration-200">
+                    <AlertTriangle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold font-cinzel text-red-300 tracking-wide uppercase">
+                        {dayBlockedReason ? `Geschlossen: ${dayBlockedReason}` : 'Taverne an diesem Tag geschlossen'}
+                      </p>
+                      <p className="mt-1 text-cream-parchment/80 leading-relaxed">
+                        An diesem Tag können leider keine Online-Reservierungen angenommen werden. Bitte wählt über das Kalendersymbol einen anderen Tag für Euer Festmahl!
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Vault / Location Selection */}
                 <div className="flex flex-col space-y-3 pt-2">
                   <label className="font-cinzel text-xs font-bold tracking-widest text-gold-primary uppercase mb-1">
@@ -1237,11 +1299,15 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
                 <button
                   id="btn-submit-booking"
                   type="submit"
-                  disabled={isSubmitting || isTuesdaySelected || !time}
+                  disabled={isSubmitting || isTuesdaySelected || isDayFullyBlocked || !time}
                   className="w-full sm:w-auto bg-gold-primary border border-gold-primary px-10 py-4 font-cinzel text-sm font-black tracking-widest uppercase text-void-black hover:bg-gold-bright transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting
                     ? 'Brieftaube fliegt...'
+                    : isTuesdaySelected
+                    ? 'Dienstags geschlossen'
+                    : isDayFullyBlocked
+                    ? '🔒 Tag geschlossen'
                     : isLargeGroup
                     ? 'Großgruppen-Anfrage absenden'
                     : isInquiry

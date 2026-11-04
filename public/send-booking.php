@@ -86,11 +86,11 @@ try {
 
     $pdo->beginTransaction();
 
-    // Aktuelle Buchungen für den Zeitslot abfragen (bestätigte Buchungen, Voranfragen und Wirt-Sperren blockieren den Slot)
+    // Aktuelle Buchungen und Sperren (inkl. Ganztagssperre time = 'ALL') für den Tag abfragen
     $stmt = $pdo->prepare("
-        SELECT guests, status
+        SELECT time, guests, status, notes
         FROM reservations
-        WHERE date = :date AND time = :time AND status IN ('confirmed', 'inquiry', 'blocked')
+        WHERE date = :date AND (time = :time OR time = 'ALL') AND status IN ('confirmed', 'inquiry', 'blocked')
     ");
     $stmt->execute([':date' => $date, ':time' => $time]);
     $existingRows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -99,16 +99,25 @@ try {
     $currentBooked = 0;
     $hasLargeGroup = false;
     $isBlocked = false;
+    $isDayBlocked = false;
+    $dayBlockReason = '';
 
     foreach ($existingRows as $row) {
         if ($row['status'] === 'blocked') {
             $isBlocked = true;
+            if (trim($row['time']) === 'ALL') {
+                $isDayBlocked = true;
+                $dayBlockReason = trim($row['notes'] ?? '');
+            }
         } else {
-            $gInt = (int)$row['guests'];
-            $currentBooked += $gInt;
-            $bookingCount++;
-            if ($gInt > STANDARD_SLOT_CAPACITY) {
-                $hasLargeGroup = true;
+            // Nur echte Zeitslots zur Belegung zählen (nicht time = 'ALL')
+            if (trim($row['time']) !== 'ALL') {
+                $gInt = (int)$row['guests'];
+                $currentBooked += $gInt;
+                $bookingCount++;
+                if ($gInt > STANDARD_SLOT_CAPACITY) {
+                    $hasLargeGroup = true;
+                }
             }
         }
     }
@@ -116,7 +125,11 @@ try {
     $isAllowed = false;
     $errorMessage = '';
 
-    if ($isBlocked) {
+    if ($isDayBlocked) {
+        $isAllowed = false;
+        $reasonText = !empty($dayBlockReason) ? " (" . htmlspecialchars($dayBlockReason) . ")" : "";
+        $errorMessage = "Die Taverne ist an diesem Tag für Reservierungen geschlossen" . $reasonText . ".";
+    } else if ($isBlocked) {
         $isAllowed = false;
         $errorMessage = "Dieser Termin (" . htmlspecialchars($time) . " Uhr) ist durch die Wirtsleute gesperrt.";
     } else if ($hasLargeGroup || ($bookingCount > 0 && $currentBooked >= STANDARD_SLOT_CAPACITY)) {

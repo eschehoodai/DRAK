@@ -54,7 +54,11 @@ Ihre neue Website wurde als hochmoderne **Single-Page-Application (SPA)** konzip
 ### 📱 Digitaler Tischplan & Slot-Manager fürs iPad (`/tischplan.php`)
 - **Eigenständige Theken-App:** Unter `https://drakzittau.de/tischplan.php` (Passwort: `Zittau2026!`) kann der Wirt direkt auf seinem Apple iPad (9. Gen) telefonische Reservierungen oder Vor-Ort-Gäste erfassen.
 - **Echtzeit-Synchronisierung:** Bucht der Wirt manuell Plätze ein (z. B. 2 Personen um 18:00 Uhr), sind für Online-Gäste auf der Website sofort nur noch 8 Plätze in diesem Slot verfügbar. Es wird dabei bewusst keine E-Mail versendet.
-- **1-Klick-Slot-Sperre:** Ganze Zeitslots können mit einem einzigen Tipp auf „🔒 Sperren“ komplett geschlossen werden (z. B. für geschlossene Gesellschaften oder Schichtende).
+- **1-Klick-Ganztags-Sperre:** Mit einem Klick auf „🔒 Ganzen Tag sperren“ kann ein ganzer Tag direkt geschlossen werden (z. B. für geschlossene Gesellschaften, Betriebsurlaub oder Krankheit).
+  - *Schutz bestehender Buchungen:* Liegen an dem Tag bereits Reservierungen vor, warnt das System – alle bestehenden Buchungen bleiben im Tischplan vollständig erhalten und sichtbar. Es werden lediglich keine neuen Online-Buchungen mehr angenommen.
+  - *Intelligenter Website-Kalender:* Vollständig gesperrte Tage werden für Gäste im Buchungskalender automatisch mit einem roten Label „Gesperrt“ markiert und können gar nicht erst angeklickt werden. Tage mit teilweiser Belegung bleiben wie gewohnt normal buchbar.
+  - *1-Klick-Freigabe:* Über den Button „🔓 Tag freigeben (Entsperren)“ kann der Tag jederzeit mit einem Fingertipp wieder geöffnet werden.
+- **1-Klick-Slot-Sperre:** Einzelne 30-Minuten-Zeitslots können über die Checkboxen flexibel gesperrt oder freigegeben werden.
 - **Löschen & Freigabe:** Mit dem Papierkorb-Symbol (`🗑️`) können Buchungen oder Sperren mit einem Klick gelöscht werden – die Plätze stehen online sofort wieder zur Verfügung.
 - **Apple Home-Screen:** Kann im Safari auf dem iPad über „Teilen ➔ Zum Home-Bildschirm“ als Vollbild-App wie eine native App ohne störende Browserleisten abgelegt werden.
 

@@ -13,59 +13,8 @@ define('ADMIN_PASSWORD', 'Zittau2026!');
 
 require_once __DIR__ . '/db.php';
 
-// Öffnungszeiten-Definition (Analog zu frontend openingHours.ts)
-// 0 = Sonntag, 1 = Montag, ..., 6 = Samstag
-$OPENING_HOURS = [
-    0 => [
-        'isOpen' => true,
-        'shifts' => [
-            ['open' => '11:00', 'close' => '14:00', 'lastSlot' => '13:30', 'name' => 'Mittag'],
-            ['open' => '17:00', 'close' => '21:00', 'kitchenClose' => '20:00', 'lastSlot' => '20:00', 'name' => 'Abend'],
-        ],
-        'label'  => 'So: 11:00–14:00 & 17:00–21:00 Uhr'
-    ],
-    1 => [
-        'isOpen' => true,
-        'shifts' => [
-            ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
-        ],
-        'label'  => 'Mo: 17:00–22:00 Uhr'
-    ],
-    2 => [
-        'isOpen' => false,
-        'shifts' => [],
-        'label'  => 'Di: Ruhetag (Geschlossen)'
-    ],
-    3 => [
-        'isOpen' => true,
-        'shifts' => [
-            ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
-        ],
-        'label'  => 'Mi: 17:00–22:00 Uhr'
-    ],
-    4 => [
-        'isOpen' => true,
-        'shifts' => [
-            ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
-        ],
-        'label'  => 'Do: 17:00–22:00 Uhr'
-    ],
-    5 => [
-        'isOpen' => true,
-        'shifts' => [
-            ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
-        ],
-        'label'  => 'Fr: 17:00–22:00 Uhr'
-    ],
-    6 => [
-        'isOpen' => true,
-        'shifts' => [
-            ['open' => '11:00', 'close' => '14:00', 'lastSlot' => '13:30', 'name' => 'Mittag'],
-            ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
-        ],
-        'label'  => 'Sa: 11:00–14:00 & 17:00–22:00 Uhr'
-    ],
-];
+// Öffnungszeiten-Definition aus db.php beziehen (Single Source of Truth)
+$OPENING_HOURS = getStandardOpeningHours();
 
 $message = null;
 $messageType = 'info'; // 'success' | 'error' | 'info'
@@ -102,37 +51,7 @@ function getSlotsForDate(string $dateStr, array $openingHoursConfig): array {
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateStr)) return [];
     $dayOfWeek = (int)date('w', strtotime($dateStr));
     $config = $openingHoursConfig[$dayOfWeek] ?? null;
-    if (!$config || !$config['isOpen']) return [];
-
-    $slots = [];
-    if (!empty($config['shifts']) && is_array($config['shifts'])) {
-        foreach ($config['shifts'] as $shift) {
-            if (!empty($shift['open']) && !empty($shift['lastSlot'])) {
-                list($openH, $openM) = explode(':', $shift['open']);
-                list($lastH, $lastM) = explode(':', $shift['lastSlot']);
-                $currentMin = (int)$openH * 60 + (int)$openM;
-                $endMin = (int)$lastH * 60 + (int)$lastM;
-                while ($currentMin <= $endMin) {
-                    $h = floor($currentMin / 60);
-                    $m = $currentMin % 60;
-                    $slots[] = sprintf('%02d:%02d', $h, $m);
-                    $currentMin += 30;
-                }
-            }
-        }
-    } elseif (!empty($config['open']) && !empty($config['lastSlot'])) {
-        list($openH, $openM) = explode(':', $config['open']);
-        list($lastH, $lastM) = explode(':', $config['lastSlot']);
-        $currentMin = (int)$openH * 60 + (int)$openM;
-        $endMin = (int)$lastH * 60 + (int)$lastM;
-        while ($currentMin <= $endMin) {
-            $h = floor($currentMin / 60);
-            $m = $currentMin % 60;
-            $slots[] = sprintf('%02d:%02d', $h, $m);
-            $currentMin += 30;
-        }
-    }
-    return $slots;
+    return $config ? getSlotsForDayConfig($config) : [];
 }
 
 // Aktuelles Datum bestimmen (Standard: heute)
@@ -236,6 +155,74 @@ if ($isLoggedIn) {
         }
     }
 
+    // 4b. 1-Klick Ganztags-Sperre aktivieren
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'block_entire_day') {
+        $rDate = trim($_POST['date'] ?? $selectedDate);
+        $reason = trim(strip_tags($_POST['reason'] ?? ''));
+        if (empty($reason)) {
+            $reason = 'Ganztägige Sperre durch Wirt';
+        }
+
+        if (empty($rDate)) {
+            $message = 'Datum für die Tagessperre erforderlich.';
+            $messageType = 'error';
+        } else {
+            try {
+                $existingLock = isDayBlocked($pdo, $rDate);
+                if (!$existingLock) {
+                    $newId = 'DRAK-LOCK-DAY-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 6));
+                    $stmt = $pdo->prepare("
+                        INSERT INTO reservations (id, name, phone, email, guests, date, time, vault, notes, status)
+                        VALUES (:id, '🔒 Ganzer Tag gesperrt (Wirt)', '', '', 0, :date, 'ALL', 'Komplett', :notes, 'blocked')
+                    ");
+                    $stmt->execute([
+                        ':id'    => $newId,
+                        ':date'  => $rDate,
+                        ':notes' => $reason
+                    ]);
+                } else {
+                    $updateStmt = $pdo->prepare("UPDATE reservations SET notes = :notes WHERE id = :id");
+                    $updateStmt->execute([':notes' => $reason, ':id' => $existingLock['id']]);
+                }
+
+                $formattedDate = date('d.m.Y', strtotime($rDate));
+                $message = "Der gesamte Tag ({$formattedDate}) wurde erfolgreich gesperrt ({$reason}). Online-Reservierungen sind für diesen Tag gestoppt.";
+                $messageType = 'success';
+                $selectedDate = $rDate;
+                $selectedMonth = substr($rDate, 0, 7);
+            } catch (Exception $e) {
+                $message = 'Fehler beim Sperren des Tages: ' . $e->getMessage();
+                $messageType = 'error';
+            }
+        }
+    }
+
+    // 4c. Ganztags-Sperre aufheben (Alle Slots des Tages wieder freigeben)
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'unblock_entire_day') {
+        $rDate = trim($_POST['date'] ?? $selectedDate);
+
+        if (empty($rDate)) {
+            $message = 'Datum zum Aufheben der Tagessperre erforderlich.';
+            $messageType = 'error';
+        } else {
+            try {
+                // Löscht sowohl die Ganztagssperre (time = 'ALL') als auch einzelne Slot-Sperren für diesen Tag
+                // WICHTIG: Echte Gästereservierungen (confirmed, inquiry) bleiben VOLLSTÄNDIG erhalten!
+                $stmt = $pdo->prepare("DELETE FROM reservations WHERE date = :date AND status = 'blocked'");
+                $stmt->execute([':date' => $rDate]);
+
+                $formattedDate = date('d.m.Y', strtotime($rDate));
+                $message = "Die Sperre für den {$formattedDate} wurde aufgehoben. Alle Zeitslots sind online wieder frei!";
+                $messageType = 'success';
+                $selectedDate = $rDate;
+                $selectedMonth = substr($rDate, 0, 7);
+            } catch (Exception $e) {
+                $message = 'Fehler beim Freigeben des Tages: ' . $e->getMessage();
+                $messageType = 'error';
+            }
+        }
+    }
+
     // 5. Buchung oder Sperre löschen (gibt die Plätze online sofort wieder frei)
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_reservation') {
         $delId = trim($_POST['id'] ?? '');
@@ -261,9 +248,19 @@ if ($isLoggedIn) {
     $monthSummary = getMonthOccupancySummary($pdo, $selectedMonth, $OPENING_HOURS);
 
     // Daten für den gewählten Tag laden
+    $dayLockInfo = isDayBlocked($pdo, $selectedDate);
+    $isEntireDayBlocked = !empty($dayLockInfo);
     $occupancy = getOccupancyDetailsForDate($pdo, $selectedDate);
-    $reservationsList = getReservationsListForDate($pdo, $selectedDate);
+    $allReservationsList = getReservationsListForDate($pdo, $selectedDate);
     $daySlots = getSlotsForDate($selectedDate, $OPENING_HOURS);
+
+    // Ganztagssperre (time = 'ALL') aus der normalen Reservierungsliste für Einzelslots filtern
+    $reservationsList = [];
+    foreach ($allReservationsList as $res) {
+        if (trim($res['time']) !== 'ALL') {
+            $reservationsList[] = $res;
+        }
+    }
 
     // Buchungen nach Zeitslots gruppieren
     $reservationsBySlot = [];
@@ -777,6 +774,42 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
         }
         .day-stats-pill strong {
             color: var(--gold-bright);
+        }
+
+        /* ================= GANZTAGS-SPERRE BANNER ================= */
+        .day-lock-alert-banner {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.22) 0%, rgba(120, 53, 15, 0.3) 100%);
+            border: 2px solid var(--danger);
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+        }
+        .day-lock-alert-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .day-lock-icon {
+            font-size: 1.8rem;
+        }
+        .day-lock-alert-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fca5a5;
+            letter-spacing: 1px;
+        }
+        .day-lock-alert-sub {
+            font-size: 0.9rem;
+            color: var(--text-cream);
+            opacity: 0.9;
+            margin-top: 2px;
         }
 
         /* ================= 30-MINUTEN SLOTS SCHNELLSPERRE (CHECKBOXEN) ================= */
@@ -1344,12 +1377,16 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
                     $statusColor = $dayData['status'];
                     $isSelected = ($curDateStr === $selectedDate);
                     $guestsCount = (int)$dayData['total_guests'];
+                    $isDayBlockedCal = !empty($dayData['is_day_blocked']);
                     $hasBlocks = $dayData['blocked_count'] > 0;
 
                     // Badge-Text je nach Status
                     if ($statusColor === 'gray') {
                         $badgeText = 'Ruhetag';
                         $badgeClass = 'badge-gray';
+                    } elseif ($isDayBlockedCal) {
+                        $badgeText = $guestsCount > 0 ? "🔒 Gesperrt ({$guestsCount}G)" : '🔒 Tag gesperrt';
+                        $badgeClass = 'badge-red';
                     } elseif ($statusColor === 'red') {
                         $badgeText = $hasBlocks ? '🔒 Gesperrt' : "Voll ({$guestsCount}G)";
                         $badgeClass = 'badge-red';
@@ -1430,15 +1467,50 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
                         <?php endif; ?>
                     </div>
                 </div>
-                <div class="day-stats-pill">
-                    <span>Gebuchte Gäste: <strong><?= $totalGuestsDay ?></strong></span>
-                    <span>Reservierungen: <strong><?= $totalBookingsDay ?></strong></span>
-                    <?php if ($totalLocksDay > 0): ?>
-                        <span style="color: #fca5a5;">Gesperrte Slots: <strong><?= $totalLocksDay ?></strong></span>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <div class="day-stats-pill">
+                        <span>Gebuchte Gäste: <strong><?= $totalGuestsDay ?></strong></span>
+                        <span>Reservierungen: <strong><?= $totalBookingsDay ?></strong></span>
+                        <?php if ($isEntireDayBlocked): ?>
+                            <span style="color: #fca5a5; font-weight: 700;">🔒 Ganztägig gesperrt</span>
+                        <?php elseif ($totalLocksDay > 0): ?>
+                            <span style="color: #fca5a5;">Gesperrte Slots: <strong><?= $totalLocksDay ?></strong></span>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (!$isEntireDayBlocked && $dayConfig && $dayConfig['isOpen']): ?>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="openDayLockModal('<?= htmlspecialchars($selectedDate) ?>', '<?= htmlspecialchars($dayNameDe . ', ' . $formattedDateDe) ?>', <?= $totalBookingsDay ?>, <?= $totalGuestsDay ?>)" title="Diesen Tag für alle weiteren Online-Buchungen sperren">
+                            🔒 Ganzen Tag sperren
+                        </button>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
+
+        <?php if ($isEntireDayBlocked): ?>
+            <!-- GANZTAGS-SPERRE BANNER (AKTIV) -->
+            <div class="day-lock-alert-banner">
+                <div class="day-lock-alert-left">
+                    <span class="day-lock-icon">🔒</span>
+                    <div>
+                        <div class="day-lock-alert-title">GANZER TAG GESPERRT</div>
+                        <div class="day-lock-alert-sub">
+                            Grund: <strong><?= htmlspecialchars($dayLockInfo['notes'] ?: 'Ganztägige Sperre durch Wirt') ?></strong>
+                            · Keine neuen Online-Buchungen möglich
+                            <?php if ($totalGuestsDay > 0): ?>
+                                · <strong><?= $totalGuestsDay ?> Gäste</strong> an diesem Tag gebucht
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <form method="POST" action="tischplan.php" onsubmit="return confirm('Möchtest du die Sperre für den gesamten Tag aufheben? Alle Zeitslots werden online wieder freigegeben. Bestehende Buchungen bleiben vollständig erhalten.');">
+                    <input type="hidden" name="action" value="unblock_entire_day">
+                    <input type="hidden" name="date" value="<?= htmlspecialchars($selectedDate) ?>">
+                    <button type="submit" class="btn btn-success" style="min-height: 44px;">
+                        🔓 Tag freigeben (Entsperren)
+                    </button>
+                </form>
+            </div>
+        <?php endif; ?>
 
         <!-- 30-MINUTEN SLOTS SCHNELLSPERRE (CHECKBOXEN) -->
         <?php if (!empty($daySlots)): ?>
@@ -1449,7 +1521,13 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
                         <span>30-Minuten Slots sperren / freigeben:</span>
                     </span>
                     <span class="slot-lock-hint">
-                        💡 Checkbox anklicken: Angehakt = Slot gesperrt | Nicht angehakt = Slot frei
+                        <?php if ($isEntireDayBlocked): ?>
+                            <span style="color: #fca5a5; font-weight: 600;">
+                                🔒 Ganztags-Sperre ist aktiv. Klicke oben auf „Tag freigeben“, um alle Slots wieder zu öffnen.
+                            </span>
+                        <?php else: ?>
+                            💡 Checkbox anklicken: Angehakt = Slot gesperrt | Nicht angehakt = Slot frei
+                        <?php endif; ?>
                     </span>
                 </div>
 
@@ -1793,10 +1871,87 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
         document.getElementById('modalNotes').value = 'Sperre durch Wirt';
     }
 
+<!-- GANZTAGS-SPERRE MODAL -->
+<div class="modal-backdrop" id="dayLockModal">
+    <div class="modal-card" style="max-width: 480px;">
+        <div class="modal-header" style="background: rgba(239, 68, 68, 0.15); border-bottom-color: var(--danger);">
+            <h3 style="color: #fca5a5;">🔒 Ganzen Tag sperren</h3>
+            <button type="button" class="btn-close-modal" onclick="closeDayLockModal()">✕</button>
+        </div>
+
+        <form method="POST" action="tischplan.php" class="modal-body-scroll">
+            <input type="hidden" name="action" value="block_entire_day">
+            <input type="hidden" name="date" id="dayLockDateInput" value="">
+
+            <div style="font-size: 1.05rem; margin-bottom: 12px;">
+                Datum: <strong id="dayLockDateDisplay" style="color: var(--gold-bright);"></strong>
+            </div>
+
+            <div id="dayLockExistingWarning" style="display:none; background: rgba(234, 179, 8, 0.15); border: 1px solid var(--warning); padding: 12px; border-radius: 4px; margin-bottom: 14px; font-size: 0.9rem; color: #fef08a;">
+                ⚠️ <strong>Bestehende Reservierungen vorhanden:</strong><br>
+                <span id="dayLockWarningText"></span><br>
+                <small style="opacity: 0.9; display: block; margin-top: 4px;">Diese Buchungen bleiben im Tischplan erhalten. Es werden lediglich keine neuen Online-Buchungen mehr angenommen.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="dayLockReasonInput">Grund für die Tagessperre (optional)</label>
+                <input type="text" id="dayLockReasonInput" name="reason" class="form-control" placeholder="z.B. Geschlossene Gesellschaft" value="Geschlossene Gesellschaft">
+                <div class="name-presets" style="margin-top: 8px;">
+                    <button type="button" class="name-preset-btn" onclick="setDayLockReason('Geschlossene Gesellschaft')">Geschlossene Gesellschaft</button>
+                    <button type="button" class="name-preset-btn" onclick="setDayLockReason('Betriebsurlaub')">Betriebsurlaub</button>
+                    <button type="button" class="name-preset-btn" onclick="setDayLockReason('Krankheit / Ruhetag')">Krankheit / Ruhetag</button>
+                    <button type="button" class="name-preset-btn" onclick="setDayLockReason('Sonderveranstaltung')">Sonderveranstaltung</button>
+                    <button type="button" class="name-preset-btn" onclick="setDayLockReason('Renovierung / Umbau')">Renovierung</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 18px; display: flex; gap: 10px;">
+                <button type="button" class="btn" style="flex: 1;" onclick="closeDayLockModal()">
+                    Abbrechen
+                </button>
+                <button type="submit" class="btn btn-danger" style="flex: 1.5; font-size: 0.95rem;">
+                    🔒 Jetzt sperren
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const isDayBlockedGlobally = <?= $isEntireDayBlocked ? 'true' : 'false' ?>;
+
+    // Day Lock Modal Steuerung
+    function openDayLockModal(date, formattedDate, bookingCount, guestCount) {
+        document.getElementById('dayLockDateInput').value = date;
+        document.getElementById('dayLockDateDisplay').textContent = formattedDate;
+
+        const warnEl = document.getElementById('dayLockExistingWarning');
+        const warnText = document.getElementById('dayLockWarningText');
+        if (bookingCount > 0) {
+            warnText.textContent = `An diesem Tag liegen bereits ${bookingCount} Buchung(en) mit ${guestCount} Gästen vor!`;
+            warnEl.style.display = 'block';
+        } else {
+            warnEl.style.display = 'none';
+        }
+
+        document.getElementById('dayLockModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDayLockModal() {
+        document.getElementById('dayLockModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function setDayLockReason(reason) {
+        document.getElementById('dayLockReasonInput').value = reason;
+    }
+
     // Modal schließen mit Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeBookingModal();
+            closeDayLockModal();
         }
     });
 
@@ -1806,9 +1961,18 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
             closeBookingModal();
         }
     });
+    document.getElementById('dayLockModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDayLockModal();
+        }
+    });
 
     // 30-Minuten Slot Checkbox Umschaltung
     function toggleSlot(slotTime, targetState) {
+        if (isDayBlockedGlobally) {
+            alert('Der gesamte Tag ist aktuell durch eine Ganztagssperre blockiert. Nutze den grünen Button "Tag freigeben", um alle Slots wieder zu öffnen.');
+            return;
+        }
         document.getElementById('toggleTimeInput').value = slotTime;
         document.getElementById('toggleBlockedInput').value = targetState;
         document.getElementById('slotToggleForm').submit();
@@ -1816,7 +1980,7 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
 
     // Automatischer dezenter Refresh alle 60 Sekunden (damit neue Online-Buchungen erscheinen)
     let idleTimer = setTimeout(() => {
-        if (!document.getElementById('bookingModal').classList.contains('active')) {
+        if (!document.getElementById('bookingModal').classList.contains('active') && !document.getElementById('dayLockModal').classList.contains('active')) {
             window.location.reload();
         }
     }, 60000);

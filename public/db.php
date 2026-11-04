@@ -11,6 +11,64 @@ define('STANDARD_SLOT_CAPACITY', 10);
 define('MAX_EXCLUSIVE_GROUP_CAPACITY', 20);
 
 /**
+ * Standard Öffnungszeiten der Drachen Taverne Zittau
+ * 0 = Sonntag, 1 = Montag, ..., 6 = Samstag
+ */
+function getStandardOpeningHours(): array {
+    return [
+        0 => [
+            'isOpen' => true,
+            'shifts' => [
+                ['open' => '11:00', 'close' => '14:00', 'lastSlot' => '13:30', 'name' => 'Mittag'],
+                ['open' => '17:00', 'close' => '21:00', 'kitchenClose' => '20:00', 'lastSlot' => '20:00', 'name' => 'Abend'],
+            ],
+            'label'  => 'So: 11:00–14:00 & 17:00–21:00 Uhr'
+        ],
+        1 => [
+            'isOpen' => true,
+            'shifts' => [
+                ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+            ],
+            'label'  => 'Mo: 17:00–22:00 Uhr'
+        ],
+        2 => [
+            'isOpen' => false,
+            'shifts' => [],
+            'label'  => 'Di: Ruhetag (Geschlossen)'
+        ],
+        3 => [
+            'isOpen' => true,
+            'shifts' => [
+                ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+            ],
+            'label'  => 'Mi: 17:00–22:00 Uhr'
+        ],
+        4 => [
+            'isOpen' => true,
+            'shifts' => [
+                ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+            ],
+            'label'  => 'Do: 17:00–22:00 Uhr'
+        ],
+        5 => [
+            'isOpen' => true,
+            'shifts' => [
+                ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+            ],
+            'label'  => 'Fr: 17:00–22:00 Uhr'
+        ],
+        6 => [
+            'isOpen' => true,
+            'shifts' => [
+                ['open' => '11:00', 'close' => '14:00', 'lastSlot' => '13:30', 'name' => 'Mittag'],
+                ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+            ],
+            'label'  => 'Sa: 11:00–14:00 & 17:00–22:00 Uhr'
+        ],
+    ];
+}
+
+/**
  * Gibt eine betriebsbereite PDO-Verbindung zur SQLite-Datenbank zurück.
  * Erstellt die Datei und Tabelle automatisch, falls noch nicht vorhanden.
  *
@@ -201,8 +259,68 @@ function drainFallbackQueue(PDO $pdo): void {
 }
 
 /**
+ * Berechnet alle Zeitslots für eine gegebene Tageskonfiguration der Öffnungszeiten.
+ *
+ * @param array $config
+ * @return array<string>
+ */
+function getSlotsForDayConfig(array $config): array {
+    if (empty($config) || empty($config['isOpen'])) return [];
+    $slots = [];
+    if (!empty($config['shifts']) && is_array($config['shifts'])) {
+        foreach ($config['shifts'] as $shift) {
+            if (!empty($shift['open']) && !empty($shift['lastSlot'])) {
+                list($openH, $openM) = explode(':', $shift['open']);
+                list($lastH, $lastM) = explode(':', $shift['lastSlot']);
+                $currentMin = (int)$openH * 60 + (int)$openM;
+                $endMin = (int)$lastH * 60 + (int)$lastM;
+                while ($currentMin <= $endMin) {
+                    $h = floor($currentMin / 60);
+                    $m = $currentMin % 60;
+                    $slots[] = sprintf('%02d:%02d', $h, $m);
+                    $currentMin += 30;
+                }
+            }
+        }
+    } elseif (!empty($config['open']) && !empty($config['lastSlot'])) {
+        list($openH, $openM) = explode(':', $config['open']);
+        list($lastH, $lastM) = explode(':', $config['lastSlot']);
+        $currentMin = (int)$openH * 60 + (int)$openM;
+        $endMin = (int)$lastH * 60 + (int)$lastM;
+        while ($currentMin <= $endMin) {
+            $h = floor($currentMin / 60);
+            $m = $currentMin % 60;
+            $slots[] = sprintf('%02d:%02d', $h, $m);
+            $currentMin += 30;
+        }
+    }
+    return $slots;
+}
+
+/**
+ * Prüft, ob ein Tag durch eine explizite Ganztagssperre (time = 'ALL' AND status = 'blocked') gesperrt ist.
+ *
+ * @param PDO $pdo
+ * @param string $date
+ * @return array|null Gibt Datensatz der Sperre zurück oder null.
+ */
+function isDayBlocked(PDO $pdo, string $date): ?array {
+    drainFallbackQueue($pdo);
+    $stmt = $pdo->prepare("
+        SELECT id, name, notes, created_at
+        FROM reservations
+        WHERE date = :date AND time = 'ALL' AND status = 'blocked'
+        LIMIT 1
+    ");
+    $stmt->execute([':date' => $date]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}
+
+/**
  * Gibt detaillierte Belegungsdaten je Zeitslot für ein bestimmtes Datum zurück.
  * Erfasst Gesamtzahl der realen Gäste, Buchungsanzahl, Großgruppen und Wirt-Sperren.
+ * Berücksichtigt automatisch auch Ganztagssperren (time = 'ALL').
  *
  * @param PDO $pdo
  * @param string $date (Format: YYYY-MM-DD)
@@ -210,6 +328,8 @@ function drainFallbackQueue(PDO $pdo): void {
  */
 function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
     drainFallbackQueue($pdo);
+
+    $dayLock = isDayBlocked($pdo, $date);
 
     $stmt = $pdo->prepare("
         SELECT time, guests, status
@@ -221,6 +341,9 @@ function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
     $occupancy = [];
     while ($row = $stmt->fetch()) {
         $timeSlot = trim($row['time']);
+        if ($timeSlot === 'ALL') {
+            continue; // Ganztagssperre wird separat über $dayLock verwaltet
+        }
         $guests = (int)$row['guests'];
         $status = trim($row['status']);
 
@@ -249,6 +372,7 @@ function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
     foreach ($fallbacks as $fb) {
         if (($fb['date'] ?? '') !== $date) continue;
         $t = trim($fb['time'] ?? '');
+        if ($t === 'ALL') continue;
         $g = (int)($fb['guests'] ?? 1);
         $s = $fb['status'] ?? 'confirmed';
         if (!isset($occupancy[$t])) {
@@ -263,6 +387,14 @@ function getOccupancyDetailsForDate(PDO $pdo, string $date): array {
                 $occupancy[$t]['has_large_group'] = true;
             }
         }
+    }
+
+    // Wenn der gesamte Tag gesperrt ist, alle erfassten Slots als is_blocked markieren
+    if ($dayLock) {
+        foreach ($occupancy as $slotTime => &$info) {
+            $info['is_blocked'] = true;
+        }
+        unset($info);
     }
 
     return $occupancy;
@@ -327,7 +459,7 @@ function getReservationsListForDate(PDO $pdo, string $date): array {
  * @param PDO $pdo
  * @param string $yearMonth Format YYYY-MM (z. B. "2026-09")
  * @param array $openingHoursConfig
- * @return array<string, array{total_guests: int, booking_count: int, blocked_count: int, full_count: int, total_slots: int, status: string}>
+ * @return array<string, array{total_guests: int, booking_count: int, blocked_count: int, full_count: int, total_slots: int, status: string, is_day_blocked: bool}>
  */
 function getMonthOccupancySummary(PDO $pdo, string $yearMonth, array $openingHoursConfig): array {
     $startDate = $yearMonth . '-01';
@@ -344,9 +476,14 @@ function getMonthOccupancySummary(PDO $pdo, string $yearMonth, array $openingHou
 
     // Nach Datum und Slot gruppieren
     $daySlotMap = [];
+    $dayLocksMap = [];
     foreach ($allRows as $r) {
         $d = $r['date'];
         $t = trim($r['time']);
+        if ($t === 'ALL' && $r['status'] === 'blocked') {
+            $dayLocksMap[$d] = true;
+            continue;
+        }
         if (!isset($daySlotMap[$d])) $daySlotMap[$d] = [];
         if (!isset($daySlotMap[$d][$t])) {
             $daySlotMap[$d][$t] = ['guests' => 0, 'count' => 0, 'has_large' => false, 'is_blocked' => false];
@@ -372,35 +509,20 @@ function getMonthOccupancySummary(PDO $pdo, string $yearMonth, array $openingHou
         // Ruhetag (z. B. Dienstag)
         if (!$config || !$config['isOpen']) {
             $summary[$curDate] = [
-                'total_guests'  => 0,
-                'booking_count' => 0,
-                'blocked_count' => 0,
-                'full_count'    => 0,
-                'total_slots'   => 0,
-                'status'        => 'gray'
+                'total_guests'   => 0,
+                'booking_count'  => 0,
+                'blocked_count'  => 0,
+                'full_count'     => 0,
+                'total_slots'    => 0,
+                'status'         => 'gray',
+                'is_day_blocked' => false
             ];
             continue;
         }
 
         // Maximale Slots des Tages ermitteln (unter Berücksichtigung von geteilten Schichten)
-        $totalSlots = 0;
-        if (!empty($config['shifts']) && is_array($config['shifts'])) {
-            foreach ($config['shifts'] as $shift) {
-                if (!empty($shift['open']) && !empty($shift['lastSlot'])) {
-                    list($openH, $openM) = explode(':', $shift['open']);
-                    list($lastH, $lastM) = explode(':', $shift['lastSlot']);
-                    $slotMinutes = ((int)$lastH * 60 + (int)$lastM) - ((int)$openH * 60 + (int)$openM);
-                    $totalSlots += max(1, floor($slotMinutes / 30) + 1);
-                }
-            }
-        } elseif (!empty($config['open']) && !empty($config['lastSlot'])) {
-            list($openH, $openM) = explode(':', $config['open']);
-            list($lastH, $lastM) = explode(':', $config['lastSlot']);
-            $slotMinutes = ((int)$lastH * 60 + (int)$lastM) - ((int)$openH * 60 + (int)$openM);
-            $totalSlots = max(1, floor($slotMinutes / 30) + 1);
-        } else {
-            $totalSlots = 1;
-        }
+        $daySlots = getSlotsForDayConfig($config);
+        $totalSlots = max(1, count($daySlots));
         $maxCapacity = $totalSlots * STANDARD_SLOT_CAPACITY; // Standard 10 pro Slot
 
         $daySlotsData = $daySlotMap[$curDate] ?? [];
@@ -420,10 +542,16 @@ function getMonthOccupancySummary(PDO $pdo, string $yearMonth, array $openingHou
             }
         }
 
+        $isDayLockActive = !empty($dayLocksMap[$curDate]);
+
         // 3-Farben-Ampel bestimmen
         $occupancyRatio = $maxCapacity > 0 ? ($totalGuests / $maxCapacity) : 0;
 
-        if ($fullCount >= ($totalSlots * 0.7) || $occupancyRatio >= 0.75) {
+        if ($isDayLockActive) {
+            $color = 'red';
+            $blockedCount = $totalSlots;
+            $fullCount = $totalSlots;
+        } elseif ($fullCount >= ($totalSlots * 0.7) || $occupancyRatio >= 0.75) {
             $color = 'red';
         } elseif ($occupancyRatio >= 0.3 || $fullCount >= 2 || $totalGuests >= 15) {
             $color = 'yellow';
@@ -432,16 +560,101 @@ function getMonthOccupancySummary(PDO $pdo, string $yearMonth, array $openingHou
         }
 
         $summary[$curDate] = [
-            'total_guests'  => $totalGuests,
-            'booking_count' => $bookingCount,
-            'blocked_count' => $blockedCount,
-            'full_count'    => $fullCount,
-            'total_slots'   => $totalSlots,
-            'status'        => $color
+            'total_guests'   => $totalGuests,
+            'booking_count'  => $bookingCount,
+            'blocked_count'  => $blockedCount,
+            'full_count'     => $fullCount,
+            'total_slots'    => $totalSlots,
+            'status'         => $color,
+            'is_day_blocked' => $isDayLockActive
         ];
     }
 
     return $summary;
+}
+
+/**
+ * Ermittelt alle Tage eines Monats, die VOLLSTÄNDIG gesperrt sind.
+ * Ein Tag gilt als vollständig gesperrt, wenn:
+ * 1) time = 'ALL' AND status = 'blocked' vorliegt (Ganztagssperre durch Wirt)
+ * 2) ODER alle regulären Zeitslots des Tages einzeln gesperrt sind.
+ * Tage mit nur teilweiser Belegung oder einzelnen freien Slots werden NICHT zurückgegeben ("Aber wirklich nur dann").
+ *
+ * @param PDO $pdo
+ * @param string $yearMonth Format YYYY-MM
+ * @param array $openingHoursConfig
+ * @return array<string> Liste von Datums-Strings (z. B. ['2026-11-14', '2026-11-20'])
+ */
+function getBlockedDaysForMonth(PDO $pdo, string $yearMonth, ?array $openingHoursConfig = null): array {
+    if ($openingHoursConfig === null) {
+        $openingHoursConfig = getStandardOpeningHours();
+    }
+    $startDate = $yearMonth . '-01';
+    $daysInMonth = (int)date('t', strtotime($startDate));
+    $endDate = $yearMonth . '-' . sprintf('%02d', $daysInMonth);
+
+    $stmt = $pdo->prepare("
+        SELECT date, time, status
+        FROM reservations
+        WHERE date >= :start AND date <= :end AND status = 'blocked'
+    ");
+    $stmt->execute([':start' => $startDate, ':end' => $endDate]);
+    $blockedRows = $stmt->fetchAll();
+
+    $dayBlocks = [];
+    foreach ($blockedRows as $r) {
+        $d = $r['date'];
+        $t = trim($r['time']);
+        if (!isset($dayBlocks[$d])) {
+            $dayBlocks[$d] = ['has_day_lock' => false, 'slots' => []];
+        }
+        if ($t === 'ALL') {
+            $dayBlocks[$d]['has_day_lock'] = true;
+        } else {
+            $dayBlocks[$d]['slots'][$t] = true;
+        }
+    }
+
+    $completelyBlockedDates = [];
+
+    for ($day = 1; $day <= $daysInMonth; $day++) {
+        $curDate = $yearMonth . '-' . sprintf('%02d', $day);
+        $dayOfWeek = (int)date('w', strtotime($curDate));
+        $config = $openingHoursConfig[$dayOfWeek] ?? null;
+
+        // Wenn regulär Ruhetag (z. B. Di), ist er ohnehin im Frontend als Ruhetag markiert
+        if (!$config || !$config['isOpen']) {
+            continue;
+        }
+
+        $info = $dayBlocks[$curDate] ?? null;
+        if (!$info) {
+            continue;
+        }
+
+        // 1. Explizite Ganztagssperre durch Wirt
+        if (!empty($info['has_day_lock'])) {
+            $completelyBlockedDates[] = $curDate;
+            continue;
+        }
+
+        // 2. Prüfung, ob ALLE regulären Zeitslots des Tages gesperrt sind
+        $daySlots = getSlotsForDayConfig($config);
+        if (!empty($daySlots)) {
+            $allSlotsBlocked = true;
+            foreach ($daySlots as $slot) {
+                if (empty($info['slots'][$slot])) {
+                    $allSlotsBlocked = false;
+                    break;
+                }
+            }
+            if ($allSlotsBlocked) {
+                $completelyBlockedDates[] = $curDate;
+            }
+        }
+    }
+
+    return $completelyBlockedDates;
 }
 
 
