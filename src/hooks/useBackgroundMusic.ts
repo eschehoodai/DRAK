@@ -4,73 +4,103 @@ import tavernTrack from '../assets/images/taverne.mp3.mp3';
 /**
  * Plays looping tavern ambience with no visible UI of any kind.
  *
- * - Playback begins on the first user interaction (click, scroll, touchstart,
- *   keydown or mousemove). play() is invoked synchronously inside the gesture
- *   handler so browser autoplay policies — including iOS Safari — accept it.
- * - When the tab goes to the background the audio pauses and the "started" flag
- *   resets, so returning to the tab leaves the music off until a fresh user
- *   interaction starts it again.
+ * - Attempts immediate playback on load, falling back to aggressive capture-phase
+ *   listeners on any user action (pointermove, click, scroll, touch, keydown, focus).
+ * - Pauses playback when the tab is hidden and automatically resumes when the tab
+ *   becomes visible again.
  *
- * Volume is fixed at 0.3 and intentionally has no controls (no play button,
- * mute, slider or persistence).
+ * Volume is set to 0.2.
  */
 export function useBackgroundMusic(): void {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const startedRef = useRef(false);
 
-  // Create the audio element imperatively (never in JSX) and tear it down on unmount.
   useEffect(() => {
     const audio = new Audio();
-    audio.preload = 'metadata';
+    audio.preload = 'auto';
     audio.loop = true;
-    audio.volume = 0.3;
+    audio.volume = 0.2;
     audio.src = tavernTrack;
     audioRef.current = audio;
 
-    return () => {
-      audio.pause();
-      audio.src = '';
-      audioRef.current = null;
+    const events: Array<keyof WindowEventMap> = [
+      'pointerdown',
+      'pointermove',
+      'mousedown',
+      'click',
+      'scroll',
+      'wheel',
+      'touchstart',
+      'keydown',
+      'focus',
+    ];
+
+    let listenersAttached = false;
+
+    const cleanupListeners = () => {
+      if (!listenersAttached) return;
+      listenersAttached = false;
+      events.forEach((event) => {
+        window.removeEventListener(event, handleInteraction, { capture: true });
+      });
     };
-  }, []);
 
-  // Start playback on the first user gesture. The listeners stay attached for the
-  // whole lifetime of the hook; the startedRef guard turns repeated events (e.g.
-  // a stream of mousemove events) into cheap no-ops once playback has begun.
-  useEffect(() => {
-    const startPlayback = () => {
-      const audio = audioRef.current;
-      if (!audio || startedRef.current) return;
-      startedRef.current = true;
-      // Silently ignore autoplay rejections or a missing file — never crash the UI.
-      audio.play().catch(() => {});
+    const attachListeners = () => {
+      if (listenersAttached) return;
+      listenersAttached = true;
+      events.forEach((event) => {
+        window.addEventListener(event, handleInteraction, {
+          capture: true,
+          passive: true,
+        });
+      });
     };
 
-    const events = ['click', 'scroll', 'touchstart', 'keydown', 'mousemove'];
-    events.forEach((event) =>
-      window.addEventListener(event, startPlayback, { passive: true }),
-    );
-
-    return () => {
-      events.forEach((event) =>
-        window.removeEventListener(event, startPlayback),
-      );
+    const playAudio = () => {
+      if (!audioRef.current || startedRef.current) return;
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            startedRef.current = true;
+            cleanupListeners();
+          })
+          .catch(() => {
+            // Autoplay was blocked by browser policy; wait for user interaction
+            attachListeners();
+          });
+      }
     };
-  }, []);
 
-  // Pause when the tab is hidden and reset the flag, so the music only resumes
-  // after a new user gesture once the tab becomes visible again.
-  useEffect(() => {
+    const handleInteraction = () => {
+      playAudio();
+    };
+
+    // 1. Sofortiger aggressiver Autoplay-Versuch bei Seitenaufruf
+    playAudio();
+
+    // Listener vorsorglich aktivieren, falls Autoplay fehlschlägt oder pending ist
+    if (!startedRef.current) {
+      attachListeners();
+    }
+
+    // 2. Tab-Sichtbarkeit handhaben
     const handleVisibilityChange = () => {
       if (document.hidden) {
         audioRef.current?.pause();
-        startedRef.current = false;
+      } else if (startedRef.current) {
+        audioRef.current?.play().catch(() => {});
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
+      cleanupListeners();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      audio.pause();
+      audio.src = '';
+      audioRef.current = null;
     };
   }, []);
 }
