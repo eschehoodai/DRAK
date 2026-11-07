@@ -5,7 +5,8 @@
 
 import React from 'react';
 import { Screen } from '../types';
-import { ShieldAlert, Calendar, Phone } from 'lucide-react';
+import { SCREEN_PATHS, SCREEN_META } from '../routes';
+import { Calendar, Phone } from 'lucide-react';
 import { useIsTavernOpen } from '../utils/openingHours';
 import { trackPhoneCallClick } from '../utils/gtag';
 
@@ -17,13 +18,21 @@ interface HeaderProps {
 export default function Header({ currentScreen, onNavigate }: HeaderProps) {
   const isTavernOpenNow = useIsTavernOpen();
 
+  const handleNavClick = (screen: Screen) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    onNavigate(screen);
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gold-secondary/20 bg-void-black/95 backdrop-blur-md">
+    <header role="banner" className="sticky top-0 z-50 w-full border-b border-gold-secondary/20 bg-void-black/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
         {/* Logo */}
-        <div 
+        <a
           id="hdr-logo-container"
-          onClick={() => onNavigate(Screen.HOME)}
+          href={SCREEN_PATHS[Screen.HOME]}
+          onClick={handleNavClick(Screen.HOME)}
+          title="Drachen Taverne Zittau – Zur Startseite"
+          aria-label="Drachen Taverne Zittau – Zur Startseite"
           className="group flex items-center space-x-2 cursor-pointer select-none"
         >
           <span id="hdr-logo-text" className="font-cinzel text-3xl font-extrabold tracking-widest text-gold-primary transition-colors group-hover:text-gold-bright">
@@ -32,13 +41,16 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
           <span className="hidden font-cinzel text-xs uppercase tracking-widest text-cream-parchment/60 md:inline-block">
             | Zittau
           </span>
-        </div>
+        </a>
 
         {/* Desktop Navigation links */}
-        <nav className="hidden items-center space-x-8 md:flex">
-          <button
+        <nav aria-label="Hauptnavigation" className="hidden items-center space-x-6 lg:space-x-8 md:flex">
+          <a
             id="hdr-nav-home"
-            onClick={() => onNavigate(Screen.HOME)}
+            href={SCREEN_PATHS[Screen.HOME]}
+            onClick={handleNavClick(Screen.HOME)}
+            title={SCREEN_META[Screen.HOME].navTooltip}
+            aria-current={currentScreen === Screen.HOME ? 'page' : undefined}
             className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
               currentScreen === Screen.HOME
                 ? 'text-gold-bright'
@@ -49,24 +61,30 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
             {currentScreen === Screen.HOME && (
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
             )}
-          </button>
-          <button
+          </a>
+          <a
             id="hdr-nav-menu"
-            onClick={() => onNavigate(Screen.MENU)}
+            href={SCREEN_PATHS[Screen.MENU]}
+            onClick={handleNavClick(Screen.MENU)}
+            title={SCREEN_META[Screen.MENU].navTooltip}
+            aria-current={currentScreen === Screen.MENU ? 'page' : undefined}
             className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
               currentScreen === Screen.MENU
                 ? 'text-gold-bright'
                 : 'text-cream-parchment/70 hover:text-gold-primary'
             }`}
           >
-            Speisen & Trank
+            Speisen &amp; Trank
             {currentScreen === Screen.MENU && (
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
             )}
-          </button>
-          <button
+          </a>
+          <a
             id="hdr-nav-reserve"
-            onClick={() => onNavigate(Screen.RESERVE)}
+            href={SCREEN_PATHS[Screen.RESERVE]}
+            onClick={handleNavClick(Screen.RESERVE)}
+            title={SCREEN_META[Screen.RESERVE].navTooltip}
+            aria-current={currentScreen === Screen.RESERVE ? 'page' : undefined}
             className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
               currentScreen === Screen.RESERVE
                 ? 'text-gold-bright'
@@ -77,10 +95,30 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
             {currentScreen === Screen.RESERVE && (
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
             )}
-          </button>
-          <button
+          </a>
+          <a
+            id="hdr-nav-gallery"
+            href={SCREEN_PATHS[Screen.GALLERY]}
+            onClick={handleNavClick(Screen.GALLERY)}
+            title={SCREEN_META[Screen.GALLERY].navTooltip}
+            aria-current={currentScreen === Screen.GALLERY ? 'page' : undefined}
+            className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
+              currentScreen === Screen.GALLERY
+                ? 'text-gold-bright'
+                : 'text-cream-parchment/70 hover:text-gold-primary'
+            }`}
+          >
+            Galerie
+            {currentScreen === Screen.GALLERY && (
+              <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
+            )}
+          </a>
+          <a
             id="hdr-nav-jobs"
-            onClick={() => onNavigate(Screen.JOBS)}
+            href={SCREEN_PATHS[Screen.JOBS]}
+            onClick={handleNavClick(Screen.JOBS)}
+            title={SCREEN_META[Screen.JOBS].navTooltip}
+            aria-current={currentScreen === Screen.JOBS ? 'page' : undefined}
             className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
               currentScreen === Screen.JOBS
                 ? 'text-gold-bright'
@@ -91,10 +129,13 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
             {currentScreen === Screen.JOBS && (
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
             )}
-          </button>
-          <button
+          </a>
+          <a
             id="hdr-nav-impressum"
-            onClick={() => onNavigate(Screen.IMPRESSUM)}
+            href={SCREEN_PATHS[Screen.IMPRESSUM]}
+            onClick={handleNavClick(Screen.IMPRESSUM)}
+            title={SCREEN_META[Screen.IMPRESSUM].navTooltip}
+            aria-current={currentScreen === Screen.IMPRESSUM ? 'page' : undefined}
             className={`font-cinzel text-xs font-bold uppercase tracking-widest transition-all duration-300 relative py-1 ${
               currentScreen === Screen.IMPRESSUM
                 ? 'text-gold-bright'
@@ -105,7 +146,7 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
             {currentScreen === Screen.IMPRESSUM && (
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gold-primary" />
             )}
-          </button>
+          </a>
         </nav>
 
         {/* CTA Buttons (Phone & Table Reservation) */}
@@ -116,61 +157,103 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
               href="tel:035835495389"
               onClick={trackPhoneCallClick}
               className="hidden sm:flex items-center space-x-1.5 border border-gold-secondary/40 bg-gold-primary/10 px-3 py-2 font-cinzel text-xs font-bold text-gold-bright hover:bg-gold-primary hover:text-void-black transition-all duration-300 cursor-pointer"
-              title="Direkt in der Taverne anrufen"
+              title="Direkt in der Taverne anrufen: 03583 5495389"
             >
               <Phone className="h-3.5 w-3.5 shrink-0" />
               <span>03583 5495389</span>
             </a>
           )}
-          <button
+          <a
             id="hdr-cta-reserve"
-            onClick={() => onNavigate(Screen.RESERVE)}
+            href={SCREEN_PATHS[Screen.RESERVE]}
+            onClick={handleNavClick(Screen.RESERVE)}
+            title={SCREEN_META[Screen.RESERVE].navTooltip}
             className="flex items-center space-x-2 border border-gold-primary bg-gold-primary px-4 sm:px-5 py-2.5 text-center font-cinzel text-xs font-black uppercase tracking-wider text-void-black transition-all duration-300 hover:bg-gold-bright hover:border-gold-bright active:scale-95 cursor-pointer"
           >
             <Calendar className="h-4 w-4 shrink-0" />
             <span>Tisch Reservieren</span>
-          </button>
+          </a>
         </div>
       </div>
 
       {/* Mobile nav indicator bar */}
-      <div className="flex md:hidden justify-between border-t border-gold-secondary/10 bg-void-black px-1 py-2 text-xs font-semibold">
-        <button
+      <nav
+        aria-label="Mobile Navigation"
+        className="flex md:hidden justify-between border-t border-gold-secondary/10 bg-void-black px-1 py-2 text-xs font-semibold overflow-x-auto"
+      >
+        <a
           id="mob-nav-home"
-          onClick={() => onNavigate(Screen.HOME)}
-          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${currentScreen === Screen.HOME ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
+          href={SCREEN_PATHS[Screen.HOME]}
+          onClick={handleNavClick(Screen.HOME)}
+          title={SCREEN_META[Screen.HOME].navTooltip}
+          aria-current={currentScreen === Screen.HOME ? 'page' : undefined}
+          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${
+            currentScreen === Screen.HOME ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'
+          }`}
         >
           Startseite
-        </button>
-        <button
+        </a>
+        <a
           id="mob-nav-menu"
-          onClick={() => onNavigate(Screen.MENU)}
-          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${currentScreen === Screen.MENU ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
+          href={SCREEN_PATHS[Screen.MENU]}
+          onClick={handleNavClick(Screen.MENU)}
+          title={SCREEN_META[Screen.MENU].navTooltip}
+          aria-current={currentScreen === Screen.MENU ? 'page' : undefined}
+          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${
+            currentScreen === Screen.MENU ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'
+          }`}
         >
           Speisekarte
-        </button>
-        <button
+        </a>
+        <a
+          id="mob-nav-reserve"
+          href={SCREEN_PATHS[Screen.RESERVE]}
+          onClick={handleNavClick(Screen.RESERVE)}
+          title={SCREEN_META[Screen.RESERVE].navTooltip}
+          aria-current={currentScreen === Screen.RESERVE ? 'page' : undefined}
+          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${
+            currentScreen === Screen.RESERVE ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'
+          }`}
+        >
+          Reservierung
+        </a>
+        <a
           id="mob-nav-gallery"
-          onClick={() => onNavigate(Screen.GALLERY)}
-          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${currentScreen === Screen.GALLERY ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
+          href={SCREEN_PATHS[Screen.GALLERY]}
+          onClick={handleNavClick(Screen.GALLERY)}
+          title={SCREEN_META[Screen.GALLERY].navTooltip}
+          aria-current={currentScreen === Screen.GALLERY ? 'page' : undefined}
+          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${
+            currentScreen === Screen.GALLERY ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'
+          }`}
         >
           Galerie
-        </button>
-        <button
+        </a>
+        <a
           id="mob-nav-jobs"
-          onClick={() => onNavigate(Screen.JOBS)}
-          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${currentScreen === Screen.JOBS ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
+          href={SCREEN_PATHS[Screen.JOBS]}
+          onClick={handleNavClick(Screen.JOBS)}
+          title={SCREEN_META[Screen.JOBS].navTooltip}
+          aria-current={currentScreen === Screen.JOBS ? 'page' : undefined}
+          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${
+            currentScreen === Screen.JOBS ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'
+          }`}
         >
           Jobs
-        </button>
-        <button
+        </a>
+        <a
           id="mob-nav-impressum"
-          onClick={() => onNavigate(Screen.IMPRESSUM)}
-          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${currentScreen === Screen.IMPRESSUM ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'}`}
+          href={SCREEN_PATHS[Screen.IMPRESSUM]}
+          onClick={handleNavClick(Screen.IMPRESSUM)}
+          title={SCREEN_META[Screen.IMPRESSUM].navTooltip}
+          aria-current={currentScreen === Screen.IMPRESSUM ? 'page' : undefined}
+          className={`font-cinzel tracking-normal whitespace-nowrap px-2 py-1 ${
+            currentScreen === Screen.IMPRESSUM ? 'text-gold-primary font-bold' : 'text-cream-parchment/60'
+          }`}
         >
           Impressum
-        </button>
-      </div>
+        </a>
+      </nav>
     </header>
   );
 }

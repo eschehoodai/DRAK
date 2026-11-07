@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
 
+# Interne Endpunkte und Backend-Dateien vor Indexierung schützen
+Disallow: /admin.php
+Disallow: /db.php
+Disallow: /tischplan.php
+Disallow: /*.php$
+
 Sitemap: https://drakzittau.de/sitemap.xml

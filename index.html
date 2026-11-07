@@ -25,20 +25,20 @@
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18461699802"></script>
 
-    <title>Drachen Taverne – Mittelalter-Restaurant in Zittau | Speisen &amp; Tafeln wie anno dazumal</title>
+    <title>Mittelalter-Restaurant &amp; Taverne in Zittau | Drachen Taverne</title>
     <meta
       name="description"
-      content="Die Drachen Taverne in Zittau: Mittelalterliches Restaurant mit deftigen Speisen, Met und Tavernenatmosphäre im historischen Gewölbe. Jetzt Tisch reservieren – Innere Weberstraße 11, 02763 Zittau."
+      content="Erlebe die Drachen Taverne in Zittau: Deftige Speisen, süffiger Met und authentische Tavernenatmosphäre im historischen Gewölbe. Jetzt Tisch reservieren!"
     />
     <link rel="canonical" href="https://drakzittau.de/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="restaurant" />
     <meta property="og:site_name" content="Drachen Taverne Zittau" />
-    <meta property="og:title" content="Drachen Taverne – Mittelalter-Restaurant in Zittau" />
+    <meta property="og:title" content="Mittelalter-Restaurant &amp; Taverne in Zittau | Drachen Taverne" />
     <meta
       property="og:description"
-      content="Deftige Speisen, Met und Tavernenatmosphäre im historischen Gewölbe von Zittau. Jetzt Tisch reservieren."
+      content="Erlebe die Drachen Taverne in Zittau: Deftige Speisen, süffiger Met und authentische Tavernenatmosphäre im historischen Gewölbe. Jetzt Tisch reservieren!"
     />
     <meta property="og:url" content="https://drakzittau.de/" />
     <meta property="og:image" content="https://drakzittau.de/android-chrome-512x512.png" />
@@ -46,67 +46,146 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Drachen Taverne – Mittelalter-Restaurant in Zittau" />
+    <meta name="twitter:title" content="Mittelalter-Restaurant &amp; Taverne in Zittau | Drachen Taverne" />
     <meta
       name="twitter:description"
-      content="Deftige Speisen, Met und Tavernenatmosphäre im historischen Gewölbe von Zittau. Jetzt Tisch reservieren."
+      content="Erlebe die Drachen Taverne in Zittau: Deftige Speisen, süffiger Met und authentische Tavernenatmosphäre im historischen Gewölbe. Jetzt Tisch reservieren!"
     />
     <meta name="twitter:image" content="https://drakzittau.de/android-chrome-512x512.png" />
 
-    <!-- Schema.org: Lokales Restaurant -->
-    <script type="application/ld+json">
+    <!-- Schema.org: Structured Data (WebSite, Restaurant & SiteNavigationElement for Sitelinks) -->
+    <script id="structured-data-ldjson" type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Restaurant",
-        "name": "Drachen Taverne",
-        "description": "Mittelalterliches Restaurant mit deftigen Speisen, Met und Tavernenatmosphäre im historischen Gewölbe von Zittau.",
-        "url": "https://drakzittau.de/",
-        "image": "https://drakzittau.de/android-chrome-512x512.png",
-        "logo": "https://drakzittau.de/android-chrome-512x512.png",
-        "telephone": "+49 3583 5495389",
-        "email": "drakzittau@dlr-gastro-event.de",
-        "servesCuisine": ["Deutsch", "Mittelalterlich", "Rustikal"],
-        "priceRange": "€€",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Innere Weberstraße 11",
-          "postalCode": "02763",
-          "addressLocality": "Zittau",
-          "addressCountry": "DE"
-        },
-        "openingHoursSpecification": [
+        "@graph": [
           {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": "Sunday",
-            "opens": "11:00",
-            "closes": "14:00"
+            "@type": "WebSite",
+            "@id": "https://drakzittau.de/#website",
+            "url": "https://drakzittau.de/",
+            "name": "Drachen Taverne",
+            "alternateName": ["Drachen Taverne Zittau", "Drak Zittau"],
+            "inLanguage": "de-DE",
+            "description": "Mittelalterliches Restaurant mit deftigen Speisen, Met und Tavernenatmosphäre im historischen Gewölbe von Zittau."
           },
           {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": "Sunday",
-            "opens": "17:00",
-            "closes": "21:00"
+            "@type": "Restaurant",
+            "@id": "https://drakzittau.de/#restaurant",
+            "name": "Drachen Taverne",
+            "alternateName": "Drachen Taverne Zittau",
+            "description": "Mittelalterliches Erlebnis-Restaurant mit deftigen Speisen, Met und Tavernenatmosphäre im historischen Gewölbe von Zittau.",
+            "url": "https://drakzittau.de/",
+            "image": "https://drakzittau.de/android-chrome-512x512.png",
+            "logo": "https://drakzittau.de/android-chrome-512x512.png",
+            "telephone": "+49 3583 5495389",
+            "email": "drakzittau@dlr-gastro-event.de",
+            "servesCuisine": ["Deutsch", "Mittelalterlich", "Rustikal"],
+            "priceRange": "€€",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Innere Weberstraße 11",
+              "postalCode": "02763",
+              "addressLocality": "Zittau",
+              "addressRegion": "Sachsen",
+              "addressCountry": "DE"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 50.8971,
+              "longitude": 14.8044
+            },
+            "hasMap": "https://maps.google.com/?q=Innere+Weberstra%C3%9Fe+11,+02763+Zittau",
+            "openingHoursSpecification": [
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Sunday",
+                "opens": "11:00",
+                "closes": "14:00"
+              },
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Sunday",
+                "opens": "17:00",
+                "closes": "21:00"
+              },
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Wednesday", "Thursday", "Friday"],
+                "opens": "17:00",
+                "closes": "22:00"
+              },
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Saturday",
+                "opens": "11:00",
+                "closes": "14:00"
+              },
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Saturday",
+                "opens": "17:00",
+                "closes": "22:00"
+              }
+            ],
+            "acceptsReservations": "True",
+            "menu": "https://drakzittau.de/speisekarte"
           },
           {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Monday", "Wednesday", "Thursday", "Friday"],
-            "opens": "17:00",
-            "closes": "22:00"
+            "@type": "SiteNavigationElement",
+            "@id": "https://drakzittau.de/#nav-startseite",
+            "position": 1,
+            "name": "Startseite",
+            "url": "https://drakzittau.de/",
+            "description": "Startseite der Drachen Taverne Zittau mit Neuigkeiten und Tavernenschild."
           },
           {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": "Saturday",
-            "opens": "11:00",
-            "closes": "14:00"
+            "@type": "SiteNavigationElement",
+            "@id": "https://drakzittau.de/#nav-speisekarte",
+            "position": 2,
+            "name": "Speisekarte",
+            "url": "https://drakzittau.de/speisekarte",
+            "description": "Deftige Gerichte, Pfannen, Braten, Met und Tavernentränke in historischem Ambiente."
           },
           {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": "Saturday",
-            "opens": "17:00",
-            "closes": "22:00"
+            "@type": "SiteNavigationElement",
+            "@id": "https://drakzittau.de/#nav-tisch-reservieren",
+            "position": 3,
+            "name": "Tisch reservieren",
+            "url": "https://drakzittau.de/reservierung",
+            "description": "Tischreservierung online für das historische Gewölbe oder den Biergarten."
+          },
+          {
+            "@type": "SiteNavigationElement",
+            "@id": "https://drakzittau.de/#nav-galerie",
+            "position": 4,
+            "name": "Galerie",
+            "url": "https://drakzittau.de/galerie",
+            "description": "Fotogalerie und Impressionen aus dem historischen Gewölbe der Drachen Taverne."
+          },
+          {
+            "@type": "SiteNavigationElement",
+            "@id": "https://drakzittau.de/#nav-zunft-jobs",
+            "position": 5,
+            "name": "Zunft (Jobs)",
+            "url": "https://drakzittau.de/jobs",
+            "description": "Offene Stellen in Service und Küche: Werde Teil unserer Tavernen-Zunft."
+          },
+          {
+            "@type": "SiteNavigationElement",
+            "@id": "https://drakzittau.de/#nav-impressum",
+            "position": 6,
+            "name": "Impressum",
+            "url": "https://drakzittau.de/impressum",
+            "description": "Rechtliche Anbieterkennzeichnung, Anschrift und Kontakt der Drachen Taverne."
+          },
+          {
+            "@type": "SiteNavigationElement",
+            "@id": "https://drakzittau.de/#nav-datenschutz",
+            "position": 7,
+            "name": "Datenschutz",
+            "url": "https://drakzittau.de/datenschutz",
+            "description": "Datenschutzerklärung und Hinweise zur DSGVO-konformen Datenverarbeitung."
           }
-        ],
-        "acceptsReservations": "True"
+        ]
       }
     </script>
   </head>

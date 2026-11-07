@@ -16,6 +16,7 @@ import DatenschutzView from './components/DatenschutzView';
 import NotFoundView from './components/NotFoundView';
 import { CookieBanner } from './components/ConsentNotice';
 import BackgroundMusic from './components/BackgroundMusic';
+import StructuredData from './components/StructuredData';
 import { CookieProvider } from './context/CookieContext';
 import { Screen } from './types';
 import { SCREEN_PATHS, SCREEN_META, screenFromPath } from './routes';
@@ -49,18 +50,37 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Per-view title and meta description for SEO
+  // Per-view title, canonical and meta tags for SEO & Sitelinks
   useEffect(() => {
     const meta = SCREEN_META[currentScreen];
     document.title = meta.title;
-    const descriptionTag = document.querySelector('meta[name="description"]');
-    if (descriptionTag) {
-      descriptionTag.setAttribute('content', meta.description);
+
+    const setOrCreateMeta = (attr: string, key: string, content: string) => {
+      let el = document.querySelector(`meta[${attr}="${key}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    };
+
+    setOrCreateMeta('name', 'description', meta.description);
+    setOrCreateMeta('property', 'og:title', meta.ogTitle || meta.title);
+    setOrCreateMeta('property', 'og:description', meta.ogDescription || meta.description);
+    setOrCreateMeta('property', 'og:url', meta.canonical);
+    setOrCreateMeta('property', 'og:type', meta.ogType);
+    setOrCreateMeta('name', 'twitter:title', meta.ogTitle || meta.title);
+    setOrCreateMeta('name', 'twitter:description', meta.ogDescription || meta.description);
+
+    let canonicalTag = document.querySelector('link[rel="canonical"]');
+    if (!canonicalTag) {
+      canonicalTag = document.createElement('link');
+      canonicalTag.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalTag);
     }
-    const canonicalTag = document.querySelector('link[rel="canonical"]');
-    if (canonicalTag && currentScreen !== Screen.NOT_FOUND) {
-      const path = SCREEN_PATHS[currentScreen];
-      canonicalTag.setAttribute('href', `https://drakzittau.de${path === '/' ? '/' : path}`);
+    if (currentScreen !== Screen.NOT_FOUND) {
+      canonicalTag.setAttribute('href', meta.canonical);
     }
   }, [currentScreen]);
 
@@ -71,6 +91,9 @@ export default function App() {
   return (
     <CookieProvider>
       <div id="app-root" className="min-h-screen flex flex-col bg-void-black text-cream-parchment font-serif selection:bg-gold-primary selection:text-void-black">
+        {/* Schema.org / JSON-LD Structured Data for Sitelinks & Search Engines */}
+        <StructuredData />
+
         {/* Headless looping tavern ambience — no visible controls, renders nothing */}
         <BackgroundMusic />
 
