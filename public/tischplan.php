@@ -18,6 +18,7 @@ $OPENING_HOURS = getStandardOpeningHours();
 
 $message = null;
 $messageType = 'info'; // 'success' | 'error' | 'info'
+$isEntireDayBlocked = false;
 
 // 1. Logout verarbeiten
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
@@ -1688,6 +1689,7 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
 
 </div>
 
+<?php if ($isLoggedIn): ?>
 <!-- BUCHUNGS-MODAL (FÜR TABLET TOUCH OPTIMIERT) -->
 <div class="modal-backdrop" id="bookingModal">
     <div class="modal-card">
@@ -1782,95 +1784,6 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
     </div>
 </div>
 
-<script>
-    // Kalender ein-/ausblenden (Zustand im localStorage merken)
-    function toggleCalendar() {
-        const cal = document.getElementById('calendarSection');
-        const btn = document.getElementById('toggleCalBtn');
-        if (cal.style.display === 'none') {
-            cal.style.display = 'block';
-            btn.classList.add('btn-gold');
-            localStorage.setItem('drak_cal_visible', '1');
-        } else {
-            cal.style.display = 'none';
-            btn.classList.remove('btn-gold');
-            localStorage.setItem('drak_cal_visible', '0');
-        }
-    }
-
-    // Gespeicherten Zustand beim Laden prüfen
-    if (localStorage.getItem('drak_cal_visible') === '0') {
-        const cal = document.getElementById('calendarSection');
-        if (cal) cal.style.display = 'none';
-    } else {
-        const btn = document.getElementById('toggleCalBtn');
-        if (btn) btn.classList.add('btn-gold');
-    }
-
-    // Modal Steuerung
-    function openBookingModal(date, time) {
-        document.getElementById('modalDate').value = date;
-        document.getElementById('modalTime').value = time;
-        document.getElementById('modalGuests').value = 2;
-        document.getElementById('modalName').value = '';
-        document.getElementById('modalPhone').value = '';
-        document.getElementById('modalNotes').value = '';
-        document.getElementById('modalVault').value = 'Die Grosse Kathedrale';
-        highlightGuestBtn(2);
-
-        document.getElementById('bookingModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-        const form = document.getElementById('modalBookingForm');
-        if (form) form.scrollTop = 0;
-        setTimeout(() => {
-            document.getElementById('modalName').focus();
-        }, 150);
-    }
-
-    function closeBookingModal() {
-        document.getElementById('bookingModal').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    // Gästebutton Schnellauswahl
-    function selectGuests(count) {
-        document.getElementById('modalGuests').value = count;
-        highlightGuestBtn(count);
-    }
-
-    function highlightGuestBtn(count) {
-        document.querySelectorAll('.guest-btn').forEach(btn => {
-            if (parseInt(btn.textContent.trim(), 10) === count) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-    }
-
-    document.getElementById('modalGuests').addEventListener('input', function() {
-        highlightGuestBtn(parseInt(this.value, 10));
-    });
-
-    function setNamePreset(text) {
-        const input = document.getElementById('modalName');
-        if (input.value) {
-            input.value = input.value + ' (' + text + ')';
-        } else {
-            input.value = text;
-        }
-        input.focus();
-    }
-
-    function setTimePreset(time) {
-        document.getElementById('modalTime').value = time;
-    }
-
-    function setLockPreset() {
-        document.getElementById('modalName').value = '🔒 Tisch gesperrt (Wirt)';
-        document.getElementById('modalNotes').value = 'Sperre durch Wirt';
-    }
-
 <!-- GANZTAGS-SPERRE MODAL -->
 <div class="modal-backdrop" id="dayLockModal">
     <div class="modal-card" style="max-width: 480px;">
@@ -1918,7 +1831,103 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
 </div>
 
 <script>
-    const isDayBlockedGlobally = <?= $isEntireDayBlocked ? 'true' : 'false' ?>;
+    const isDayBlockedGlobally = <?= !empty($isEntireDayBlocked) ? 'true' : 'false' ?>;
+
+    // Kalender ein-/ausblenden (Zustand im localStorage merken)
+    function toggleCalendar() {
+        const cal = document.getElementById('calendarSection');
+        const btn = document.getElementById('toggleCalBtn');
+        if (!cal || !btn) return;
+        if (cal.style.display === 'none') {
+            cal.style.display = 'block';
+            btn.classList.add('btn-gold');
+            localStorage.setItem('drak_cal_visible', '1');
+        } else {
+            cal.style.display = 'none';
+            btn.classList.remove('btn-gold');
+            localStorage.setItem('drak_cal_visible', '0');
+        }
+    }
+
+    // Gespeicherten Zustand beim Laden prüfen
+    if (localStorage.getItem('drak_cal_visible') === '0') {
+        const cal = document.getElementById('calendarSection');
+        if (cal) cal.style.display = 'none';
+    } else {
+        const btn = document.getElementById('toggleCalBtn');
+        if (btn) btn.classList.add('btn-gold');
+    }
+
+    // Modal Steuerung
+    function openBookingModal(date, time) {
+        document.getElementById('modalDate').value = date;
+        document.getElementById('modalTime').value = time;
+        document.getElementById('modalGuests').value = 2;
+        document.getElementById('modalName').value = '';
+        document.getElementById('modalPhone').value = '';
+        document.getElementById('modalNotes').value = '';
+        document.getElementById('modalVault').value = 'Die Grosse Kathedrale';
+        highlightGuestBtn(2);
+
+        document.getElementById('bookingModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        const form = document.getElementById('modalBookingForm');
+        if (form) form.scrollTop = 0;
+        setTimeout(() => {
+            const nameEl = document.getElementById('modalName');
+            if (nameEl) nameEl.focus();
+        }, 150);
+    }
+
+    function closeBookingModal() {
+        const modal = document.getElementById('bookingModal');
+        if (modal) modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Gästebutton Schnellauswahl
+    function selectGuests(count) {
+        const guestsInput = document.getElementById('modalGuests');
+        if (guestsInput) guestsInput.value = count;
+        highlightGuestBtn(count);
+    }
+
+    function highlightGuestBtn(count) {
+        document.querySelectorAll('.guest-btn').forEach(btn => {
+            if (parseInt(btn.textContent.trim(), 10) === count) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    const modalGuestsInput = document.getElementById('modalGuests');
+    if (modalGuestsInput) {
+        modalGuestsInput.addEventListener('input', function() {
+            highlightGuestBtn(parseInt(this.value, 10));
+        });
+    }
+
+    function setNamePreset(text) {
+        const input = document.getElementById('modalName');
+        if (input) {
+            input.value = input.value ? input.value + ' (' + text + ')' : text;
+            input.focus();
+        }
+    }
+
+    function setTimePreset(time) {
+        const input = document.getElementById('modalTime');
+        if (input) input.value = time;
+    }
+
+    function setLockPreset() {
+        const nameInput = document.getElementById('modalName');
+        const notesInput = document.getElementById('modalNotes');
+        if (nameInput) nameInput.value = '🔒 Tisch gesperrt (Wirt)';
+        if (notesInput) notesInput.value = 'Sperre durch Wirt';
+    }
 
     // Day Lock Modal Steuerung
     function openDayLockModal(date, formattedDate, bookingCount, guestCount) {
@@ -1939,12 +1948,14 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
     }
 
     function closeDayLockModal() {
-        document.getElementById('dayLockModal').classList.remove('active');
+        const modal = document.getElementById('dayLockModal');
+        if (modal) modal.classList.remove('active');
         document.body.style.overflow = '';
     }
 
     function setDayLockReason(reason) {
-        document.getElementById('dayLockReasonInput').value = reason;
+        const input = document.getElementById('dayLockReasonInput');
+        if (input) input.value = reason;
     }
 
     // Modal schließen mit Escape
@@ -1956,16 +1967,18 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
     });
 
     // Modal schließen bei Klick auf Hintergrund
-    document.getElementById('bookingModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeBookingModal();
-        }
-    });
-    document.getElementById('dayLockModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeDayLockModal();
-        }
-    });
+    const bookingModalBackdrop = document.getElementById('bookingModal');
+    if (bookingModalBackdrop) {
+        bookingModalBackdrop.addEventListener('click', function(e) {
+            if (e.target === this) closeBookingModal();
+        });
+    }
+    const dayLockModalBackdrop = document.getElementById('dayLockModal');
+    if (dayLockModalBackdrop) {
+        dayLockModalBackdrop.addEventListener('click', function(e) {
+            if (e.target === this) closeDayLockModal();
+        });
+    }
 
     // 30-Minuten Slot Checkbox Umschaltung
     function toggleSlot(slotTime, targetState) {
@@ -1980,11 +1993,14 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
 
     // Automatischer dezenter Refresh alle 60 Sekunden (damit neue Online-Buchungen erscheinen)
     let idleTimer = setTimeout(() => {
-        if (!document.getElementById('bookingModal').classList.contains('active') && !document.getElementById('dayLockModal').classList.contains('active')) {
+        const bModal = document.getElementById('bookingModal');
+        const dModal = document.getElementById('dayLockModal');
+        if (bModal && dModal && !bModal.classList.contains('active') && !dModal.classList.contains('active')) {
             window.location.reload();
         }
     }, 60000);
 </script>
+<?php endif; ?>
 
 </body>
 </html>
