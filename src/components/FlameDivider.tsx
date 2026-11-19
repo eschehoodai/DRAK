@@ -4,8 +4,8 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import fireWebm from '../assets/images/fire-loop.webm';
 import fireMp4 from '../assets/images/fire-loop.mp4';
+import fireWebm from '../assets/images/fire-loop.webm';
 
 interface FlameDividerProps {
   /** Height of the flame zone in pixels (default: 550) */
@@ -27,24 +27,56 @@ export default function FlameDivider({ height = 550, className = '' }: FlameDivi
     };
     mq.addEventListener('change', handleMotionChange);
 
-    const container = containerRef.current;
     const video = videoRef.current;
+    let cleanupUnlock: (() => void) | null = null;
+
+    if (video) {
+      // Essential for Android Chrome & iOS Safari mobile autoplay
+      video.muted = true;
+      video.defaultMuted = true;
+      video.setAttribute('muted', '');
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', '');
+
+      // Attempt immediate autoplay
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Mobile autoplay policy blocked: unlock on first touch or scroll
+          const unlockPlayback = () => {
+            video.play().catch(() => {});
+            window.removeEventListener('touchstart', unlockPlayback);
+            window.removeEventListener('scroll', unlockPlayback);
+          };
+          window.addEventListener('touchstart', unlockPlayback, { passive: true, once: true });
+          window.addEventListener('scroll', unlockPlayback, { passive: true, once: true });
+          cleanupUnlock = () => {
+            window.removeEventListener('touchstart', unlockPlayback);
+            window.removeEventListener('scroll', unlockPlayback);
+          };
+        });
+      }
+    }
+
+    const container = containerRef.current;
     if (!container || !video) return;
 
-    // Autopause when not in viewport to save 100% GPU / battery
+    // Autopause when far out of viewport, preload 300px before appearing
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            if (!mq.matches) {
+            if (!mq.matches && video.paused) {
               video.play().catch(() => {});
             }
           } else {
-            video.pause();
+            if (!video.paused) {
+              video.pause();
+            }
           }
         });
       },
-      { threshold: 0.05 }
+      { rootMargin: '300px 0px 300px 0px', threshold: 0 }
     );
 
     observer.observe(container);
@@ -52,6 +84,9 @@ export default function FlameDivider({ height = 550, className = '' }: FlameDivi
     return () => {
       observer.disconnect();
       mq.removeEventListener('change', handleMotionChange);
+      if (cleanupUnlock) {
+        cleanupUnlock();
+      }
     };
   }, []);
 
@@ -72,6 +107,7 @@ export default function FlameDivider({ height = 550, className = '' }: FlameDivi
           style={{
             maskImage: 'linear-gradient(to top, black 70%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to top, black 70%, transparent 100%)',
+            transform: 'translateZ(0)',
           }}
         >
           <video
@@ -80,10 +116,11 @@ export default function FlameDivider({ height = 550, className = '' }: FlameDivi
             loop
             muted
             playsInline
-            className="w-full h-full object-cover object-bottom mix-blend-screen opacity-95 filter contrast-125 saturate-125 brightness-110"
+            preload="auto"
+            className="w-full h-full object-cover object-bottom opacity-95"
           >
-            <source src={fireWebm} type="video/webm" />
             <source src={fireMp4} type="video/mp4" />
+            <source src={fireWebm} type="video/webm" />
           </video>
         </div>
       ) : (
