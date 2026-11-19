@@ -104,7 +104,7 @@ export default function App() {
         <Header currentScreen={currentScreen} onNavigate={handleNavigate} />
 
         {/* Main Content Area */}
-        <main className="flex-grow">
+        <main className="flex-grow relative z-10">
           {currentScreen === Screen.HOME && (
             <HomeView onNavigate={handleNavigate} />
           )}

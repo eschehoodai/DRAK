@@ -1,6 +1,6 @@
 import React from 'react';
 import { Screen } from '../types';
-import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin, Phone, Snowflake } from 'lucide-react';
+import { Shield, Sparkles, BookOpen, Quote, Flame, MapPin, Phone, Snowflake, Castle, UtensilsCrossed } from 'lucide-react';
 import { useIsTavernOpen } from '../utils/openingHours';
 import { trackPhoneCallClick } from '../utils/gtag';
 import candlelitGobletImage from '../assets/images/Speise2.webp';
@@ -137,24 +137,63 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
                 Ob nach einem Bummel durch Zittaus Altstadt, einem Besuch der Frauenkirche oder einer Wanderung durch das Zittauer Gebirge — in der Drachentaverne kehrt Ihr ein, wo seit jeher Gäste willkommen sind.
               </p>
 
-              {/* Facts + reserve CTA */}
+              {/* Badges + reserve CTA */}
               <div className="border-t border-gold-secondary/25 pt-6 flex flex-col gap-5 items-center">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-gold-secondary/25 w-full text-center">
-                  <div className="px-2">
-                    <p className="font-cinzel text-base sm:text-lg font-bold text-gold-primary tracking-wider uppercase leading-snug">
-                      Mittelalter Restaurant
-                    </p>
-                    <p className="font-serif text-xs text-cream-parchment/60 uppercase tracking-widest mt-1">
-                      Historisches Gewölbe
-                    </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                  {/* Badge 1: Mittelalter Restaurant */}
+                  <div className="group relative overflow-hidden border border-gold-secondary/35 bg-void-black/60 p-4 transition-all duration-300 hover:scale-[1.02] hover:border-gold-bright hover:shadow-[0_0_20px_rgba(212,175,55,0.25)]">
+                    {/* Gilded Corner Flourishes */}
+                    <div className="gilded-corner gilded-corner-tl opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <div className="gilded-corner gilded-corner-tr opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <div className="gilded-corner gilded-corner-bl opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <div className="gilded-corner gilded-corner-br opacity-60 group-hover:opacity-100 transition-opacity" />
+
+                    {/* Shimmer Light Beam */}
+                    <div
+                      className="pointer-events-none absolute inset-0 -top-1/2 -bottom-1/2 w-1/3 bg-gradient-to-r from-transparent via-gold-bright/15 to-transparent animate-gold-shimmer"
+                      aria-hidden="true"
+                    />
+
+                    {/* Content */}
+                    <div className="relative z-10 flex flex-col items-center text-center">
+                      <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full border border-gold-primary/40 bg-gold-primary/10 text-gold-bright transition-transform duration-300 group-hover:scale-110 group-hover:border-gold-bright">
+                        <Castle className="h-4 w-4" />
+                      </div>
+                      <p className="font-cinzel text-sm sm:text-base font-bold text-gold-primary tracking-wider uppercase leading-snug group-hover:text-gold-bright transition-colors">
+                        Mittelalter Restaurant
+                      </p>
+                      <span className="mt-1.5 inline-block font-serif text-[11px] text-cream-parchment/70 uppercase tracking-widest border-t border-gold-secondary/20 pt-1">
+                        Historisches Gewölbe
+                      </span>
+                    </div>
                   </div>
-                  <div className="pt-3 sm:pt-0 px-2">
-                    <p className="font-cinzel text-base sm:text-lg font-bold text-gold-primary tracking-wider uppercase leading-snug">
-                      Regionale Küche
-                    </p>
-                    <p className="font-serif text-xs text-cream-parchment/60 uppercase tracking-widest mt-1">
-                      + Oberlausitzer Spezialitäten
-                    </p>
+
+                  {/* Badge 2: Regionale Küche */}
+                  <div className="group relative overflow-hidden border border-gold-secondary/35 bg-void-black/60 p-4 transition-all duration-300 hover:scale-[1.02] hover:border-gold-bright hover:shadow-[0_0_20px_rgba(212,175,55,0.25)]">
+                    {/* Gilded Corner Flourishes */}
+                    <div className="gilded-corner gilded-corner-tl opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <div className="gilded-corner gilded-corner-tr opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <div className="gilded-corner gilded-corner-bl opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <div className="gilded-corner gilded-corner-br opacity-60 group-hover:opacity-100 transition-opacity" />
+
+                    {/* Shimmer Light Beam (mit leichtem Versatz) */}
+                    <div
+                      className="pointer-events-none absolute inset-0 -top-1/2 -bottom-1/2 w-1/3 bg-gradient-to-r from-transparent via-gold-bright/15 to-transparent animate-gold-shimmer [animation-delay:1.5s]"
+                      aria-hidden="true"
+                    />
+
+                    {/* Content */}
+                    <div className="relative z-10 flex flex-col items-center text-center">
+                      <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full border border-gold-primary/40 bg-gold-primary/10 text-gold-bright transition-transform duration-300 group-hover:scale-110 group-hover:border-gold-bright">
+                        <UtensilsCrossed className="h-4 w-4" />
+                      </div>
+                      <p className="font-cinzel text-sm sm:text-base font-bold text-gold-primary tracking-wider uppercase leading-snug group-hover:text-gold-bright transition-colors">
+                        Regionale Küche
+                      </p>
+                      <span className="mt-1.5 inline-block font-serif text-[11px] text-cream-parchment/70 uppercase tracking-widest border-t border-gold-secondary/20 pt-1">
+                        + Oberlausitzer Spezialitäten
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <button
@@ -397,7 +436,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
         </div>
 
         {/* Main CTA */}
-        <div className="mt-20 border border-gold-primary/30 p-12 relative overflow-hidden">
+        <div className="mt-20 border border-gold-primary/30 p-12 relative z-10 overflow-hidden">
           <video
             autoPlay
             muted
