@@ -116,3 +116,76 @@ export function useIsTavernOpen(): boolean {
 
   return isOpen;
 }
+
+export interface TavernStatusInfo {
+  isOpen: boolean;
+  closingTime?: string;
+  nextOpenText?: string;
+  statusBadgeText: string;
+}
+
+const DAY_NAMES = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+
+export function getTavernStatusInfo(date: Date = new Date()): TavernStatusInfo {
+  const dayOfWeek = date.getDay();
+  const config = OPENING_HOURS[dayOfWeek];
+  const currentMinutes = date.getHours() * 60 + date.getMinutes();
+
+  if (config && config.isOpen && config.shifts && config.shifts.length > 0) {
+    for (const shift of config.shifts) {
+      const [openHour, openMin] = shift.open.split(':').map(Number);
+      const [closeHour, closeMin] = shift.close.split(':').map(Number);
+      const openMinutes = openHour * 60 + openMin;
+      const closeMinutes = closeHour * 60 + closeMin;
+
+      if (currentMinutes >= openMinutes && currentMinutes < closeMinutes) {
+        return {
+          isOpen: true,
+          closingTime: shift.close,
+          statusBadgeText: `Jetzt geöffnet • bis ${shift.close} Uhr`,
+        };
+      }
+
+      if (currentMinutes < openMinutes) {
+        return {
+          isOpen: false,
+          nextOpenText: `heute ab ${shift.open} Uhr`,
+          statusBadgeText: `Jetzt geschlossen • Öffnet heute ${shift.open} Uhr`,
+        };
+      }
+    }
+  }
+
+  // Find next opening day
+  for (let i = 1; i <= 7; i++) {
+    const nextDay = (dayOfWeek + i) % 7;
+    const nextConfig = OPENING_HOURS[nextDay];
+    if (nextConfig && nextConfig.isOpen && nextConfig.shifts && nextConfig.shifts.length > 0) {
+      const nextShift = nextConfig.shifts[0];
+      const dayName = i === 1 ? 'morgen' : DAY_NAMES[nextDay];
+      return {
+        isOpen: false,
+        nextOpenText: `${dayName} ab ${nextShift.open} Uhr`,
+        statusBadgeText: `Jetzt geschlossen • Öffnet ${dayName} ${nextShift.open} Uhr`,
+      };
+    }
+  }
+
+  return {
+    isOpen: false,
+    statusBadgeText: 'Jetzt geschlossen',
+  };
+}
+
+export function useTavernStatus(): TavernStatusInfo {
+  const [status, setStatus] = useState<TavernStatusInfo>(() => getTavernStatusInfo());
+
+  useEffect(() => {
+    const check = () => setStatus(getTavernStatusInfo());
+    check();
+    const interval = setInterval(check, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return status;
+}
