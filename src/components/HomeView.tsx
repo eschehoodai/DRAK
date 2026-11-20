@@ -114,7 +114,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
           {/* Tier 1–3: the legend, with logo watermark behind */}
           <div className="flex flex-col gap-6 justify-between">
-            <div className="relative border border-gold-secondary/30 bg-void-black/40 p-6 sm:p-8">
+            <div className="relative border border-gold-secondary/30 bg-void-black/40 p-4 sm:p-8">
               <div className="gilded-corner gilded-corner-tl" />
               <div className="gilded-corner gilded-corner-tr" />
               <div className="gilded-corner gilded-corner-bl" />
@@ -126,20 +126,20 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
                 aria-hidden="true"
                 className="pointer-events-none select-none absolute inset-0 h-full w-full opacity-30 object-contain p-4"
               />
-              <div className="relative z-10 space-y-6 text-center">
+              <div className="relative z-10 space-y-4 sm:space-y-6 text-center">
                 <div className="flex items-center justify-center space-x-2 text-gold-primary font-cinzel text-xs font-extrabold tracking-widest uppercase">
                   <BookOpen className="h-4 w-4" />
                   <span>Unsere Sage</span>
                 </div>
-                <h2 className="font-cinzel text-2xl sm:text-3xl font-bold tracking-widest text-gold-bright uppercase text-center">
+                <h2 className="font-cinzel text-lg sm:text-3xl font-bold tracking-wider sm:tracking-widest leading-snug text-gold-bright uppercase text-center">
                   Die Drachentaverne - Euer Mittelalter-Restaurant in Zittau mit Regionaler Küche und Geschichte
                 </h2>
 
-                <p className="font-serif text-cream-parchment/80 leading-relaxed text-base pt-2 text-center">
+                <p className="font-serif text-cream-parchment/80 leading-relaxed text-sm sm:text-base pt-1 sm:pt-2 text-center">
                   Im Herzen von Zittau, am Fuße des Zittauer Gebirges und unweit der berühmten Zittauer Fastentücher, lädt die Drachentaverne als einzigartiges Mittelalter-Restaurant in Zittau zu regionalen Genüssen aus der Oberlausitz ein. Was vor Jahrhunderten als Herberge für Reisende, Handwerker und Händler begann, ist heute ein Gasthaus mit Charakter: deftige Hausmannskost, Fleischgerichte vom heimischen Metzger, täglich frisches Brot aus der Region und ein kühles Bier aus sächsischer Brautradition.
                 </p>
 
-                <p className="font-serif text-cream-parchment/80 leading-relaxed text-base text-center">
+                <p className="font-serif text-cream-parchment/80 leading-relaxed text-sm sm:text-base text-center">
                   Ob nach einem Bummel durch Zittaus Altstadt, einem Besuch der Frauenkirche oder einer Wanderung durch das Zittauer Gebirge — in der Drachentaverne kehrt Ihr ein, wo seit jeher Gäste willkommen sind.
                 </p>
               </div>
