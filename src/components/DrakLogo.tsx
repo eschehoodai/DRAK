@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 interface DrakLogoProps {
   /** 'header' for the main sticky navbar, 'drawer' for the compact mobile menu pill */
@@ -10,12 +10,15 @@ interface DrakLogoProps {
  */
 export const DrakLogo: React.FC<DrakLogoProps> = ({ variant = 'header' }) => {
   const isDrawer = variant === 'drawer';
+  const uid = useId();
+  const gradId = `drak-gold-grad-${uid}`;
+  const maskId = `drak-dragon-cutouts-${uid}`;
 
   return (
     <span className="inline-flex items-center space-x-2 sm:space-x-2.5">
       {/* Heraldic Dragon Crest */}
       <svg
-        viewBox="0 0 40 40"
+        viewBox="0 0 64 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
@@ -26,47 +29,31 @@ export const DrakLogo: React.FC<DrakLogoProps> = ({ variant = 'header' }) => {
         }`}
       >
         <defs>
-          <linearGradient id="drak-gold-grad" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#F5D061" />
-            <stop offset="50%" stopColor="#C99738" />
-            <stop offset="100%" stopColor="#8F651E" />
+          <linearGradient id={gradId} x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#F8DC7A" />
+            <stop offset="50%" stopColor="#D4A23E" />
+            <stop offset="100%" stopColor="#9A6E20" />
           </linearGradient>
+          <mask id={maskId}>
+            <rect width="64" height="64" fill="white" />
+            {/* Fierce slanted dragon eye cutout */}
+            <path d="M39.8 15.6 L42.9 14.8 L41.7 16.5 Z" fill="black" />
+          </mask>
         </defs>
 
-        {/* Subtle Shield / Crest Frame */}
+        {/* Heraldic Shield Frame */}
         <path
-          d="M20 2.5L34.5 8.5V19.5C34.5 28.2 28.2 34.8 20 37.5C11.8 34.8 5.5 28.2 5.5 19.5V8.5L20 2.5Z"
-          stroke="url(#drak-gold-grad)"
-          strokeWidth="1.5"
+          d="M32 3.5 L55.5 12.8 V30.5 C55.5 45.5 45.2 56 32 60 C18.8 56 8.5 45.5 8.5 30.5 V12.8 L32 3.5 Z"
+          stroke={`url(#${gradId})`}
+          strokeWidth={isDrawer ? '2.6' : '2.2'}
           fill="rgba(201, 151, 56, 0.08)"
         />
-        <path
-          d="M20 5L32 10V19.5C32 26.6 26.8 32 20 34.5C13.2 32 8 26.6 8 19.5V10L20 5Z"
-          stroke="url(#drak-gold-grad)"
-          strokeOpacity="0.35"
-          strokeWidth="0.75"
-        />
 
-        {/* Stylized Heraldic Dragon Silhouette */}
+        {/* Rampant Heraldic Dragon Silhouette */}
         <path
-          d="M26.5 12.5C24.8 11.2 22.3 11 20.5 12.1C19.2 12.9 18.7 14.3 19.1 15.6C17.4 15.2 15.6 15.7 14.4 17C13 18.5 12.8 20.8 13.8 22.6C14.6 24 16.1 24.8 17.6 25C16.8 26.1 15.5 26.8 14 27C15.8 28.2 18.2 28.4 20.2 27.4C22.4 26.3 23.7 24.2 23.8 21.8C23.9 20.3 23.3 19 22.3 18.1C23.5 18.3 24.8 17.9 25.7 17C26.4 16.3 26.8 15.3 26.7 14.3L28.5 13.8L26.5 12.5Z"
-          fill="url(#drak-gold-grad)"
-        />
-        {/* Dragon Wing Accent */}
-        <path
-          d="M15.2 16.5C13.5 15.2 12.2 13.5 12 11.5C13.6 12.2 15.1 13.3 16.2 14.8"
-          stroke="url(#drak-gold-grad)"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* Dragon Horn / Crown */}
-        <path
-          d="M24.2 11.6L26 9.5L25.6 12.1"
-          stroke="url(#drak-gold-grad)"
-          strokeWidth="1.3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          mask={`url(#${maskId})`}
+          fill={`url(#${gradId})`}
+          d="M26.8 9.4C30.6 10.1 33.8 11.6 36.2 13.6C38.8 12.6 41.8 12.7 44.2 13.5L45.2 12.2L46.1 14C48 14.6 49.6 15.4 50.6 16.4L47.4 17.6L46.4 18.8L45.4 17.5L41.2 18.4L48 20.6C47 21.8 45 22.3 42.6 21.8L39 21.2C37.2 22.8 36.8 24.8 38 27.2L42.8 26.8L46.8 24.8L45.4 26.9L48 27.3L45.2 28.5L46.6 30.2L43.4 29.2L38 30.8C36.2 33.2 33.6 35.2 32 37.8C31.2 39.2 31.5 40.3 33 41.2C35.8 42.2 37.8 43.4 37.8 45.2C37.8 46.8 36 48.2 35.6 49.5L40.4 50.4L38 51L39.4 52.4L36.2 51.6L33.4 52.3L33.9 50.4C33.2 49.3 33.8 47.4 34.5 45.8C33 44.6 30.8 43.8 28.8 43.6C26.2 44.5 24.8 46.6 25 49C25.2 51.2 27.4 52.6 30.4 53C27.6 54.8 23 54.4 19.8 51.6C16.4 48.6 15.6 44 17.3 39.6L15 39.3L18.6 34.8L21.3 39.8L19.2 39.6C18.3 43 19.2 46.6 21.6 48.8C21.8 45.6 23 42.4 25.6 39.8C24.4 37.6 24.2 35 25.2 32.6C22.4 31.2 20.2 30.6 17.8 31.8C18.4 29 19.4 27.6 21.2 26.8C18.2 26.4 16 26.6 13.8 27.8C15 25 16.6 23.4 19 22.6C16.2 21.8 14 21.8 12 22.6C13.8 19.6 16.4 17.8 19.2 17C17 15.2 15.6 13.8 14.8 12.2C20.2 14 25 18 29.2 23.8C30 22 30.8 20.4 31.4 19L29.4 18.2L31.8 17.4C32.3 16.4 32.7 15.5 33.1 14.8L29.2 13.6L33.2 13.4C31.4 11.8 29.2 10.4 26.8 9.4Z"
         />
       </svg>
 
