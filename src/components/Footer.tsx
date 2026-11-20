@@ -9,7 +9,6 @@ import { SCREEN_PATHS, SCREEN_META } from '../routes';
 import { Phone, Mail, Clock, MapPin } from 'lucide-react';
 import { useCookieConsent } from '../context/CookieContext';
 import { trackPhoneCallClick } from '../utils/gtag';
-import FlameDivider from './FlameDivider';
 
 interface FooterProps {
   onNavigate: (screen: Screen) => void;
@@ -25,9 +24,6 @@ export default function Footer({ onNavigate }: FooterProps) {
 
   return (
     <footer role="contentinfo" className="relative z-0 mt-auto border-t-2 border-gold-primary/40 bg-void-black text-cream-parchment/80 pt-16 pb-12 shadow-[0_-2px_20px_rgba(212,175,55,0.25)]">
-      {/* Animated medieval dragon fire & tavern embers rising above the footer divider line */}
-      <FlameDivider height={550} />
-
       {/* Visual top highlight line with glowing gold fire aura */}
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-gold-bright/60 to-transparent shadow-[0_0_12px_rgba(245,158,11,0.6)]" />
 

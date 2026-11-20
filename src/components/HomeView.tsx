@@ -113,32 +113,40 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
           {/* Tier 1–3: the legend, with logo watermark behind */}
-          <div className="relative">
-            <img
-              src={logoDrak}
-              alt=""
-              aria-hidden="true"
-              className="pointer-events-none select-none absolute inset-0 h-full w-full opacity-30 object-contain"
-            />
-            <div className="relative z-10 space-y-6 text-center">
-              <div className="flex items-center justify-center space-x-2 text-gold-primary font-cinzel text-xs font-extrabold tracking-widest uppercase">
-                <BookOpen className="h-4 w-4" />
-                <span>Unsere Sage</span>
+          <div className="flex flex-col gap-6 justify-between">
+            <div className="relative border border-gold-secondary/30 bg-void-black/40 p-6 sm:p-8">
+              <div className="gilded-corner gilded-corner-tl" />
+              <div className="gilded-corner gilded-corner-tr" />
+              <div className="gilded-corner gilded-corner-bl" />
+              <div className="gilded-corner gilded-corner-br" />
+
+              <img
+                src={logoDrak}
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none select-none absolute inset-0 h-full w-full opacity-30 object-contain p-4"
+              />
+              <div className="relative z-10 space-y-6 text-center">
+                <div className="flex items-center justify-center space-x-2 text-gold-primary font-cinzel text-xs font-extrabold tracking-widest uppercase">
+                  <BookOpen className="h-4 w-4" />
+                  <span>Unsere Sage</span>
+                </div>
+                <h2 className="font-cinzel text-2xl sm:text-3xl font-bold tracking-widest text-gold-bright uppercase text-center">
+                  Die Drachentaverne - Euer Mittelalter-Restaurant in Zittau mit Regionaler Küche und Geschichte
+                </h2>
+
+                <p className="font-serif text-cream-parchment/80 leading-relaxed text-base pt-2 text-center">
+                  Im Herzen von Zittau, am Fuße des Zittauer Gebirges und unweit der berühmten Zittauer Fastentücher, lädt die Drachentaverne als einzigartiges Mittelalter-Restaurant in Zittau zu regionalen Genüssen aus der Oberlausitz ein. Was vor Jahrhunderten als Herberge für Reisende, Handwerker und Händler begann, ist heute ein Gasthaus mit Charakter: deftige Hausmannskost, Fleischgerichte vom heimischen Metzger, täglich frisches Brot aus der Region und ein kühles Bier aus sächsischer Brautradition.
+                </p>
+
+                <p className="font-serif text-cream-parchment/80 leading-relaxed text-base text-center">
+                  Ob nach einem Bummel durch Zittaus Altstadt, einem Besuch der Frauenkirche oder einer Wanderung durch das Zittauer Gebirge — in der Drachentaverne kehrt Ihr ein, wo seit jeher Gäste willkommen sind.
+                </p>
               </div>
-              <h2 className="font-cinzel text-2xl sm:text-3xl font-bold tracking-widest text-gold-bright uppercase text-center">
-                Die Drachentaverne - Euer Mittelalter-Restaurant in Zittau mit Regionaler Küche und Geschichte
-              </h2>
+            </div>
 
-              <p className="font-serif text-cream-parchment/80 leading-relaxed text-base pt-2 text-center">
-                Im Herzen von Zittau, am Fuße des Zittauer Gebirges und unweit der berühmten Zittauer Fastentücher, lädt die Drachentaverne als einzigartiges Mittelalter-Restaurant in Zittau zu regionalen Genüssen aus der Oberlausitz ein. Was vor Jahrhunderten als Herberge für Reisende, Handwerker und Händler begann, ist heute ein Gasthaus mit Charakter: deftige Hausmannskost, Fleischgerichte vom heimischen Metzger, täglich frisches Brot aus der Region und ein kühles Bier aus sächsischer Brautradition.
-              </p>
-
-              <p className="font-serif text-cream-parchment/80 leading-relaxed text-base text-center">
-                Ob nach einem Bummel durch Zittaus Altstadt, einem Besuch der Frauenkirche oder einer Wanderung durch das Zittauer Gebirge — in der Drachentaverne kehrt Ihr ein, wo seit jeher Gäste willkommen sind.
-              </p>
-
-              {/* Badges + reserve CTA */}
-              <div className="border-t border-gold-secondary/25 pt-6 flex flex-col gap-5 items-center">
+            {/* Badges + reserve CTA */}
+            <div className="flex flex-col gap-5 items-center">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                   {/* Badge 1: Mittelalter Restaurant */}
                   <div className="group relative overflow-hidden border border-gold-secondary/35 bg-void-black/60 p-4 transition-all duration-300 hover:scale-[1.02] hover:border-gold-bright hover:shadow-[0_0_20px_rgba(212,175,55,0.25)]">
@@ -196,14 +204,13 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
                     </div>
                   </div>
                 </div>
-                <button
-                  id="sage-btn-reserve"
-                  onClick={() => onNavigate(Screen.RESERVE)}
-                  className="w-full bg-gold-primary border border-gold-primary px-6 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer text-center whitespace-nowrap"
-                >
-                  Jetzt Reservieren
-                </button>
-              </div>
+              <button
+                id="sage-btn-reserve"
+                onClick={() => onNavigate(Screen.RESERVE)}
+                className="w-full bg-gold-primary border border-gold-primary px-6 py-4 font-cinzel text-xs font-black uppercase tracking-widest text-void-black hover:bg-gold-bright transition-all cursor-pointer text-center whitespace-nowrap"
+              >
+                Jetzt Reservieren
+              </button>
             </div>
           </div>
 
