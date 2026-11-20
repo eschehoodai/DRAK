@@ -13,6 +13,8 @@ import {
 interface ReservationViewProps {
   initialNotes?: string;
   onClearNotes?: () => void;
+  initialDate?: string;
+  onClearDate?: () => void;
 }
 
 import { OPENING_HOURS, useIsTavernOpen } from '../utils/openingHours';
@@ -273,7 +275,7 @@ function CustomCalendarModal({ isOpen, onClose, selectedDate, onSelectDate }: Cu
 }
 
 /* ================= MAIN RESERVATION VIEW COMPONENT ================= */
-export default function ReservationView({ initialNotes, onClearNotes }: ReservationViewProps) {
+export default function ReservationView({ initialNotes, onClearNotes, initialDate, onClearDate }: ReservationViewProps) {
   const isTavernOpenNow = useIsTavernOpen();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -281,8 +283,8 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
   const isInquiry = guests >= 11;
   const isLargeGroup = guests >= 20;
   
-  // Initialize default date to next open day
-  const [date, setDate] = useState(() => getNextOpenDate(new Date()));
+  // Initialize default date to incoming date or next open day
+  const [date, setDate] = useState(() => initialDate || getNextOpenDate(new Date()));
   const [time, setTime] = useState('18:00');
   const [vault, setVault] = useState('Die Grosse Kathedrale');
   const [notes, setNotes] = useState(initialNotes || '');
@@ -443,7 +445,7 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
     }
   }, [date, guests, availability]);
 
-  // Handle incoming pre-filled notes (e.g. clicked dish from menu)
+  // Handle incoming pre-filled notes (e.g. clicked dish from menu or Silvester event)
   useEffect(() => {
     if (initialNotes) {
       setNotes(initialNotes);
@@ -451,6 +453,15 @@ export default function ReservationView({ initialNotes, onClearNotes }: Reservat
       if (onClearNotes) onClearNotes();
     }
   }, [initialNotes]);
+
+  // Handle incoming pre-filled date (e.g. Silvester 31.12.2026)
+  useEffect(() => {
+    if (initialDate) {
+      setDate(initialDate);
+      setActiveTab('create');
+      if (onClearDate) onClearDate();
+    }
+  }, [initialDate]);
 
   // Load existing bookings
   useEffect(() => {

@@ -28,7 +28,7 @@ export default function Footer({ onNavigate }: FooterProps) {
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-gold-bright/60 to-transparent shadow-[0_0_12px_rgba(245,158,11,0.6)]" />
 
       <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
           
           {/* Logo & Copyright */}
           <div className="flex flex-col space-y-4">
@@ -49,10 +49,10 @@ export default function Footer({ onNavigate }: FooterProps) {
             </div>
           </div>
 
-          {/* Contact Details */}
+          {/* Kontakt & Anfahrt */}
           <div className="flex flex-col space-y-4">
             <h4 id="ftr-hdr-kontakt" className="font-cinzel text-xs font-bold uppercase tracking-widest text-gold-primary border-b border-gold-secondary/20 pb-2">
-              Kontakt
+              Kontakt &amp; Anfahrt
             </h4>
             <ul className="space-y-3 text-sm">
               <li className="flex items-center space-x-3">
@@ -76,7 +76,25 @@ export default function Footer({ onNavigate }: FooterProps) {
                   Email: drakzittau@dlr-gastro-event.de
                 </a>
               </li>
+              <li className="flex items-start space-x-3 pt-1">
+                <MapPin className="mt-0.5 h-4 w-4 text-gold-secondary shrink-0" />
+                <div className="font-serif">
+                  <p>Innere Weberstraße 11</p>
+                  <p className="text-cream-parchment/60">02763 Zittau</p>
+                </div>
+              </li>
             </ul>
+            <div className="pt-2">
+              <a 
+                id="ftr-shortcut-impressum"
+                href={SCREEN_PATHS[Screen.IMPRESSUM]}
+                onClick={handleNavClick(Screen.IMPRESSUM)}
+                title={SCREEN_META[Screen.IMPRESSUM].navTooltip}
+                className="font-cinzel text-[11px] font-bold text-gold-secondary hover:text-gold-bright transition-colors uppercase tracking-widest underline underline-offset-4 cursor-pointer"
+              >
+                Impressum anzeigen
+              </a>
+            </div>
           </div>
 
           {/* Öffnungszeiten */}
@@ -99,33 +117,6 @@ export default function Footer({ onNavigate }: FooterProps) {
                 </div>
               </li>
             </ul>
-          </div>
-
-          {/* Anfahrt */}
-          <div className="flex flex-col space-y-4">
-            <h4 id="ftr-hdr-anfahrt" className="font-cinzel text-xs font-bold uppercase tracking-widest text-gold-primary border-b border-gold-secondary/20 pb-2">
-              Anfahrt
-            </h4>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-start space-x-3">
-                <MapPin className="mt-0.5 h-4 w-4 text-gold-secondary shrink-0" />
-                <div className="font-serif">
-                  <p>Innere Weberstraße 11</p>
-                  <p className="text-cream-parchment/60">02763 Zittau</p>
-                </div>
-              </li>
-            </ul>
-            <div className="pt-2">
-              <a 
-                id="ftr-shortcut-impressum"
-                href={SCREEN_PATHS[Screen.IMPRESSUM]}
-                onClick={handleNavClick(Screen.IMPRESSUM)}
-                title={SCREEN_META[Screen.IMPRESSUM].navTooltip}
-                className="font-cinzel text-[11px] font-bold text-gold-secondary hover:text-gold-bright transition-colors uppercase tracking-widest underline underline-offset-4 cursor-pointer"
-              >
-                Impressum anzeigen
-              </a>
-            </div>
           </div>
 
         </div>

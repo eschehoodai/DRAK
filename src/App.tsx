@@ -26,10 +26,14 @@ export default function App() {
     screenFromPath(window.location.pathname),
   );
   const [initialReserveNotes, setInitialReserveNotes] = useState<string | undefined>(undefined);
+  const [initialReserveDate, setInitialReserveDate] = useState<string | undefined>(undefined);
 
-  const handleNavigate = (screen: Screen, notesMsg?: string) => {
+  const handleNavigate = (screen: Screen, notesMsg?: string, dateStr?: string) => {
     if (notesMsg) {
       setInitialReserveNotes(notesMsg);
+    }
+    if (dateStr) {
+      setInitialReserveDate(dateStr);
     }
     const path = SCREEN_PATHS[screen];
     if (window.location.pathname !== path) {
@@ -88,6 +92,10 @@ export default function App() {
     setInitialReserveNotes(undefined);
   };
 
+  const handleClearDate = () => {
+    setInitialReserveDate(undefined);
+  };
+
   return (
     <CookieProvider>
       <div id="app-root" className="min-h-screen flex flex-col bg-void-black text-cream-parchment font-serif selection:bg-gold-primary selection:text-void-black">
@@ -125,6 +133,8 @@ export default function App() {
             <ReservationView
               initialNotes={initialReserveNotes}
               onClearNotes={handleClearNotes}
+              initialDate={initialReserveDate}
+              onClearDate={handleClearDate}
             />
           )}
 

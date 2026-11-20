@@ -9,6 +9,7 @@ import logoDrak from '../assets/images/logo-drak.webp';
 import headerVideo from '../assets/images/headervideo.webm';
 import gewoelbeVideo from '../assets/images/gewölbe.mp4';
 import tafelVideo from '../assets/images/tafel.webm';
+import SilvesterBanner from './SilvesterBanner';
 
 const WINTER_SNOWFLAKES = [
   { id: 1, left: '8%', size: 14, duration: '7.5s', delay: '0s', opacity: 0.75 },
@@ -23,7 +24,7 @@ const WINTER_SNOWFLAKES = [
 ];
 
 interface HomeViewProps {
-  onNavigate: (screen: Screen) => void;
+  onNavigate: (screen: Screen, notesMsg?: string, dateStr?: string) => void;
 }
 
 export default function HomeView({ onNavigate }: HomeViewProps) {
@@ -106,6 +107,17 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
           </div>
         </div>
       </section>
+
+      {/* ================= SILVESTER EVENT BANNER ================= */}
+      <SilvesterBanner
+        onReserveSilvester={() =>
+          onNavigate(
+            Screen.RESERVE,
+            'Silvesterabend am 31.12.2026 (Gaukler-Vorführung)',
+            '2026-12-31'
+          )
+        }
+      />
 
       {/* ================= LEGEND STORY SECTION ================= */}
       <section className="mx-auto max-w-6xl px-4 py-24 md:px-8 relative">

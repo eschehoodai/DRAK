@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Screen } from '../types';
 import { SCREEN_PATHS, SCREEN_META } from '../routes';
+import { DrakLogo } from './DrakLogo';
 import {
   Calendar,
   Phone,
@@ -83,9 +84,7 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
           aria-label="Drachen Taverne Zittau – Zur Startseite"
           className="group flex items-center space-x-2 cursor-pointer select-none shrink-0"
         >
-          <span id="hdr-logo-text" className="font-cinzel text-xl sm:text-3xl font-extrabold tracking-widest text-gold-primary transition-colors group-hover:text-gold-bright">
-            DRAK
-          </span>
+          <DrakLogo variant="header" />
 
         </a>
 
@@ -257,9 +256,7 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
                   className="flex items-center space-x-2.5 px-3 py-1.5 rounded-full border border-gold-primary/40 bg-gold-primary/10 hover:border-gold-primary transition-all cursor-pointer shadow-[0_0_12px_rgba(201,151,56,0.1)]"
                   title="Drachen Taverne – Mittelalter Restaurant Zittau"
                 >
-                  <span className="font-cinzel text-base font-black tracking-widest text-gold-primary">
-                    DRAK
-                  </span>
+                  <DrakLogo variant="drawer" />
                   <span className="h-3.5 w-[1px] bg-gold-primary/40" />
                   <span className="font-cinzel text-[10px] font-bold uppercase tracking-wider text-cream-parchment/80">
                     Mittelalter Restaurant Zittau
