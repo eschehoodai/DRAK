@@ -143,7 +143,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
                   <BookOpen className="h-4 w-4" />
                   <span>Unsere Sage</span>
                 </div>
-                <h2 className="font-cinzel text-lg sm:text-3xl font-bold tracking-wider sm:tracking-widest leading-snug text-gold-bright uppercase text-center">
+                <h2 className="font-cinzel text-lg sm:text-xl md:text-2xl font-bold tracking-wide sm:tracking-wider leading-tight text-gold-bright uppercase text-center">
                   Die Drachentaverne - Euer Mittelalter-Restaurant in Zittau mit Regionaler Küche und Geschichte
                 </h2>
 
