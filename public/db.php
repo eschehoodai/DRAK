@@ -69,6 +69,41 @@ function getStandardOpeningHours(): array {
 }
 
 /**
+ * Datumsbezogene Sonderöffnungszeiten (Format: 'YYYY-MM-DD').
+ * Überschreiben die regulären Wochentags-Öffnungszeiten für einzelne Tage.
+ */
+function getSpecialOpeningHours(): array {
+    return [
+        '2026-12-26' => [
+            'isOpen' => true,
+            'shifts' => [
+                ['open' => '11:00', 'close' => '15:00', 'lastSlot' => '14:00', 'name' => 'Mittag'],
+                ['open' => '17:00', 'close' => '22:00', 'kitchenClose' => '21:00', 'lastSlot' => '21:00', 'name' => 'Abend'],
+            ],
+            'label'  => 'Sa (26.12.): 11:00–15:00 & 17:00–22:00 Uhr'
+        ],
+    ];
+}
+
+/**
+ * Gibt die gültige Tageskonfiguration inkl. eventueller Sonderöffnungszeiten zurück.
+ */
+function getOpeningHoursForDate(string $dateStr, ?array $openingHoursConfig = null): ?array {
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateStr)) {
+        return null;
+    }
+    $special = getSpecialOpeningHours();
+    if (isset($special[$dateStr])) {
+        return $special[$dateStr];
+    }
+    if ($openingHoursConfig === null) {
+        $openingHoursConfig = getStandardOpeningHours();
+    }
+    $dayOfWeek = (int)date('w', strtotime($dateStr));
+    return $openingHoursConfig[$dayOfWeek] ?? null;
+}
+
+/**
  * Gibt eine betriebsbereite PDO-Verbindung zur SQLite-Datenbank zurück.
  * Erstellt die Datei und Tabelle automatisch, falls noch nicht vorhanden.
  *
@@ -503,8 +538,7 @@ function getMonthOccupancySummary(PDO $pdo, string $yearMonth, array $openingHou
     $summary = [];
     for ($day = 1; $day <= $daysInMonth; $day++) {
         $curDate = $yearMonth . '-' . sprintf('%02d', $day);
-        $dayOfWeek = (int)date('w', strtotime($curDate));
-        $config = $openingHoursConfig[$dayOfWeek] ?? null;
+        $config = getOpeningHoursForDate($curDate, $openingHoursConfig);
 
         // Ruhetag (z. B. Dienstag)
         if (!$config || !$config['isOpen']) {
@@ -619,8 +653,7 @@ function getBlockedDaysForMonth(PDO $pdo, string $yearMonth, ?array $openingHour
 
     for ($day = 1; $day <= $daysInMonth; $day++) {
         $curDate = $yearMonth . '-' . sprintf('%02d', $day);
-        $dayOfWeek = (int)date('w', strtotime($curDate));
-        $config = $openingHoursConfig[$dayOfWeek] ?? null;
+        $config = getOpeningHoursForDate($curDate, $openingHoursConfig);
 
         // Wenn regulär Ruhetag (z. B. Di), ist er ohnehin im Frontend als Ruhetag markiert
         if (!$config || !$config['isOpen']) {

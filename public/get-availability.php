@@ -68,10 +68,9 @@ try {
     $dayLock = isDayBlocked($pdo, $date);
     $occupancy = getOccupancyDetailsForDate($pdo, $date);
 
-    // Standard-Slots des Wochentags ermitteln, um auch bei 0 Buchungen alle Slots zu kennen
+    // Standard-Slots des Tages (inkl. eventueller Sonderöffnungszeiten) ermitteln
     $openingHours = getStandardOpeningHours();
-    $dayOfWeek = (int)date('w', strtotime($date));
-    $dayConfig = $openingHours[$dayOfWeek] ?? null;
+    $dayConfig = getOpeningHoursForDate($date, $openingHours);
     $standardSlots = $dayConfig ? getSlotsForDayConfig($dayConfig) : [];
 
     // Alle Standard-Slots in die Belegungsdaten einmischen, falls sie noch nicht vorkommen

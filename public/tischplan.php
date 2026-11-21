@@ -47,11 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_action'])) {
 // Login-Prüfung (auch Session von admin.php wird akzeptiert)
 $isLoggedIn = !empty($_SESSION['tischplan_logged_in']) || !empty($_SESSION['admin_logged_in']);
 
-// Hilfsfunktion: Zeitslots für ein Datum ermitteln
+// Hilfsfunktion: Zeitslots für ein Datum ermitteln (inkl. Sonderöffnungszeiten)
 function getSlotsForDate(string $dateStr, array $openingHoursConfig): array {
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateStr)) return [];
-    $dayOfWeek = (int)date('w', strtotime($dateStr));
-    $config = $openingHoursConfig[$dayOfWeek] ?? null;
+    $config = getOpeningHoursForDate($dateStr, $openingHoursConfig);
     return $config ? getSlotsForDayConfig($config) : [];
 }
 
@@ -374,7 +373,7 @@ $daysInMonth = (int)date('t', $monthTimestamp);
 $firstDayWeekday = (int)date('N', $monthTimestamp); // 1 = Montag, ..., 7 = Sonntag
 
 $dayOfWeekSelected = (int)date('w', strtotime($selectedDate));
-$dayConfig = $OPENING_HOURS[$dayOfWeekSelected] ?? null;
+$dayConfig = getOpeningHoursForDate($selectedDate, $OPENING_HOURS);
 
 // Deutsche Wochentagsnamen
 $weekdaysDe = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
@@ -1611,7 +1610,7 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
                         <div class="res-shift-header">
                             <div class="res-shift-title">
                                 <span>☀️</span>
-                                <span>Mittagsschicht (11:00 – 14:00 Uhr)</span>
+                                <span>Mittagsschicht (<?= htmlspecialchars(($dayConfig['shifts'][0]['open'] ?? '11:00') . ' – ' . ($dayConfig['shifts'][0]['close'] ?? '14:00')) ?> Uhr)</span>
                             </div>
                             <span class="res-shift-badge">
                                 <?= count($lunchReservations) ?> Buchungen
@@ -1714,6 +1713,8 @@ $formattedDateDe = date('d.m.Y', strtotime($selectedDate));
                         <button type="button" class="name-preset-btn" onclick="setTimePreset('12:00')">12:00</button>
                         <button type="button" class="name-preset-btn" onclick="setTimePreset('12:30')">12:30</button>
                         <button type="button" class="name-preset-btn" onclick="setTimePreset('13:00')">13:00</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('13:30')">13:30</button>
+                        <button type="button" class="name-preset-btn" onclick="setTimePreset('14:00')">14:00</button>
                         <button type="button" class="name-preset-btn" onclick="setTimePreset('17:00')">17:00</button>
                         <button type="button" class="name-preset-btn" onclick="setTimePreset('17:30')">17:30</button>
                         <button type="button" class="name-preset-btn" onclick="setTimePreset('18:00')">18:00</button>

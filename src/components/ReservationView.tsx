@@ -17,7 +17,7 @@ interface ReservationViewProps {
   onClearDate?: () => void;
 }
 
-import { OPENING_HOURS, useIsTavernOpen } from '../utils/openingHours';
+import { getOpeningHoursForDate, useIsTavernOpen } from '../utils/openingHours';
 import { trackReservationSuccess, trackPhoneCallClick } from '../utils/gtag';
 
 
@@ -45,8 +45,7 @@ const getDayOfWeek = (dateStr: string): number => {
  * Generate 30-min time slots for given YYYY-MM-DD string (up to kitchen closing, 1 hour before tavern closing)
  */
 const getTimeSlotsForDate = (dateStr: string): string[] => {
-  const dayOfWeek = getDayOfWeek(dateStr);
-  const config = OPENING_HOURS[dayOfWeek];
+  const config = getOpeningHoursForDate(dateStr);
   if (!config || !config.isOpen || !config.shifts) return [];
 
   const slots: string[] = [];
@@ -74,8 +73,7 @@ const getTimeSlotsForDate = (dateStr: string): string[] => {
 const getNextOpenDate = (startDate: Date = new Date()): string => {
   const d = new Date(startDate);
   for (let i = 0; i < 7; i++) {
-    const dayIndex = d.getDay();
-    if (OPENING_HOURS[dayIndex].isOpen) {
+    if (getOpeningHoursForDate(d)?.isOpen) {
       return formatYYYYMMDD(d);
     }
     d.setDate(d.getDate() + 1);
@@ -672,8 +670,8 @@ export default function ReservationView({ initialNotes, onClearNotes, initialDat
   };
 
   const selectedDayOfWeek = getDayOfWeek(date);
-  const selectedDayConfig = OPENING_HOURS[selectedDayOfWeek];
-  const isTuesdaySelected = selectedDayOfWeek === 2;
+  const selectedDayConfig = getOpeningHoursForDate(date);
+  const isTuesdaySelected = selectedDayOfWeek === 2 && !selectedDayConfig?.isOpen;
   const availableSlots = getTimeSlotsForDate(date);
 
   return (
