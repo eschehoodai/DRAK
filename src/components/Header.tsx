@@ -427,7 +427,7 @@ export default function Header({ currentScreen, onNavigate }: HeaderProps) {
               {/* Anschrift */}
               <div className="flex items-center justify-center space-x-1.5 text-xs text-cream-parchment/60 font-sans pt-0.5">
                 <MapPin className="h-3.5 w-3.5 text-gold-primary/70 shrink-0" />
-                <span>Markt 15, 02763 Zittau</span>
+                <span>Innere Weberstraße 11, 02763 Zittau</span>
               </div>
             </div>
           </aside>
