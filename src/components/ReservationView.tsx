@@ -297,6 +297,7 @@ export default function ReservationView({ initialNotes, onClearNotes, initialDat
   const [lastCreated, setLastCreated] = useState<Reservation | null>(null);
   const [searchedReservation, setSearchedReservation] = useState<Reservation | null>(null);
   const [searchError, setSearchError] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
 
@@ -585,60 +586,87 @@ export default function ReservationView({ initialNotes, onClearNotes, initialDat
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setSearchError('');
     setSearchedReservation(null);
 
-    const term = searchCode.trim().toLowerCase();
+    const rawTerm = searchCode.trim();
+    const term = rawTerm.toLowerCase();
     if (!term) {
-      setSearchError('Bitte tragt eine gültige Reservierungsnummer, Telefonnummer oder E-Mail ein.');
+      setSearchError('Bitte tragt einen gültigen 6-stelligen Reservierungscode oder Eure Telefonnummer ein.');
       return;
     }
 
-    // Normalized alphanumeric query (e.g. "drak-4821" -> "drak4821", "#4821" -> "4821")
     const cleanTerm = term.replace(/[^a-z0-9]/g, '');
+    const cleanDigits = term.replace(/[^0-9]/g, '');
 
-    const target = reservations.find((r) => {
-      const resId = r.id.toLowerCase();
-      const cleanResId = resId.replace(/[^a-z0-9]/g, '');
+    if (cleanTerm.length < 6 && cleanDigits.length < 5) {
+      setSearchError('Bitte gebt den vollständigen 6-stelligen Reservierungscode (z.B. DRAK-482193 oder 482193) oder Eure Telefonnummer ein.');
+      return;
+    }
 
-      // 1. Direct ID match
-      if (resId === term || cleanResId === cleanTerm) return true;
+    setIsSearching(true);
+    try {
+      const res = await fetch(`/get-reservation.php?q=${encodeURIComponent(rawTerm)}`);
+      const contentType = res.headers.get('content-type') || '';
 
-      // 2. Number-only match: e.g. user entered "4821" and ID is "DRAK-4821"
-      if (cleanTerm.length >= 3 && cleanResId.endsWith(cleanTerm)) return true;
-
-      // 3. User entered "DRAK4821" or "DRAK 4821"
-      if (cleanResId.includes(cleanTerm)) return true;
-
-      // 4. Phone match (ignoring spaces, dashes, slashes)
-      if (r.phone) {
-        const cleanPhone = r.phone.replace(/[^0-9]/g, '');
-        const cleanQueryPhone = term.replace(/[^0-9]/g, '');
-        if (cleanQueryPhone.length >= 4 && cleanPhone.includes(cleanQueryPhone)) {
-          return true;
+      if (contentType.includes('application/json')) {
+        const data = await res.json();
+        if (data.success && data.reservation) {
+          setSearchedReservation(data.reservation);
+        } else {
+          setSearchError(
+            data.error ||
+              'Kein Zunftbrief unter diesem Reservierungscode oder dieser Telefonnummer gefunden. Überprüft Eure Inschrift.'
+          );
         }
+        return;
       }
+      // Falls kein JSON zurückkommt (z.B. lokale Vite-Dev-Umgebung ohne PHP), Fallback auf localStorage
+      throw new Error('Kein PHP-Backend erreichbar');
+    } catch {
+      const target = reservations.find((r) => {
+        const resId = r.id.toLowerCase();
+        const cleanResId = resId.replace(/[^a-z0-9]/g, '');
 
-      // 5. Email match
-      if (r.email && r.email.toLowerCase().trim() === term) {
-        return true;
+        // 1. Direkter ID-Treffer (z.B. "DRAK-482193" oder "DRAK482193")
+        if (resId === term || cleanResId === cleanTerm) return true;
+
+        // 2. 6-stelliger Nummern-Code ohne Präfix (z.B. "482193" -> "DRAK-482193")
+        if (cleanDigits.length === 6 && cleanTerm === cleanDigits) {
+          if (cleanResId === `drak${cleanDigits}` || cleanResId.startsWith(`drak${cleanDigits}`)) {
+            return true;
+          }
+        }
+
+        // 3. Telefonnummer-Treffer (ignoriert Leerzeichen, Bindestriche, Schrägstriche)
+        if (r.phone && cleanDigits.length >= 5) {
+          const cleanPhone = r.phone.replace(/[^0-9]/g, '');
+          if (cleanPhone.includes(cleanDigits)) {
+            return true;
+          }
+        }
+
+        return false;
+      });
+
+      if (target) {
+        setSearchedReservation(target);
+      } else {
+        setSearchError('Kein Zunftbrief unter diesem Reservierungscode oder dieser Telefonnummer gefunden. Überprüft Eure Inschrift.');
       }
-
-      return false;
-    });
-
-    if (target) {
-      setSearchedReservation(target);
-    } else {
-      setSearchError('Kein Zunftbrief unter dieser Nummer oder Telefonnummer gefunden. Überprüft Eure Inschrift.');
+    } finally {
+      setIsSearching(false);
     }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('Seid Ihr sicher, dass Ihr Euer Mahl stornieren wollt?')) {
-      const targetRes = reservations.find((r) => r.id === id);
+      const targetRes =
+        reservations.find((r) => r.id === id) ||
+        (searchedReservation?.id === id ? searchedReservation : undefined) ||
+        (lastCreated?.id === id ? lastCreated : undefined);
 
       if (targetRes) {
         try {
@@ -1351,7 +1379,7 @@ export default function ReservationView({ initialNotes, onClearNotes, initialDat
               <input
                 id="search-input"
                 type="text"
-                placeholder="z.B. DRAK-4821, 4821 oder 0170 1234567"
+                placeholder="z.B. DRAK-482193, 482193 oder 0170 1234567"
                 value={searchCode}
                 onChange={(e) => setSearchCode(e.target.value)}
                 className="flex-1 border-0 border-b-2 border-gold-secondary bg-transparent py-2.5 font-serif text-base text-cream-parchment outline-none focus:border-gold-primary tracking-wider"
@@ -1359,9 +1387,10 @@ export default function ReservationView({ initialNotes, onClearNotes, initialDat
               <button
                 id="btn-search"
                 type="submit"
-                className="bg-gold-primary text-void-black px-6 py-2.5 font-cinzel text-xs font-bold uppercase tracking-widest hover:bg-gold-bright transition-colors cursor-pointer"
+                disabled={isSearching}
+                className="bg-gold-primary text-void-black px-6 py-2.5 font-cinzel text-xs font-bold uppercase tracking-widest hover:bg-gold-bright transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Im Folianten Suchen
+                {isSearching ? 'Suche läuft...' : 'Im Folianten Suchen'}
               </button>
             </div>
           </form>
