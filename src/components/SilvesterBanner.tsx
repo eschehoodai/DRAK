@@ -76,12 +76,12 @@ export default function SilvesterBanner({ onReserveSilvester }: SilvesterBannerP
 
               {/* Balanced Headline */}
               <h2 className="font-cinzel text-xl sm:text-2xl lg:text-[1.75rem] font-extrabold tracking-wider text-gold-bright uppercase leading-snug">
-                Silvester mit Gauklerspiel
+                Silvester bei Kerzenschein
               </h2>
 
               {/* Concise Copy */}
               <p className="font-serif text-sm sm:text-base leading-relaxed text-cream-parchment/85">
-                Zum Jahresausklang am 31. Dezember erwartet Euch in der Drachentaverne ein besonderes Erlebnis: Echte Gaukler ziehen mit einer kleinen Vorführung durch das Gewölbe und sorgen für einen unvergesslichen Silvesterabend — nur solange die Plätze reichen.
+                Zum Jahresausklang am 31. Dezember erwartet Euch in der Drachentaverne ein gemütlicher Abend bei Kerzenschein in stimmungsvoller Atmosphäre — nur solange die Plätze reichen.
               </p>
 
               {/* Action Row */}

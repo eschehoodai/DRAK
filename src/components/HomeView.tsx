@@ -113,7 +113,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
         onReserveSilvester={() =>
           onNavigate(
             Screen.RESERVE,
-            'Silvesterabend am 31.12.2026 (Gaukler-Vorführung)',
+            'Silvesterabend am 31.12.2026 (Gemütlicher Abend bei Kerzenschein)',
             '2026-12-31'
           )
         }
